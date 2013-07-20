@@ -7,7 +7,7 @@
 # e-mail:   ocefpaf@gmail
 # web:      http://ocefpaf.tiddlyspot.com/
 # created:  22-Jun-2012
-# modified: Fri 19 Jul 2013 05:46:11 PM BRT
+# modified: Fri 19 Jul 2013 06:24:21 PM BRT
 #
 # obs: New constructors and methods for pandas DataFrame and Series.
 #
@@ -54,8 +54,9 @@ def header(xml):
 
 def basename(fname):
     """Return filename without path.
+
     Examples
-    ========
+    --------
     >>> fname = '../test/data/FSI.txt.zip'
     >>> basename(fname)
     ('../test/data', 'FSI.txt', '.zip')
@@ -130,6 +131,14 @@ def rosette_summary(rosfile):
     perform this averaging eliminating the need to read the data into SBE
     Software again after pre-processing.
     NOTE: Do not run LoopEdit on the upcast!
+
+    Examples
+    --------
+    >>> fname = '../test/data/CTD/g01l01s01.ros'
+    >>> ros = rosette_summary(fname)
+    >>> ros = ros.groupby(ros.index).mean()
+    >>> np.int_(ros.pressure.values)
+    array([835, 806, 705, 604, 503, 404, 303, 201, 151, 100,  51,   1])
     """
     ros = DataFrame.from_cnv(rosfile)
     ros['pressure'] = ros.index.values.astype(float)
@@ -150,6 +159,60 @@ def seabird_filter(data, sample_rate=24.0, time_constant=0.15):
     NOTE: Seabird actually uses a cosine window filter, here we use a kaiser
     window instead.
     NOTE: 911+ systems do not require filter for temperature nor salinity.
+
+    Examples
+    --------
+    >>> from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+    >>> sample_rate, nsamples = 100., 400.
+    >>> t = np.arange(nsamples) / sample_rate
+    >>> x = (np.cos(2 * np.pi * 0.5 * t) +
+    ...      0.2 * np.sin(2 * np.pi * 2.5 * t + 0.1) +
+    ...      0.2 * np.sin(2 * np.pi * 15.3 * t) + 0.1 *
+    ...      np.sin(2 * np.pi * 16.7 * t + 0.1) +
+    ...      0.1 * np.sin(2 * np.pi * 23.45 * t + 0.8))
+    >>> cutoff_hz = 10.0
+    >>> nyq_rate = sample_rate / 2.
+    >>> width = 5.0 / nyq_rate
+    >>> N, beta = signal.kaiserord(60.0, width)
+    >>> taps = signal.firwin(N, cutoff_hz / nyq_rate, window=('kaiser', beta))
+    >>> filtered_x = seabird_filter(x, sample_rate=sample_rate,
+    ...                             time_constant=1 / cutoff_hz)
+    >>> fig, (ax0, ax1, ax3) = plt.subplots(nrows=3)
+    >>> _ = ax0.plot(taps, 'bo-', linewidth=2)
+    >>> _ = ax0.set_title('Filter Coefficients (%d taps)' % N)
+    >>> ax0.grid(True)
+    >>> w, h = signal.freqz(taps, worN=8000)
+    >>> _ = ax1.plot((w / np.pi) * nyq_rate, np.abs(h), linewidth=2)
+    >>> _ = ax1.set_xlabel('Frequency (Hz)')
+    >>> _ = ax1.set_ylabel('Gain')
+    >>> _ = ax1.set_title('Frequency Response')
+    >>> _ = ax1.set_ylim(-0.05, 1.05)
+    >>> ax1.grid(True)
+    >>> # Upper inset plot.
+    >>> axu = inset_axes(ax1, width="20%", height="20%", loc=4)
+    >>> _ = axu.plot((w / np.pi) * nyq_rate, np.abs(h), linewidth=2)
+    >>> _ = axu.set_xlim(0, 8.0)
+    >>> _ = axu.set_ylim(0.9985, 1.001)
+    >>> axu.grid(True)
+    >>> # Lower inset plot.
+    >>> _ = axl = inset_axes(ax1, width="20%", height="20%", loc=5)
+    >>> _ = axl.plot((w / np.pi) * nyq_rate, np.abs(h), linewidth=2)
+    >>> _ = axl.set_xlim(12.0, 20.0)
+    >>> _ = axl.set_ylim(0.0, 0.0025)
+    >>> axl.grid(True)
+    >>> # Plot the original signal.
+    >>> _ = ax3.plot(t, x)
+    >>> # Plot the filtered signal.
+    >>> _ = ax3.plot(t, filtered_x, 'r-')
+    >>> # Plot just the "good" part of the filtered signal.  The first N-1
+    >>> # samples are "corrupted" by the initial conditions.
+    >>> _ = ax3.plot(t, filtered_x, 'g', linewidth=4)
+    >>> _ = ax3.set_xlabel('t')
+    >>> _ = ax3.grid(True)
+
+    NOTES
+    -----
+    http://wiki.scipy.org/Cookbook/FIRFilter
     """
 
     nyq_rate = sample_rate / 2.0
@@ -182,6 +245,10 @@ def pmel_inversion_check():
     """
 
     # TODO
+    pass
+
+
+def align(conductivity):
     pass
 
 
@@ -626,6 +693,14 @@ def from_fsi(cls, fname, compression=None, skiprows=9):
     """
     DataFrame constructor to open Falmouth Scientific, Inc. (FSI) CTD
     ASCII format.
+
+    Examples
+    --------
+    >>> cast = DataFrame.from_fsi('../test/data/FSI.txt.zip',
+    ...                           compression='zip')
+    >>> downcast, upcast = cast.split()
+    >>> fig, ax = downcast['TEMP'].plot()
+    >>> ax.grid(True)
     """
     f = read_file(fname, compression=compression)
     cast = read_table(f, header='infer', index_col=None, dtype=float,
@@ -641,6 +716,14 @@ def from_fsi(cls, fname, compression=None, skiprows=9):
 def from_edf(cls, fname, compression=None):
     """
     DataFrame constructor to open XBT EDF ASCII format.
+
+    Examples
+    --------
+    >>> cast = DataFrame.from_edf('../test/data/XBT.EDF.gz',
+    ...                           compression='gzip')
+    >>> fig, ax = cast['temperature'].plot()
+    >>> ax.axis([20, 24, 19, 0])
+    >>> ax.grid(True)
     """
     f = read_file(fname, compression=compression)
     header, names = [], []
@@ -696,9 +779,17 @@ def from_edf(cls, fname, compression=None):
 
 
 @classmethod
-def from_cnv(cls, fname, compression=None, blfile=None):
+def from_cnv(cls, fname, compression=None):
     """
     DataFrame constructor to open Seabird CTD CNV-ASCII format.
+
+    Examples
+    --------
+    >>> cast = DataFrame.from_cnv('../test/data/CTD_big.cnv.bz2',
+    ...                           compression='bz2')
+    >>> downcast, upcast = cast.split()
+    >>> fig, ax = downcast['t090c'].plot()
+    >>> ax.grid(True)
     """
 
     f = read_file(fname, compression=compression)

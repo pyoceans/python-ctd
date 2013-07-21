@@ -3,14 +3,14 @@ python-ctd
 
 Tools to load hydrographic data into pandas DataFrame.
 
-This module can load `SeaBird CTD`_ (CNV), `Sippican XBT`_ (EDF), and
-`Falmouth CTD`_ (ASCII) formats.
+This module can load [SeaBird CTD (CNV)][SBE], [Sippican XBT (EDF)][XBT],
+and [Falmouth CTD (ASCII)][FSI] formats.
 
-.. _`Sea Bird`: http://www.seabird.com/software/SBEDataProcforWindows.htm
+[SBE]: http://www.seabird.com/software/SBEDataProcforWindows.htm
 
-.. _`Sippican XBT`: http://www.sippican.com/
+[XBT]: http://www.sippican.com/
 
-.. _`Falmouth CTD`: http://www.falmouth.com/
+[FSI]: http://www.falmouth.com/
 
 Quick intro
 -----------

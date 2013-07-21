@@ -44,7 +44,9 @@ __all__ = ['rosette_summary',
            'gen_topomask',
            'from_fsi',
            'from_edf',
-           'from_cnv']
+           'from_cnv',
+           'Series',
+           'DataFrame']
 
 
 # Utilities.

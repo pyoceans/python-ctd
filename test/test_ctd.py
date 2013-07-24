@@ -16,12 +16,9 @@ import bz2
 import gzip
 import unittest
 import cStringIO
-import matplotlib.pyplot as plt
-plt.switch_backend('Agg')
-from numpy.testing import assert_array_equal
 
-from ctd import DataFrame
 from ctd.ctd import read_file
+from ctd import DataFrame, rosette_summary
 
 
 class ReadCompressedFile(unittest.TestCase):
@@ -56,6 +53,7 @@ class DataFrameTests(unittest.TestCase):
                                       compression='gzip', skiprows=9)
         self.cnv = DataFrame.from_cnv(fname='data/CTD_big.cnv.bz2',
                                       compression='bz2')
+        self.ros = rosette_summary(fname='data/CTD/g01l03s01m-m2.ros')
 
     def tearDown(self):
         unittest.TestCase.tearDown(self)
@@ -79,17 +77,6 @@ class DataFrameTests(unittest.TestCase):
 
     def test_cnv_is_not_empty(self):
         self.assertFalse(self.cnv.empty)
-
-    """Test Basic plotting."""
-    def test_savefig(self):
-        fig, ax = self.cnv['t090c'].plot()
-        imgdata = cStringIO.StringIO()
-        fig.savefig(imgdata, format='png')
-        plt.close()
-        imgdata.seek(0)
-        im1 = plt.imread(imgdata)
-        im2 = plt.imread('data/CTD_big.cnv.png')
-        assert_array_equal(im1, im2, err_msg='Image arrays differ.')
 
 
 def main():

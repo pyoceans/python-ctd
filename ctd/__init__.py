@@ -24,9 +24,9 @@ Series.bindata = bindata
 Series.press_check = press_check
 
 DataFrame.split = split
-DataFrame.from_cnv = from_cnv
-DataFrame.from_edf = from_edf
-DataFrame.from_fsi = from_fsi
+DataFrame.from_cnv = staticmethod(from_cnv)
+DataFrame.from_edf = staticmethod(from_edf)
+DataFrame.from_fsi = staticmethod(from_fsi)
 DataFrame.plot_vars = plot_vars
 DataFrame.press_check = press_check
 DataFrame.get_maxdepth = get_maxdepth

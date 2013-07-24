@@ -37,8 +37,7 @@ def asof(self, label):
     return label
 
 
-@classmethod
-def from_edf(cls, fname, compression=None):
+def from_edf(fname, compression=None):
     """
     DataFrame constructor to open XBT EDF ASCII format.
 
@@ -104,8 +103,7 @@ def from_edf(cls, fname, compression=None):
     return cast
 
 
-@classmethod
-def from_cnv(cls, fname, compression=None):
+def from_cnv(fname, compression=None):
     """
     DataFrame constructor to open Seabird CTD CNV-ASCII format.
 
@@ -176,8 +174,7 @@ def from_cnv(cls, fname, compression=None):
     return cast
 
 
-@classmethod
-def from_fsi(cls, fname, compression=None, skiprows=9):
+def from_fsi(fname, compression=None, skiprows=9):
     """
     DataFrame constructor to open Falmouth Scientific, Inc. (FSI) CTD
     ASCII format.
@@ -201,7 +198,7 @@ def from_fsi(cls, fname, compression=None, skiprows=9):
     return cast
 
 
-def rosette_summary(rosfile):
+def rosette_summary(fname):
     """
     Make a BTL (bottle) file from a ROS (bottle log) file.
 
@@ -218,9 +215,9 @@ def rosette_summary(rosfile):
     >>> np.int_(ros.pressure.values)
     array([835, 806, 705, 604, 503, 404, 303, 201, 151, 100,  51,   1])
     """
-    ros = from_cnv(rosfile)
+    ros = from_cnv(fname)
     ros['pressure'] = ros.index.values.astype(float)
-    ros['nbf'] = ros['nbf'].astype(int)  # Make bottle number as string.
+    ros['nbf'] = ros['nbf'].astype(int)
     ros.set_index('nbf', drop=True, inplace=True, verify_integrity=False)
     return ros
 

@@ -7,7 +7,7 @@
 # e-mail:   ocefpaf@gmail
 # web:      http://ocefpaf.tiddlyspot.com/
 # created:  23-Jul-2013
-# modified: Tue 23 Jul 2013 01:07:59 PM BRT
+# modified: Wed 24 Jul 2013 08:17:22 PM BRT
 #
 # obs:
 #
@@ -16,17 +16,16 @@
 import gsw
 import numpy as np
 import numpy.ma as ma
-import matplotlib.pyplot as plt
 
 from scipy import signal
 from pandas import Series, Index
 
 from utilities import rolling_window
 
-__all__ = ['data_conversion',
+__all__ = ['data_conversion',  # TODO: Add as a constructor.
            'align',
            'despike',
-           'seabird_filter',
+           'lp_filter',
            'cell_thermal_mass',
            'press_check',  # TODO: Loop edit + velocity_check
            'bindata',
@@ -54,7 +53,7 @@ def despike(self, n1=2, n2=20, block=100, keep=0):
     `n1` and `n2` with window size `block`.
     """
 
-    data = self.values.copy()
+    data = self.values.astype(float).copy()
     roll = rolling_window(data, block)
     roll = ma.masked_invalid(roll)
     std = n1 * roll.std(axis=1)
@@ -75,13 +74,15 @@ def despike(self, n1=2, n2=20, block=100, keep=0):
     # Use the last value to fill-up.
     std = np.r_[std, np.tile(std[-1], block - 1)]
     mean = np.r_[mean, np.tile(mean[-1], block - 1)]
-    mask = (np.abs(self.values - mean.filled(fill_value=np.NaN)) >
-            std.filled(fill_value=np.NaN))
-    self[mask] = np.NaN
-    return self
+    mask = (np.abs(self.values.astype(float) - mean.filled(fill_value=np.NaN))
+            > std.filled(fill_value=np.NaN))
+
+    clean = self.astype(float).copy()
+    clean[mask] = np.NaN
+    return clean
 
 
-def seabird_filter(data, sample_rate=24.0, time_constant=0.15):
+def lp_filter(data, sample_rate=24.0, time_constant=0.15):
     """
     Filter a series with `time_constant` (use 0.15 s for pressure), and for
     a signal of `sample_rate` in Hertz (24 Hz for 911+).
@@ -91,67 +92,44 @@ def seabird_filter(data, sample_rate=24.0, time_constant=0.15):
 
     Examples
     --------
-    >>> from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-    >>> sample_rate, nsamples = 100., 400.
-    >>> t = np.arange(nsamples) / sample_rate
-    >>> x = (np.cos(2 * np.pi * 0.5 * t) +
-    ...      0.2 * np.sin(2 * np.pi * 2.5 * t + 0.1) +
-    ...      0.2 * np.sin(2 * np.pi * 15.3 * t) + 0.1 *
-    ...      np.sin(2 * np.pi * 16.7 * t + 0.1) +
-    ...      0.1 * np.sin(2 * np.pi * 23.45 * t + 0.8))
-    >>> cutoff_hz = 10.0
-    >>> nyq_rate = sample_rate / 2.
-    >>> width = 5.0 / nyq_rate
-    >>> N, beta = signal.kaiserord(60.0, width)
-    >>> taps = signal.firwin(N, cutoff_hz / nyq_rate, window=('kaiser', beta))
-    >>> filtered_x = seabird_filter(x, sample_rate=sample_rate,
-    ...                             time_constant=1 / cutoff_hz)
-    >>> fig, (ax0, ax1, ax3) = plt.subplots(nrows=3)
-    >>> _ = ax0.plot(taps, 'bo-', linewidth=2)
-    >>> _ = ax0.set_title('Filter Coefficients (%d taps)' % N)
-    >>> ax0.grid(True)
-    >>> w, h = signal.freqz(taps, worN=8000)
-    >>> _ = ax1.plot((w / np.pi) * nyq_rate, np.abs(h), linewidth=2)
-    >>> _ = ax1.set_xlabel('Frequency (Hz)')
-    >>> _ = ax1.set_ylabel('Gain')
-    >>> _ = ax1.set_title('Frequency Response')
-    >>> _ = ax1.set_ylim(-0.05, 1.05)
-    >>> ax1.grid(True)
-    >>> # Upper inset plot.
-    >>> axu = inset_axes(ax1, width="20%", height="20%", loc=4)
-    >>> _ = axu.plot((w / np.pi) * nyq_rate, np.abs(h), linewidth=2)
-    >>> _ = axu.set_xlim(0, 8.0)
-    >>> _ = axu.set_ylim(0.9985, 1.001)
-    >>> axu.grid(True)
-    >>> # Lower inset plot.
-    >>> _ = axl = inset_axes(ax1, width="20%", height="20%", loc=5)
-    >>> _ = axl.plot((w / np.pi) * nyq_rate, np.abs(h), linewidth=2)
-    >>> _ = axl.set_xlim(12.0, 20.0)
-    >>> _ = axl.set_ylim(0.0, 0.0025)
-    >>> axl.grid(True)
-    >>> # Plot the original signal.
-    >>> _ = ax3.plot(t, x)
-    >>> # Plot the filtered signal.
-    >>> _ = ax3.plot(t, filtered_x, 'r-')
-    >>> # Plot just the "good" part of the filtered signal.  The first N-1
-    >>> # samples are "corrupted" by the initial conditions.
-    >>> _ = ax3.plot(t, filtered_x, 'g', linewidth=4)
-    >>> _ = ax3.set_xlabel('t')
-    >>> _ = ax3.grid(True)
+    >>> import matplotlib.pyplot as plt
+    >>> from ctd import DataFrame, lp_filter
+    >>> raw = DataFrame.from_cnv('../test/data/CTD-spiked-unfiltered.cnv.bz2',
+    ...                          compression='bz2')
+    >>> prc = DataFrame.from_cnv('../test/data/CTD-spiked-filtered.cnv.bz2',
+    ...                          compression='bz2')
+    >>> kw = dict(sample_rate=24.0, time_constant=0.15)
+    >>> original = prc.index.values
+    >>> unfiltered = raw.index.values
+    >>> filtered = lp_filter(unfiltered, **kw)
+    >>> fig, ax = plt.subplots()
+    >>> ax.plot(original, 'k', label='original')
+    >>> ax.plot(unfiltered, 'r', label='unfiltered')
+    >>> ax.plot(filtered, 'g', label='filtered')
+    >>> ax.legend()
+    >>> ax.axis([33564, 33648, 1034, 1035])
+    >>> plt.show()
 
     NOTES
     -----
     http://wiki.scipy.org/Cookbook/FIRFilter
     """
 
-    nyq_rate = sample_rate / 2.0
-    width = 5.0 / nyq_rate  # 5 Hz transition rate.
-    ripple_db = 60.0  # Attenuation at the stop band.
-    N, beta = signal.kaiserord(ripple_db, width)
+    # Butter is closer to what SBE is doing with their cosine filter.
+    if True:
+        Wn = (1. / time_constant) / (sample_rate * 2.)
+        b, a = signal.butter(2, Wn, 'low')
+        data = signal.filtfilt(b, a, data)
 
-    cutoff_hz = (1. / time_constant)  # Cutoff frequency at 0.15 s.
-    taps = signal.firwin(N, cutoff_hz / nyq_rate, window=('kaiser', beta))
-    data = signal.filtfilt(taps, [1.0], data)
+    if False:  # Kaiser.
+        nyq_rate = sample_rate / 2.0
+        width = 5.0 / nyq_rate  # 5 Hz transition rate.
+        ripple_db = 60.0  # Attenuation at the stop band.
+        N, beta = signal.kaiserord(ripple_db, width)
+
+        cutoff_hz = (1. / time_constant)  # Cutoff frequency at 0.15 s.
+        taps = signal.firwin(N, cutoff_hz / nyq_rate, window=('kaiser', beta))
+        data = signal.filtfilt(taps, [1.0], data)
     return data
 
 
@@ -177,7 +155,7 @@ def cell_thermal_mass(temperature, conductivity):
 
 def press_check(self, column='index'):
     """
-    Remove pressure reversal.
+    Remove pressure reversals.
     """
     data = self.copy()
     if column is not 'index':

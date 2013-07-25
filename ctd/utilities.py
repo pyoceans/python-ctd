@@ -7,7 +7,7 @@
 # e-mail:   ocefpaf@gmail
 # web:      http://ocefpaf.tiddlyspot.com/
 # created:  23-Jul-2013
-# modified: Tue 23 Jul 2013 01:20:42 PM BRT
+# modified: Thu 25 Jul 2013 01:13:03 PM BRT
 #
 # obs:
 #
@@ -84,7 +84,6 @@ def movingaverage(series, window_size=48):
 
 def normalize_names(name):
     name = name.strip()
-    name = name.lower()
     name = name.strip('*')
     return name
 

@@ -37,7 +37,11 @@ def asof(self, label):
     return label
 
 
-def from_edf(fname, compression=None):
+def remove_above_water(cast):
+    return cast[cast.index >= 0]
+
+
+def from_edf(fname, compression=None, below_water=False):
     """
     DataFrame constructor to open XBT EDF ASCII format.
 
@@ -86,9 +90,8 @@ def from_edf(fname, compression=None):
             break
 
     f.seek(0)
-    cast = read_table(f, header=None, index_col=None, names=names,
-                      skiprows=skiprows, dtype=np.float_,
-                      delim_whitespace=True)
+    cast = read_table(f, header=None, index_col=None, names=names, dtype=float,
+                      skiprows=skiprows, delim_whitespace=True)
     f.close()
 
     cast.set_index('depth', drop=True, inplace=True)
@@ -99,11 +102,12 @@ def from_edf(fname, compression=None):
     cast.serial = serial
     cast.header = header
     cast.name = basename(fname)[1]
-
+    if below_water:
+        cast = remove_above_water(cast)
     return cast
 
 
-def from_cnv(fname, compression=None):
+def from_cnv(fname, compression=None, below_water=False):
     """
     DataFrame constructor to open Seabird CTD CNV-ASCII format.
 
@@ -155,11 +159,10 @@ def from_cnv(fname, compression=None):
 
     f.seek(0)
     cast = read_table(f, header=None, index_col=None, names=names,
-                      skiprows=skiprows, dtype=np.float_,
-                      delim_whitespace=True)
+                      skiprows=skiprows, delim_whitespace=True)
     f.close()
 
-    cast.set_index('prdm', drop=True, inplace=True)
+    cast.set_index('prDM', drop=True, inplace=True)
     cast.index.name = 'Pressure [dbar]'
 
     cast.lon = lon
@@ -167,14 +170,22 @@ def from_cnv(fname, compression=None):
     cast.header = header
     cast.config = config
     cast.name = basename(fname)[0]
-    if 'pumps' in cast.columns:
-        cast['pumps'] = np.bool_(cast['pumps'])
-    if 'flag' in cast.columns:
-        cast['flag'] = np.bool_(cast['flag'])
+
+    dtypes = dict(bpos=int, pumps=bool, flag=bool)
+    for column in cast.columns:
+        if column in dtypes:
+            cast[column] = cast[column].astype(dtypes[column])
+        else:
+            try:
+                cast[column] = np.float_(cast[column].astype(float))
+            except ValueError:
+                print('Could not convert %s to float.' % column)
+    if below_water:
+        cast = remove_above_water(cast)
     return cast
 
 
-def from_fsi(fname, compression=None, skiprows=9):
+def from_fsi(fname, compression=None, skiprows=9, below_water=False):
     """
     DataFrame constructor to open Falmouth Scientific, Inc. (FSI) CTD
     ASCII format.
@@ -189,12 +200,14 @@ def from_fsi(fname, compression=None, skiprows=9):
     >>> ax.grid(True)
     """
     f = read_file(fname, compression=compression)
-    cast = read_table(f, header='infer', index_col=None, dtype=float,
-                      skiprows=skiprows, delim_whitespace=True)
+    cast = read_table(f, header='infer', index_col=None, skiprows=skiprows,
+                      dtype=float, delim_whitespace=True)
 
     cast.set_index('PRES', drop=True, inplace=True)
     cast.index.name = 'Pressure [dbar]'
     cast.name = basename(fname)[0]
+    if below_water:
+        cast = remove_above_water(cast)
     return cast
 
 

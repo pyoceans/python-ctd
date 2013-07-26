@@ -7,8 +7,9 @@ from pandas import Index, Series, DataFrame
 from ctd import asof, from_edf, from_cnv, from_fsi, rosette_summary
 from processing import (data_conversion, align, despike, lp_filter,
                         cell_thermal_mass, press_check, bindata, split,
-                        pmel_inversion_check, smooth, mixed_layer_depth,
-                        barrier_layer_thickness)
+                        movingaverage, pmel_inversion_check, smooth,
+                        mixed_layer_depth, barrier_layer_thickness,
+                        derive_cnv)
 from plotting import (get_maxdepth, extrap_sec, gen_topomask, plot, plot_vars,
                       plot_section)
 

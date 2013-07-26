@@ -35,7 +35,7 @@ __all__ = ['get_maxdepth',
 
 def get_maxdepth(self):
     valid_last_depth = self.apply(Series.notnull).values.T
-    return np.float_(self.index * valid_last_depth).max(axis=1)
+    return np.float_(self.index.values * valid_last_depth).max(axis=1)
 
 
 def extrap_sec(data, dist, depth, w1=1., w2=0):
@@ -214,23 +214,30 @@ def plot_vars(self, variables=None, **kwds):
     return fig, (ax0, ax1)
 
 
-def plot_section(self, inverse=False, filled=False, **kw):
-    if inverse:
-        lon = self.lon[::-1].copy()
-        lat = self.lat[::-1].copy()
-        data = self.T[::-1].T.copy()
-    else:
-        lon = self.lon.copy()
-        lat = self.lat.copy()
-        data = self.copy()
+def plot_section(self, reverse=False, filled=False, **kw):
+    lon, lat, data = map(np.asanyarray, (self.lon, self.lat, self.values))
+    data = ma.masked_invalid(data)
+    h = self.get_maxdepth()
+    if reverse:
+        lon = lon[::-1]
+        lat = lat[::-1]
+        data = data.T[::-1].T
+        h = h[::-1]
+    x = np.append(0, np.cumsum(gsw.distance(lon, lat)[0] / 1e3))
+    z = self.index.values.astype(float)
+
+    if filled:  # FIXME: Cause discontinuities.
+        data = data.filled(fill_value=np.nan)
+        data = extrap_sec(data, x, z, w1=0.97, w2=0.03)
+
     # Contour key words.
     fmt = kw.pop('fmt', '%1.0f')
     extend = kw.pop('extend', 'both')
     fontsize = kw.pop('fontsize', 12)
     labelsize = kw.pop('labelsize', 11)
     cmap = kw.pop('cmap', plt.cm.rainbow)
-    levels = kw.pop('levels', np.arange(np.floor(data.min().min()),
-                    np.ceil(data.max().max()) + 0.5, 0.5))
+    levels = kw.pop('levels', np.arange(np.floor(data.min()),
+                    np.ceil(data.max()) + 0.5, 0.5))
 
     # Colorbar key words.
     pad = kw.pop('pad', 0.04)
@@ -247,20 +254,9 @@ def plot_section(self, inverse=False, filled=False, **kw):
     offset = kw.pop('offset', -5)
     linewidth = kw.pop('linewidth', 1.5)
 
-    # Get data for plotting.
-    x = np.append(0, np.cumsum(gsw.distance(lon, lat)[0] / 1e3))
-    z = np.float_(data.index.values)
-    h = data.get_maxdepth()
-    data = ma.masked_invalid(data.values)
-    if filled:
-        # FIXME: Cause discontinuities.
-        data = data.filled(fill_value=np.nan)
-        data = extrap_sec(data, x, z, w1=0.97, w2=0.03)
-
-    xm, hm = gen_topomask(h, lon, lat, dx=dx, kind=kind)
-
     # Figure.
     fig, ax = plt.subplots()
+    xm, hm = gen_topomask(h, lon, lat, dx=dx, kind=kind)
     ax.plot(xm, hm, color='black', linewidth=linewidth, zorder=3)
     ax.fill_between(xm, hm, y2=hm.max(), color='0.9', zorder=3)
 

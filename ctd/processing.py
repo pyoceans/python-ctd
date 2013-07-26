@@ -19,7 +19,6 @@ import numpy.ma as ma
 
 from scipy import signal
 from pandas import Series, Index
-
 from utilities import rolling_window
 
 __all__ = ['data_conversion',  # TODO: Add as a constructor.
@@ -33,7 +32,8 @@ __all__ = ['data_conversion',  # TODO: Add as a constructor.
            'pmel_inversion_check',
            'smooth',
            'mixed_layer_depth',
-           'barrier_layer_thickness']
+           'barrier_layer_thickness',
+           'derive_cnv']
 
 
 # Pre-processing.
@@ -209,6 +209,11 @@ def split(self):
     return down, up
 
 
+def movingaverage(series, window_size=48):
+    window = np.ones(int(window_size)) / float(window_size)
+    return Series(np.convolve(series, window, 'same'), index=series.index)
+
+
 # Pos-processing.
 def pmel_inversion_check():
     """
@@ -283,6 +288,18 @@ def barrier_layer_thickness(SA, CT):
     mask = d_sig < d_sig_t  # Barrier layer.
     return Series(mask, index=SA.index, name='BLT')
 
+
+def derive_cnv(self):
+    """Compute SP, SA, CT, z, and GP from a cnv pre-processed cast."""
+    cast = self.copy()  # FIXME: Use MetaDataFrame to propagate lon, lat.
+    p = cast.index.values.astype(float)
+    cast['SP'] = gsw.SP_from_C(cast['c0S/m'] * 10., cast['t090C'], p)
+    cast['SA'] = gsw.SA_from_SP(cast['SP'], p, self.lon, self.lat)
+    cast['SR'] = gsw.SR_from_SP(cast['SP'])
+    cast['CT'] = gsw.CT_from_t(cast['SA'], cast['t090C'], p)
+    cast['z'] = -gsw.z_from_p(p, self.lat)
+    cast['sigma0_CT'] = gsw.sigma0_CT_exact(cast['SA'], cast['CT'])
+    return cast
 
 if __name__ == '__main__':
     import doctest

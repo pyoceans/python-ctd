@@ -22,7 +22,6 @@ from xml.etree import cElementTree as etree
 
 # Scientific stack.
 import numpy as np
-from pandas import Series
 
 
 # Utilities.
@@ -75,11 +74,6 @@ def extrap1d(interpolator):
         return np.array(map(pointwise, np.array(xs)))
 
     return ufunclike
-
-
-def movingaverage(series, window_size=48):
-    window = np.ones(int(window_size)) / float(window_size)
-    return Series(np.convolve(series, window, 'same'), index=series.index)
 
 
 def normalize_names(name):

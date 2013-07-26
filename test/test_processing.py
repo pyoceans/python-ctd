@@ -29,8 +29,13 @@ class BasicProcessingTests(unittest.TestCase):
         unittest.TestCase.tearDown(self)
 
     # Split.
-    def test_split_cnv(self):
+    def test_split_return_tuple(self):
         self.assertIsInstance(self.raw.split(), tuple)
+
+    def test_split_cnv(self):
+        downcast, upcast = self.raw.split()
+        self.assertTrue(downcast.index.size + upcast.index.size ==
+                        self.raw.index.size)
 
     # Despike.
     def test_despike(self):

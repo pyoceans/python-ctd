@@ -12,6 +12,8 @@
 # obs: New constructors and methods for pandas DataFrame and Series.
 #
 
+# Standard library.
+import warnings
 
 # Scientific stack.
 import numpy as np
@@ -179,9 +181,9 @@ def from_cnv(fname, compression=None, below_water=False, lon=None,
             cast[column] = cast[column].astype(dtypes[column])
         else:
             try:
-                cast[column] = np.float_(cast[column].astype(float))
+                cast[column] = cast[column].astype(float)
             except ValueError:
-                print('Could not convert %s to float.' % column)
+                warnings.warn('Could not convert %s to float.' % column)
     if below_water:
         cast = remove_above_water(cast)
     return cast

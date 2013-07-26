@@ -41,7 +41,8 @@ def remove_above_water(cast):
     return cast[cast.index >= 0]
 
 
-def from_edf(fname, compression=None, below_water=False):
+def from_edf(fname, compression=None, below_water=False, lon=None,
+             lat=None):
     """
     DataFrame constructor to open XBT EDF ASCII format.
 
@@ -107,7 +108,8 @@ def from_edf(fname, compression=None, below_water=False):
     return cast
 
 
-def from_cnv(fname, compression=None, below_water=False):
+def from_cnv(fname, compression=None, below_water=False, lon=None,
+             lat=None):
     """
     DataFrame constructor to open Seabird CTD CNV-ASCII format.
 
@@ -185,7 +187,8 @@ def from_cnv(fname, compression=None, below_water=False):
     return cast
 
 
-def from_fsi(fname, compression=None, skiprows=9, below_water=False):
+def from_fsi(fname, compression=None, skiprows=9, below_water=False,
+             lon=None, lat=None):
     """
     DataFrame constructor to open Falmouth Scientific, Inc. (FSI) CTD
     ASCII format.

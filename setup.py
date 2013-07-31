@@ -22,7 +22,7 @@ Topic :: Education
 Topic :: Software Development :: Libraries :: Python Modules
 """
 
-README = open('README.txt').read()
+README = open('README.md').read()
 CHANGES = open('CHANGES.txt').read()
 LICENSE = open('LICENSE.txt').read()
 

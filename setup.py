@@ -9,7 +9,7 @@ source = 'http://pypi.python.org/packages/source'
 install_requires = ['numpy', 'scipy', 'matplotlib', 'pandas', 'gsw']
 
 classifiers = """\
-Development Status :: 2 - Pre-Alpha
+Development Status :: 5 - Production/Stable
 Environment :: Console
 Intended Audience :: Science/Research
 Intended Audience :: Developers

@@ -1,10 +1,9 @@
 python-ctd
 ==========
 
-.. image:: https://badge.fury.io/py/ctd.png
-    :target: http://badge.fury.io/py/ctd
+[![Build](https://badge.fury.io/py/ctd.png)](http://badge.fury.io/py/ctd)
 
-[![Downloads](https://api.travis-ci.org/ocefpaf/python-ctd.png?branch=master)](https://travis-ci.org/ocefpaf/python-ctd)
+[![Build](https://api.travis-ci.org/ocefpaf/python-ctd.png?branch=master)](https://travis-ci.org/ocefpaf/python-ctd)
 
 [![Downloads](https://pypip.in/d/ctd/badge.png)](https://crate.io/packages/ctd/)
 

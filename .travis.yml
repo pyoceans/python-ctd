@@ -14,7 +14,9 @@ install:
     - pip install gsw
     - pip install pandas
     - pip install matplotlib
-script: python tests/test_ctd.py
+script:
+    - cd tests
+    - nosetests --verbose --nocapture
 branches:
   only:
     - master

@@ -7,7 +7,7 @@
 # e-mail:   ocefpaf@gmail
 # web:      http://ocefpaf.tiddlyspot.com/
 # created:  01-Mar-2013
-# modified: Sat 20 Jul 2013 05:02:14 PM BRT
+# modified: Mon 12 Aug 2013 08:39:36 PM BRT
 #
 # obs: TODO: to_nc test.
 #
@@ -23,7 +23,7 @@ from glob import glob
 from collections import OrderedDict
 
 from pandas import Panel
-from ctd.ctd import read_file
+from ctd import read_file
 from ctd import (DataFrame, Series, rosette_summary, lp_filter, movingaverage,
                  derive_cnv, plot_section)
 

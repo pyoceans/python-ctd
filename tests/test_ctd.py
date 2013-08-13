@@ -23,7 +23,7 @@ from glob import glob
 from collections import OrderedDict
 
 from pandas import Panel
-from ctd import read_file
+from ctd.utilities import read_file
 from ctd import (DataFrame, Series, rosette_summary, lp_filter, movingaverage,
                  derive_cnv, plot_section)
 

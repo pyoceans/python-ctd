@@ -7,7 +7,7 @@
 # e-mail:   ocefpaf@gmail
 # web:      http://ocefpaf.tiddlyspot.com/
 # created:  01-Mar-2013
-# modified: Fri 19 Jul 2013 01:48:30 PM BRT
+# modified: Sat 17 Aug 2013 04:49:58 PM BRT
 #
 # obs:
 #
@@ -15,35 +15,26 @@
 import os
 import re
 import unittest
-import cStringIO
 from glob import glob
 from collections import OrderedDict
 
 from pandas import Panel
 import matplotlib.pyplot as plt
-from numpy.testing import assert_array_equal
 
 from ctd import (DataFrame, Series, movingaverage, lp_filter, derive_cnv,
                  plot_section)
 
 plt.switch_backend('Agg')
+from matplotlib.testing.decorators import image_comparison
+
+path = os.path.join(os.path.dirname(__file__), 'plot_results')
+data_path = os.path.join(os.path.dirname(__file__), 'data')
 
 
 def alphanum_key(s):
     key = re.split(r"(\d+)", s)
     key[1::2] = map(int, key[1::2])
     return key
-
-
-def compare_images(fig, figname):
-    imgdata = cStringIO.StringIO()
-    fig.set_figwidth(6)
-    fig.set_figheight(6)
-    fig.savefig(imgdata, dpi=75, format='png')
-    imgdata.seek(0)
-    im1 = plt.imread(imgdata)
-    im2 = plt.imread(figname)
-    assert_array_equal(im1, im2, err_msg='Image arrays differ.')
 
 
 def proc_ctd(fname, compression='gzip', below_water=True):
@@ -124,17 +115,17 @@ class BasicPlotting(unittest.TestCase):
     def tearDown(self):
         unittest.TestCase.tearDown(self)
 
+    @image_comparison(baseline_images=['%s/test_xbt_plot.png' % path])
     def test_xbt_plot(self):
         fig, ax = self.xbt['temperature'].plot()
-        compare_images(fig, figname='data/test_xbt_plot.png')
 
+    @image_comparison(baseline_images=['%s/test_cnv_temperature.png' % path])
     def test_cnv_temperature(self):
         fig, ax = self.cnv['t090C'].plot()
-        compare_images(fig, figname='data/test_cnv_temperature.png')
 
+    @image_comparison(baseline_images=['%s/test_fsi_plot_vars.png' % path])
     def test_fsi_plot_vars(self):
         fig, ax = self.fsi.plot_vars(['TEMP', 'SAL*'])
-        compare_images(fig, figname='data/test_fsi_plot_vars.png')
 
 
 class AdvancedPlotting(unittest.TestCase):
@@ -143,7 +134,7 @@ class AdvancedPlotting(unittest.TestCase):
 
     def setUp(self):
         lon, lat = [], []
-        pattern = './data/CTD/g01mcan*c.cnv.gz'
+        pattern = '%s/CTD/g01mcan*c.cnv.gz' % data_path
         fnames = sorted(glob(pattern), key=alphanum_key)
         section = OrderedDict()
         for fname in fnames:
@@ -158,22 +149,22 @@ class AdvancedPlotting(unittest.TestCase):
         self.CT = self.section.minor_xs('CT')
         self.CT.lon, self.CT.lat = lon, lat
 
+    @image_comparison(baseline_images=['%s/test_section_reverse.png' % path])
     def test_section_reverse(self):
         fig, ax, cb = plot_section(self.CT, reverse=True)
-        compare_images(fig, figname='data/test_section_reverse.png')
 
+    @image_comparison(baseline_images=['%s/test_section_reverse_filled.png' %
+                                       path])
     def test_section_reverse_filled(self):
         fig, ax, cb = plot_section(self.CT, reverse=True, filled=True)
-        compare_images(fig,
-                       figname='data/test_section_reverse_filled.png')
 
+    @image_comparison(baseline_images=['%s/test_section.png' % path])
     def test_section(self):
         fig, ax, cb = plot_section(self.CT)
-        compare_images(fig, figname='data/test_section.png')
 
+    @image_comparison(baseline_images=['%s/test_section_filled.png' % path])
     def test_section_filled(self):
         fig, ax, cb = plot_section(self.CT, filled=True)
-        compare_images(fig, figname='data/test_section_filled.png')
 
 
 def main():

@@ -7,13 +7,14 @@
 # e-mail:   ocefpaf@gmail
 # web:      http://ocefpaf.tiddlyspot.com/
 # created:  01-Mar-2013
-# modified: Sat 17 Aug 2013 04:49:58 PM BRT
+# modified: Sun 18 Aug 2013 08:13:00 PM BRT
 #
 # obs:
 #
 
 import os
 import re
+import nose
 import unittest
 import numpy as np
 from glob import glob
@@ -23,15 +24,13 @@ from pandas.util.testing import ensure_clean
 from pandas import Panel
 import matplotlib.pyplot as plt
 
-from ctd import (DataFrame, Series, movingaverage, lp_filter, derive_cnv,
-                 plot_section)
+from ctd import DataFrame, Series, movingaverage, lp_filter, derive_cnv
 
 
 data_path = os.path.join(os.path.dirname(__file__), 'data')
 
 
 def assert_is_valid_plot_return_object(objs):
-    import matplotlib.pyplot as plt
     if isinstance(objs, np.ndarray):
         for el in objs.flat:
             assert isinstance(el, plt.Axes), ('one of \'objs\' is not a '
@@ -156,7 +155,10 @@ def proc_ctd(fname, compression='gzip', below_water=True):
     # 08-Derive.
     cast.lat = cast['latitude'].mean()
     cast.lon = cast['longitude'].mean()
-    cast = derive_cnv(cast)
+    try:
+        cast = derive_cnv(cast)
+    except:
+        raise nose.SkipTest
     cast.name = name
     return cast
 

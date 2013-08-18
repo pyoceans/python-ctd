@@ -15,8 +15,10 @@
 import os
 import re
 import unittest
+import numpy as np
 from glob import glob
 from collections import OrderedDict
+from pandas.util.testing import ensure_clean
 
 from pandas import Panel
 import matplotlib.pyplot as plt
@@ -24,11 +26,71 @@ import matplotlib.pyplot as plt
 from ctd import (DataFrame, Series, movingaverage, lp_filter, derive_cnv,
                  plot_section)
 
-plt.switch_backend('Agg')
-from matplotlib.testing.decorators import image_comparison
 
-path = os.path.join(os.path.dirname(__file__), 'plot_results')
 data_path = os.path.join(os.path.dirname(__file__), 'data')
+
+
+def assert_is_valid_plot_return_object(objs):
+    import matplotlib.pyplot as plt
+    if isinstance(objs, np.ndarray):
+        for el in objs.flat:
+            assert isinstance(el, plt.Axes), ('one of \'objs\' is not a '
+                                              'matplotlib Axes instance, '
+                                              'type encountered {0!r}'
+                                              ''.format(el.__class__.__name__))
+    else:
+        assert isinstance(objs, (plt.Artist, tuple, dict)), \
+                ('objs is neither an ndarray of Artist instances nor a '
+                 'single Artist instance, tuple, or dict, "objs" is a {0!r} '
+                 ''.format(objs.__class__.__name__))
+
+
+def _check_plot_works(f, *args, **kwargs):
+    try:
+        fig = kwargs['figure']
+    except KeyError:
+        fig = plt.gcf()
+    plt.clf()
+    ax = kwargs.get('ax', fig.add_subplot(211))
+    ret = f(*args, **kwargs)
+
+    assert ret is not None
+    assert_is_valid_plot_return_object(ret)
+
+    try:
+        kwargs['ax'] = fig.add_subplot(212)
+        ret = f(*args, **kwargs)
+    except Exception:
+        pass
+    else:
+        assert_is_valid_plot_return_object(ret)
+
+    with ensure_clean() as path:
+        plt.savefig(path)
+
+
+def _check_section_works(f, **kwargs):
+    try:
+        fig = kwargs['figure']
+    except KeyError:
+        fig = plt.gcf()
+    plt.clf()
+    ax = kwargs.get('ax', fig.add_subplot(211))
+    ret = f(**kwargs)
+
+    assert ret is not None
+    assert_is_valid_plot_return_object(ret)
+
+    try:
+        kwargs['ax'] = fig.add_subplot(212)
+        ret = f(**kwargs)
+    except Exception:
+        pass
+    else:
+        assert_is_valid_plot_return_object(ret)
+
+    with ensure_clean() as path:
+        plt.savefig(path)
 
 
 def alphanum_key(s):
@@ -38,6 +100,7 @@ def alphanum_key(s):
 
 
 def proc_ctd(fname, compression='gzip', below_water=True):
+    """Quick-n-dirty CTD processing."""
     # 00-Split, clean 'bad pump' data, and apply flag.
     cast = DataFrame.from_cnv(fname, compression=compression,
                               below_water=below_water).split()[0]
@@ -104,6 +167,14 @@ class PlotUtilities(unittest.TestCase):
 
 
 class BasicPlotting(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        try:
+            import matplotlib as mpl
+            mpl.use('Agg', warn=False)
+        except ImportError:
+            raise nose.SkipTest
+
     def setUp(self):
         self.xbt = DataFrame.from_edf(fname='data/XBT.EDF.zip',
                                       compression='zip')
@@ -113,24 +184,28 @@ class BasicPlotting(unittest.TestCase):
                                       compression='bz2')
 
     def tearDown(self):
-        unittest.TestCase.tearDown(self)
+        import matplotlib.pyplot as plt
+        plt.close('all')
 
-    @image_comparison(baseline_images=['%s/test_xbt_plot.png' % path])
     def test_xbt_plot(self):
-        fig, ax = self.xbt['temperature'].plot()
+        _check_plot_works(self.xbt['temperature'].plot)
 
-    @image_comparison(baseline_images=['%s/test_cnv_temperature.png' % path])
     def test_cnv_temperature(self):
-        fig, ax = self.cnv['t090C'].plot()
+        _check_plot_works(self.cnv['t090C'].plot)
 
-    @image_comparison(baseline_images=['%s/test_fsi_plot_vars.png' % path])
     def test_fsi_plot_vars(self):
-        fig, ax = self.fsi.plot_vars(['TEMP', 'SAL*'])
+        _check_plot_works(self.fsi.plot_vars, variables=['TEMP', 'SAL*'])
 
 
 class AdvancedPlotting(unittest.TestCase):
-    def tearDown(self):
-        unittest.TestCase.tearDown(self)
+    @classmethod
+    def setUpClass(cls):
+
+        try:
+            import matplotlib as mpl
+            mpl.use('Agg', warn=False)
+        except ImportError:
+            raise nose.SkipTest
 
     def setUp(self):
         lon, lat = [], []
@@ -149,27 +224,22 @@ class AdvancedPlotting(unittest.TestCase):
         self.CT = self.section.minor_xs('CT')
         self.CT.lon, self.CT.lat = lon, lat
 
-    @image_comparison(baseline_images=['%s/test_section_reverse.png' % path])
+    def tearDown(self):
+        import matplotlib.pyplot as plt
+        plt.close('all')
+
     def test_section_reverse(self):
-        fig, ax, cb = plot_section(self.CT, reverse=True)
+        _check_section_works(self.CT.plot_section, reverse=True)
 
-    @image_comparison(baseline_images=['%s/test_section_reverse_filled.png' %
-                                       path])
     def test_section_reverse_filled(self):
-        fig, ax, cb = plot_section(self.CT, reverse=True, filled=True)
+        _check_section_works(self.CT.plot_section, reverse=True, filled=True)
 
-    @image_comparison(baseline_images=['%s/test_section.png' % path])
     def test_section(self):
-        fig, ax, cb = plot_section(self.CT)
+        _check_section_works(self.CT.plot_section)
 
-    @image_comparison(baseline_images=['%s/test_section_filled.png' % path])
     def test_section_filled(self):
-        fig, ax, cb = plot_section(self.CT, filled=True)
-
-
-def main():
-    unittest.main()
+        _check_section_works(self.CT.plot_section, filled=True)
 
 
 if __name__ == '__main__':
-    main()
+    unittest.main()

@@ -1,12 +1,12 @@
 language: python
 python:
   - "2.7"
-  - "3.3"
+#   - "3.3"
 virtualenv:
   system_site_packages: true
 before_install:
-    - if [[ $TRAVIS_PYTHON_VERSION == "2.7" ]]; then sudo apt-get install python-numpy python-scipy python-pandas python-matplotlib; fi
-    - if [[ $TRAVIS_PYTHON_VERSION == "3.3" ]]; then sudo apt-get install python3-numpy python3-scipy; fi
+    - if [[ $TRAVIS_PYTHON_VERSION == "2.7" ]]; then sudo apt-get install python-numpy python-scipy; fi
+#     - if [[ $TRAVIS_PYTHON_VERSION == "3.3" ]]; then sudo apt-get install python3-numpy python3-scipy; fi
     - pip install --use-mirrors gsw pandas matplotlib
 install:
     - python setup.py install

@@ -1,12 +1,13 @@
 language: python
 python:
-  - "2.6"
   - "2.7"
   - "3.3"
 # Command to install dependencies.
 virtualenv:
   system_site_packages: true
 before_install:
+    - sudo apt-get update
+    - sudo apt-get install -qq
     - sudo apt-get install -qq python-numpy python-scipy
     - sudo apt-get install -qq python3-numpy python3-scipy
 install:

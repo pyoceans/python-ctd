@@ -11,7 +11,7 @@ before_install:
     - sudo apt-get install -qq python3-numpy python3-scipy
 install:
     - pip install gsw
-    - pip isntall numpy
+    - pip install numpy
     - pip install pandas
     - pip install matplotlib
 script:

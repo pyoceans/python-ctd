@@ -2,18 +2,14 @@ language: python
 python:
   - "2.7"
   - "3.3"
-# Command to install dependencies.
 virtualenv:
   system_site_packages: true
 before_install:
-    - sudo apt-get update -qq
-    - sudo apt-get install -qq libatlas-dev libatlas-base-dev liblapack-dev gfortran
+    - if [[ $TRAVIS_PYTHON_VERSION == "2.7" ]]; then sudo apt-get install python-numpy python-scipy python-pandas python-matplotlib; fi
+    - if [[ $TRAVIS_PYTHON_VERSION == "3.3" ]]; then sudo apt-get install python3-numpy python3-scipy python3-pandas python3-matplotlib; fi
+    - python setup.py build install
 install:
-    - pip install numpy
-    - pip install scipy
-    - pip install pandas
-    - pip install matplotlib
-    - pip install gsw
+    - pip install --use-mirrors gsw
 script:
     - cd tests
     - nosetests --verbose --nocapture

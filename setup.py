@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from setuptools import setup
-
-from ctd import __version__ as version
+from ctd import __version__
 
 source = 'http://pypi.python.org/packages/source'
 install_requires = ['numpy', 'scipy', 'matplotlib', 'pandas', 'gsw']
@@ -27,9 +26,9 @@ CHANGES = open('CHANGES.txt').read()
 LICENSE = open('LICENSE.txt').read()
 
 config = dict(name='ctd',
-              version=version,
+              version=__version__,
               packages=['ctd'],
-              test_suite='test',
+              test_suite='tests',
               use_2to3=True,
               license=LICENSE,
               long_description='%s\n\n%s'.encode('utf-8') % (README, CHANGES),
@@ -40,7 +39,7 @@ config = dict(name='ctd',
               maintainer='Filipe Fernandes',
               maintainer_email='ocefpaf@gmail.com',
               url='http://pypi.python.org/pypi/ctd/',
-              download_url='%s/c/ctd/ctd-%s.tar.gz' % (source, version),
+              download_url='%s/c/ctd/ctd-%s.tar.gz' % (source, __version__),
               platforms='any',
               keywords=['oceanography', 'data analysis', 'cnv', 'DataFrame'],
               install_requires=install_requires)

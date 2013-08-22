@@ -13,3 +13,6 @@ sudo apt-get install -qq build-essential
 sudo apt-get install -qq build-dep python-scipy
 sudo apt-get install -qq build-dep python-numpy
 sudo apt-get install -qq build-dep python-pandas
+
+sudo apt-get install -qq octave
+sudo apt-get install -qq octave-pkg-dev

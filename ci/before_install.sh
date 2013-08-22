@@ -8,7 +8,8 @@ echo "Using SITE_PKG_DIR: $SITE_PKG_DIR"
 # Workaround for travis ignoring system_site_packages in travis.yml
 rm -f $VIRTUAL_ENV/lib/python$TRAVIS_PYTHON_VERSION/no-global-site-packages.txt
 
-sudo apt-get install libhdf5-serial-dev hdf5-tools
-sudo apt-get install libatlas-dev libatlas-base-dev liblapack-dev gfortran
-#sudo apt-get install python-numpy
-#sudo apt-get install python-scipy
+sudo apt-get update -qq
+sudo apt-get install -qq build-essential
+sudo apt-get install -qq build-dep python-scipy
+sudo apt-get install -qq build-dep python-numpy
+sudo apt-get install -qq build-dep python-pandas

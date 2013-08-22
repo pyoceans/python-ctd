@@ -7,7 +7,7 @@
 # e-mail:   ocefpaf@gmail
 # web:      http://ocefpaf.tiddlyspot.com/
 # created:  01-Mar-2013
-# modified: Mon 19 Aug 2013 06:45:09 AM BRT
+# modified: Thu 22 Aug 2013 01:21:28 PM BRT
 #
 # obs:
 #
@@ -17,7 +17,10 @@ import re
 import nose
 import unittest
 from glob import glob
-from collections import OrderedDict
+try:
+    from collections import OrderedDict
+except ImportError:
+    raise nose.SkipTest
 
 import numpy as np
 from ctd import DataFrame, Series, lp_filter, derive_cnv, movingaverage
@@ -169,7 +172,10 @@ class AdvancedProcessingTests(unittest.TestCase):
         lon, lat = [], []
         pattern = '%s/CTD/g01mcan*c.cnv.gz' % data_path
         fnames = sorted(glob(pattern), key=alphanum_key)
-        section = OrderedDict()
+        try:
+            section = OrderedDict()
+        except:
+            raise nose.SkipTest
         for fname in fnames:
             cast = proc_ctd(fname)
             name = os.path.basename(fname).split('.')[0]

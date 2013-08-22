@@ -7,7 +7,7 @@
 # e-mail:   ocefpaf@gmail
 # web:      http://ocefpaf.tiddlyspot.com/
 # created:  01-Mar-2013
-# modified: Mon 12 Aug 2013 08:39:36 PM BRT
+# modified: Thu 22 Aug 2013 01:20:51 PM BRT
 #
 # obs: TODO: to_nc test.
 #
@@ -16,11 +16,15 @@ import re
 import os
 import bz2
 import gzip
+import nose
 import unittest
 import cStringIO
 
 from glob import glob
-from collections import OrderedDict
+try:
+    from collections import OrderedDict
+except ImportError:
+    pass
 
 from pandas import Panel
 from ctd.utilities import read_file
@@ -158,7 +162,10 @@ class SectionTest(unittest.TestCase):
         lon, lat = [], []
         pattern = './data/CTD/g01mcan*c.cnv.gz'
         fnames = sorted(glob(pattern), key=alphanum_key)
-        section = OrderedDict()
+        try:
+            section = OrderedDict()
+        except:
+            raise nose.SkipTest
         for fname in fnames:
             cast = proc_ctd(fname)
             name = os.path.basename(fname).split('.')[0]

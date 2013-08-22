@@ -7,7 +7,7 @@
 # e-mail:   ocefpaf@gmail
 # web:      http://ocefpaf.tiddlyspot.com/
 # created:  01-Mar-2013
-# modified: Mon 19 Aug 2013 06:49:50 AM BRT
+# modified: Thu 22 Aug 2013 01:20:59 PM BRT
 #
 # obs:
 #
@@ -18,7 +18,10 @@ import nose
 import unittest
 import numpy as np
 from glob import glob
-from collections import OrderedDict
+try:
+    from collections import OrderedDict
+except ImportError:
+    raise nose.SkipTest
 from pandas.util.testing import ensure_clean
 
 from pandas import Panel
@@ -89,7 +92,10 @@ def proc_ctd(fname):
 
 def make_section(data_path=data_path, variable='t090C'):
     lon, lat = [], []
-    section = OrderedDict()
+    try:
+        section = OrderedDict()
+    except:
+        raise nose.SkipTest
     pattern = '%s/CTD/g01mcan*c.cnv.gz' % data_path
     fnames = sorted(glob(pattern), key=alphanum_key)
     for fname in fnames:

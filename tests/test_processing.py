@@ -127,7 +127,7 @@ class BasicProcessingTests(unittest.TestCase):
         self.assertTrue(spikes.any() and equal)
 
     # Filter.
-    def test_lp_filter_2(self):
+    def test_lp_filter(self):
         kw = dict(sample_rate=24.0, time_constant=0.15)
         unfiltered = self.raw.index.values
         filtered = lp_filter(unfiltered, **kw)

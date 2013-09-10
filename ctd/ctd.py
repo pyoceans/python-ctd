@@ -209,6 +209,7 @@ def from_fsi(fname, compression=None, skiprows=9, below_water=False,
     f = read_file(fname, compression=compression)
     cast = read_table(f, header='infer', index_col=None, skiprows=skiprows,
                       dtype=float, delim_whitespace=True)
+    f.close()
 
     cast.set_index('PRES', drop=True, inplace=True)
     cast.index.name = 'Pressure [dbar]'

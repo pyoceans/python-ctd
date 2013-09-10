@@ -158,12 +158,14 @@ def gen_topomask(h, lon, lat, dx=1., kind='linear', plot=False):
     return xm, hm
 
 
-def plot(self, **kwds):
+def plot(self, **kw):
     """
     Plot a CTD variable against the index (pressure or depth).
     """
-    fig, ax = plt.subplots()
-    ax.plot(self.values, self.index, **kwds)
+    figsize = kw.pop('figsize', (5.5, 6))
+    fig, ax = plt.subplots(figsize=figsize)
+
+    ax.plot(self.values, self.index, **kw)
     ax.set_ylabel(self.index.name)
     ax.set_xlabel(self.name)
     ax.invert_yaxis()
@@ -248,20 +250,24 @@ def plot_section(self, reverse=False, filled=False, **kw):
     # Topography mask key words.
     dx = kw.pop('dx', 1.)
     kind = kw.pop('kind', 'linear')
+    linewidth = kw.pop('linewidth', 1.5)
 
     # Station symbols key words.
     color = kw.pop('color', 'k')
     offset = kw.pop('offset', -5)
-    linewidth = kw.pop('linewidth', 1.5)
+    marker = kw.pop('marker', 'v')
+    alpha = kw.pop('alpha', 0.5)
 
     # Figure.
-    fig, ax = plt.subplots()
+    figsize = kw.pop('figsize', (12, 6))
+    fig, ax = plt.subplots(figsize=figsize)
     xm, hm = gen_topomask(h, lon, lat, dx=dx, kind=kind)
     ax.plot(xm, hm, color='black', linewidth=linewidth, zorder=3)
     ax.fill_between(xm, hm, y2=hm.max(), color='0.9', zorder=3)
 
-    ax.plot(x, [offset] * len(h), color=color, marker='v',
-            alpha=0.5, zorder=5)
+    if marker:
+        ax.plot(x, [offset] * len(h), color=color, marker=marker, alpha=alpha,
+                zorder=5)
     ax.set_xlabel('Cross-shore distance [km]', fontsize=fontsize)
     ax.set_ylabel('Depth [m]', fontsize=fontsize)
     ax.set_ylim(offset, hm.max())

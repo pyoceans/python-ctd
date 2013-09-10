@@ -176,7 +176,7 @@ class SectionTest(unittest.TestCase):
 
         # Section.
         self.section = Panel.fromDict(section)
-        self.lon, self.lat = lon, lat
+        self.section.lon, self.section.lat = lon, lat
 
     def test_section(self):
         CT = self.section.minor_xs('CT')

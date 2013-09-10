@@ -39,6 +39,7 @@ def alphanum_key(s):
 
 
 def proc_ctd(fname, compression='gzip', below_water=True):
+    """Quick `proc_ctd` function."""
     # 00-Split, clean 'bad pump' data, and apply flag.
     cast = DataFrame.from_cnv(fname, compression=compression,
                               below_water=below_water).split()[0]

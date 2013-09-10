@@ -12,6 +12,8 @@
 # obs:
 #
 
+from __future__ import absolute_import
+
 # Scientific stack.
 import gsw
 import numpy as np
@@ -19,7 +21,7 @@ import numpy.ma as ma
 
 from scipy import signal
 from pandas import Series, Index
-from utilities import rolling_window
+from .utilities import rolling_window
 
 __all__ = ['data_conversion',  # TODO: Add as a constructor.
            'align',
@@ -86,8 +88,6 @@ def lp_filter(data, sample_rate=24.0, time_constant=0.15):
     """
     Filter a series with `time_constant` (use 0.15 s for pressure), and for
     a signal of `sample_rate` in Hertz (24 Hz for 911+).
-    NOTE: Seabird actually uses a cosine window filter, here we use a kaiser
-    window instead.
     NOTE: 911+ systems do not require filter for temperature nor salinity.
 
     Examples
@@ -115,21 +115,14 @@ def lp_filter(data, sample_rate=24.0, time_constant=0.15):
     http://wiki.scipy.org/Cookbook/FIRFilter
     """
 
-    # Butter is closer to what SBE is doing with their cosine filter.
-    if True:
+    if False:  # FIXME:
+        cosine = signal.cosine(Wn)
+
+    if True:  # Butter is closer to what SBE is doing with their cosine filter.
         Wn = (1. / time_constant) / (sample_rate * 2.)
         b, a = signal.butter(2, Wn, 'low')
         data = signal.filtfilt(b, a, data)
 
-    if False:  # Kaiser.
-        nyq_rate = sample_rate / 2.0
-        width = 5.0 / nyq_rate  # 5 Hz transition rate.
-        ripple_db = 60.0  # Attenuation at the stop band.
-        N, beta = signal.kaiserord(ripple_db, width)
-
-        cutoff_hz = (1. / time_constant)  # Cutoff frequency at 0.15 s.
-        taps = signal.firwin(N, cutoff_hz / nyq_rate, window=('kaiser', beta))
-        data = signal.filtfilt(taps, [1.0], data)
     return data
 
 

@@ -12,6 +12,8 @@
 # obs: New constructors and methods for pandas DataFrame and Series.
 #
 
+from __future__ import absolute_import
+
 # Standard library.
 import warnings
 
@@ -19,7 +21,7 @@ import warnings
 import numpy as np
 from pandas import read_table
 
-from utilities import read_file, basename, normalize_names
+from .utilities import read_file, basename, normalize_names
 
 __all__ = ['asof',
            'from_edf',
@@ -29,7 +31,7 @@ __all__ = ['asof',
 
 
 def asof(self, label):
-    """FIXME: pandas index workaround."""
+    """ FIXME: pandas index workaround."""
     if label not in self:
         loc = self.searchsorted(label, side='left')
         if loc > 0:

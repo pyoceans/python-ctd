@@ -12,6 +12,8 @@
 # obs:
 #
 
+from __future__ import absolute_import
+
 # Scientific stack.
 import gsw
 import numpy as np
@@ -23,7 +25,7 @@ from pandas import Series
 from scipy.interpolate import interp1d
 from mpl_toolkits.axes_grid1 import host_subplot
 
-from utilities import extrap1d
+from .utilities import extrap1d
 
 __all__ = ['get_maxdepth',
            'extrap_sec',

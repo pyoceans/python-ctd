@@ -197,8 +197,8 @@ def split(self):
     """
     Returns a tuple with down/up-cast.
     """
-    down = self.ix[:self.index.argmax()]
-    up = self.ix[self.index.argmax():][::-1]  # Reverse up index.
+    down = self.iloc[:self.index.argmax()]
+    up = self.iloc[self.index.argmax():][::-1]  # Reverse up index.
     return down, up
 
 

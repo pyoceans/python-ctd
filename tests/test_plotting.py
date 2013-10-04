@@ -7,7 +7,7 @@
 # e-mail:   ocefpaf@gmail
 # web:      http://ocefpaf.tiddlyspot.com/
 # created:  01-Mar-2013
-# modified: Thu 22 Aug 2013 01:20:59 PM BRT
+# modified: Fri 04 Oct 2013 08:18:25 AM BRT
 #
 # obs:
 #
@@ -25,6 +25,8 @@ except ImportError:
 from pandas.util.testing import ensure_clean
 
 from pandas import Panel
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from ctd import DataFrame, Series

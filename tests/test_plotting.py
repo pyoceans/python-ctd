@@ -7,7 +7,7 @@
 # e-mail:   ocefpaf@gmail
 # web:      http://ocefpaf.tiddlyspot.com/
 # created:  01-Mar-2013
-# modified: Fri 04 Oct 2013 08:18:25 AM BRT
+# modified: Fri 04 Oct 2013 08:55:34 AM BRT
 #
 # obs:
 #
@@ -28,6 +28,7 @@ from pandas import Panel
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+plt.ioff()
 
 from ctd import DataFrame, Series
 

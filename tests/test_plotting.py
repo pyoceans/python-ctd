@@ -7,10 +7,13 @@
 # e-mail:   ocefpaf@gmail
 # web:      http://ocefpaf.tiddlyspot.com/
 # created:  01-Mar-2013
-# modified: Fri 04 Oct 2013 08:55:34 AM BRT
+# modified: Fri 04 Oct 2013 09:10:39 AM BRT
 #
 # obs:
 #
+
+import matplotlib
+matplotlib.use('Agg')
 
 import os
 import re
@@ -25,10 +28,7 @@ except ImportError:
 from pandas.util.testing import ensure_clean
 
 from pandas import Panel
-import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-plt.ioff()
 
 from ctd import DataFrame, Series
 
@@ -125,7 +125,7 @@ class BasicPlotting(unittest.TestCase):
     def setUpClass(cls):
         try:
             import matplotlib as mpl
-            mpl.use('Agg', warn=False)
+            mpl.use('Agg', warn=True)
         except ImportError:
             raise nose.SkipTest
 
@@ -157,7 +157,7 @@ class AdvancedPlotting(unittest.TestCase):
 
         try:
             import matplotlib as mpl
-            mpl.use('Agg', warn=False)
+            mpl.use('Agg', warn=True)
         except ImportError:
             raise nose.SkipTest
 

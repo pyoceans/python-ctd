@@ -9,6 +9,7 @@ virtualenv:
 
 before_install:
   - ci/before_install.sh
+  - export DISPLAY=:99.0
   - pip install --use-mirrors numpy
   - pip install --use-mirrors scipy
   - pip install --use-mirrors matplotlib

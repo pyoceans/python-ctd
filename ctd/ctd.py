@@ -19,26 +19,49 @@ import warnings
 
 # Scientific stack.
 import numpy as np
+from pandas import Series, DataFrame
 from pandas import read_table
 
 from .utilities import read_file, basename, normalize_names
 
-__all__ = ['asof',
+__all__ = ['CTD',
+           'asof',
            'from_edf',
            'from_cnv',
            'from_fsi',
            'rosette_summary']
 
+class CTD(DataFrame):
+    def __init__(self, data=None, index=None, columns=None, name=None,
+                 longitude=None, latitude=None, header=None, serial=None,
+                 config=None, dtype=None, copy=False):
+        super(CTD, self).__init__(data=data, index=index,
+                                  columns=columns, dtype=dtype,
+                                  copy=copy)
+        self.longitude = longitude
+        self.latitude = latitude
+        self.header = header
+        self.serial = serial
+        self.config = config
+        self.name = name
 
-def asof(self, label):
-    """ FIXME: pandas index workaround."""
-    if label not in self:
-        loc = self.searchsorted(label, side='left')
-        if loc > 0:
-            return self[loc - 1]
-        else:
-            return np.nan
-    return label
+    def __reduce__(self):
+        return self.__class__, (
+            DataFrame(self), # NOTE Using that type(data)==DataFrame and the
+                              # the rest of the arguments of DataFrame.__init__
+                              # to defaults, the constructors acts as a
+                              # copy constructor.
+            None,
+            None,
+            self.longitude,
+            self.latitude,
+            self.header,
+            self.serial,
+            self.config,
+            self.name,
+            None,
+            False,
+        )
 
 
 def remove_above_water(cast):
@@ -101,15 +124,11 @@ def from_edf(fname, compression=None, below_water=False, lon=None,
 
     cast.set_index('depth', drop=True, inplace=True)
     cast.index.name = 'Depth [m]'
-    # FIXME: Try metadata class.
-    cast.lon = lon
-    cast.lat = lat
-    cast.serial = serial
-    cast.header = header
-    cast.name = basename(fname)[1]
+    name = basename(fname)[1]
     if below_water:
         cast = remove_above_water(cast)
-    return cast
+    return CTD(cast, longitude=lon, latitude=lat, serial=serial,
+               name=name, header=header)
 
 
 def from_cnv(fname, compression=None, below_water=False, lon=None,
@@ -171,11 +190,7 @@ def from_cnv(fname, compression=None, below_water=False, lon=None,
     cast.set_index('prDM', drop=True, inplace=True)
     cast.index.name = 'Pressure [dbar]'
 
-    cast.lon = lon
-    cast.lat = lat
-    cast.header = header
-    cast.config = config
-    cast.name = basename(fname)[0]
+    name = basename(fname)[0]
 
     dtypes = dict(bpos=int, pumps=bool, flag=bool)
     for column in cast.columns:
@@ -188,7 +203,8 @@ def from_cnv(fname, compression=None, below_water=False, lon=None,
                 warnings.warn('Could not convert %s to float.' % column)
     if below_water:
         cast = remove_above_water(cast)
-    return cast
+    return CTD(cast, longitude=lon, latitude=lat, name=name, header=header,
+               config=config)
 
 
 def from_fsi(fname, compression=None, skiprows=9, below_water=False,

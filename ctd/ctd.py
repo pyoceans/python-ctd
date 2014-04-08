@@ -31,6 +31,18 @@ __all__ = ['CTD',
            'from_fsi',
            'rosette_summary']
 
+
+def asof(self, label):
+    """FIXME: pandas index workaround."""
+    if label not in self:
+        loc = self.searchsorted(label, side='left')
+        if loc > 0:
+            return self[loc - 1]
+        else:
+            return np.nan
+    return label
+
+
 class CTD(DataFrame):
     def __init__(self, data=None, index=None, columns=None, name=None,
                  longitude=None, latitude=None, header=None, serial=None,

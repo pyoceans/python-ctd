@@ -1,4 +1,4 @@
-include README.md
+include README.txt
 include LICENSE.txt
 include CHANGES.txt
 include ctd/*.py

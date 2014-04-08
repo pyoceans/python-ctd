@@ -2,7 +2,17 @@
 # -*- coding: utf-8 -*-
 
 from setuptools import setup
-from ctd import __version__
+
+import re
+VERSIONFILE="ctd/__init__.py"
+verstrline = open(VERSIONFILE, "rt").read()
+VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
+mo = re.search(VSRE, verstrline, re.M)
+if mo:
+    verstr = mo.group(1)
+else:
+    raise RuntimeError("Unable to find version string in %s." % (VERSIONFILE,))
+
 
 source = 'http://pypi.python.org/packages/source'
 install_requires = ['numpy', 'scipy', 'matplotlib', 'pandas', 'gsw']
@@ -26,7 +36,7 @@ CHANGES = open('CHANGES.txt').read()
 LICENSE = open('LICENSE.txt').read()
 
 config = dict(name='ctd',
-              version=__version__,
+              version=verstr,
               packages=['ctd'],
               test_suite='tests',
               use_2to3=True,
@@ -39,7 +49,7 @@ config = dict(name='ctd',
               maintainer='Filipe Fernandes',
               maintainer_email='ocefpaf@gmail.com',
               url='http://pypi.python.org/pypi/ctd/',
-              download_url='%s/c/ctd/ctd-%s.tar.gz' % (source, __version__),
+              download_url='%s/c/ctd/ctd-%s.tar.gz' % (source, verstr),
               platforms='any',
               keywords=['oceanography', 'data analysis', 'cnv', 'DataFrame'],
               install_requires=install_requires)

@@ -154,7 +154,7 @@ def press_check(self, column='index'):
     if column is not 'index':
         press = data[column]
     else:
-        press = data.index.astype(float)
+        press = data.index.values.astype(float)
 
     ref = press[0]
     inversions = np.diff(np.r_[press, press[-1]]) < 0

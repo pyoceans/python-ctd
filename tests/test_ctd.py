@@ -12,13 +12,13 @@
 # obs: TODO: to_nc test.
 #
 
+import io
 import re
 import os
 import bz2
 import gzip
 import nose
 import unittest
-import cStringIO
 
 from glob import glob
 try:
@@ -34,7 +34,7 @@ from ctd import (DataFrame, Series, rosette_summary, lp_filter, movingaverage,
 
 def alphanum_key(s):
     key = re.split(r"(\d+)", s)
-    key[1::2] = map(int, key[1::2])
+    key[1::2] = list(map(int, key[1::2]))
     return key
 
 
@@ -101,12 +101,12 @@ def proc_ctd(fname, compression='gzip', below_water=True):
 
 
 class ReadCompressedFile(unittest.TestCase):
-    """Pandas can read StringI, GzipFile, BZ2File and file types."""
+    """Pandas can read StringIO, GzipFile, BZ2File and file types."""
 
     def test_zip(self):
         """cStringIO.StringI type."""
         cfile = read_file('data/XBT.EDF.zip', compression='zip')
-        self.assertIsInstance(cfile, cStringIO.InputType)
+        self.assertIsInstance(cfile, io.StringIO)
 
     def test_gzip(self):
         """GzipFile type."""

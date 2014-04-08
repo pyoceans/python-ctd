@@ -39,8 +39,12 @@ def proc_ctd(fname, compression='gzip', below_water=True):
     # 00-Split, clean 'bad pump' data, and apply flag.
     cast = DataFrame.from_cnv(fname, compression=compression,
                               below_water=below_water).split()[0]
-    cast = cast[cast['pumps']]
-    cast = cast[~cast['flag']]  # True for bad values.
+    if 'pumps' in df.columns:
+        # True for good values.
+        cast = cast[cast['pumps']]
+    if 'flag' in df.columns:
+        # True for bad values.
+        cast = cast[~cast['flag']]
     name = os.path.basename(fname).split('.')[0]
 
     # Removed unwanted columns.

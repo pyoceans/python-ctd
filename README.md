@@ -1,3 +1,5 @@
+<!-- pandoc --from markdown_github README.md --to rst --output README.txt -->
+
 python-ctd
 ==========
 
@@ -58,15 +60,3 @@ Not so quick intro
 Author
 ------
 Filipe Fernandes
-
-<!--
-       --parse-raw \
-       --css=style.css \
-pandoc --from markdown README.md \
-       --mathjax \
-       --smart \
-       --normalize \
-       --standalone \
-       --highlight-style=pygments \
-       --to html --output README.htm
--->

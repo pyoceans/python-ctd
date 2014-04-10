@@ -161,7 +161,7 @@ def from_cnv(fname, compression=None, below_water=False, lon=None,
     f = read_file(fname, compression=compression)
     header, config, names = [], [], []
     for k, line in enumerate(f.readlines()):
-        line = line.decode('utf-8').strip()
+        line = line.strip()
         if '# name' in line:  # Get columns names.
             name, unit = line.split('=')[1].split(':')
             name, unit = map(normalize_names, (name, unit))

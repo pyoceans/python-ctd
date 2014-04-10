@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # test_processing.py
 #
@@ -85,8 +84,8 @@ def proc_ctd(fname):
     name = os.path.basename(fname).split('.')[0]
     # Removed unwanted columns.
     keep = set(['t090C', 't190C', 'longitude', 'latitude'])
-    null = map(cast.pop, keep.symmetric_difference(cast.columns))
-    del null
+    drop = keep.symmetric_difference(cast.columns)
+    cast.drop(drop, axis=1, inplace=True)
     cast = cast.apply(Series.bindata, **dict(delta=1.))
     cast = cast.apply(Series.interpolate)
     cast.name = name
@@ -116,7 +115,7 @@ def make_section(data_path=data_path, variable='t090C'):
 
 
 class PlotUtilities(unittest.TestCase):
-    # TODO: get_maxdepth, extrap_sec, gen_topomask,
+    """TODO: get_maxdepth, extrap_sec, gen_topomask."""
     pass
 
 
@@ -154,7 +153,6 @@ class BasicPlotting(unittest.TestCase):
 class AdvancedPlotting(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-
         try:
             import matplotlib as mpl
             mpl.use('Agg', warn=True)

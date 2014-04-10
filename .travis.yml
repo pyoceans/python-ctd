@@ -19,7 +19,7 @@ install:
   - python setup.py install
 script:
   - cd tests
-  - nosetests --verbose --nocapture
+  - nosetests --verbose --nocapture test_plotting.py test_ctd.py test_processing.py
 
 branches:
   only:

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # test_ctd.py
 #
@@ -12,13 +11,13 @@
 # obs: TODO: to_nc test.
 #
 
-import io
 import re
 import os
 import bz2
 import gzip
 import nose
 import unittest
+from io import StringIO
 
 from glob import glob
 try:
@@ -52,9 +51,9 @@ def proc_ctd(fname, compression='gzip', below_water=True):
                 'longitude', 'sbeox0Mm/Kg', 'sbeox1Mm/Kg', 'oxsolMm/Kg',
                 'oxsatMm/Kg', 'par', 'pla', 'sva', 't090C', 't190C', 'tsa',
                 'sbeox0V'])
+    drop = keep.symmetric_difference(cast.columns)
 
-    null = map(cast.pop, keep.symmetric_difference(cast.columns))
-    del null
+    cast.drop(drop, axis=1, inplace=True)
 
     # Smooth velocity with a 2 seconds windows.
     cast['dz/dtM'] = movingaverage(cast['dz/dtM'], window_size=48)
@@ -100,28 +99,22 @@ def proc_ctd(fname, compression='gzip', below_water=True):
     return cast
 
 
-class ReadCompressedFile(unittest.TestCase):
-    """Pandas can read StringIO, GzipFile, BZ2File and file types."""
-
+class ReadFile(unittest.TestCase):
     def test_zip(self):
-        """cStringIO.StringI type."""
         cfile = read_file('data/XBT.EDF.zip', compression='zip')
-        self.assertIsInstance(cfile, io.StringIO)
+        self.assertIsInstance(cfile, StringIO)
 
     def test_gzip(self):
-        """GzipFile type."""
         cfile = read_file('data/XBT.EDF.gz', compression='gzip')
-        self.assertIsInstance(cfile, gzip.GzipFile)
+        self.assertIsInstance(cfile, StringIO)
 
     def test_bz2(self):
-        """bz2.BZ2File type."""
         cfile = read_file('data/XBT.EDF.bz2', compression='bz2')
-        self.assertIsInstance(cfile, bz2.BZ2File)
+        self.assertIsInstance(cfile, StringIO)
 
     def test_uncompresed(self):
-        """file type."""
         cfile = read_file('data/XBT.EDF', compression=None)
-        self.assertIsInstance(cfile, file)
+        self.assertIsInstance(cfile, StringIO)
 
 
 class DataFrameTests(unittest.TestCase):

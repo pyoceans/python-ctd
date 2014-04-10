@@ -17,7 +17,7 @@ import os
 import bz2
 import gzip
 import zipfile
-from cStringIO import StringIO
+from io import StringIO
 from xml.etree import cElementTree as etree
 
 # Scientific stack.
@@ -71,7 +71,7 @@ def extrap1d(interpolator):
             return interpolator(x)
 
     def ufunclike(xs):
-        return np.array(map(pointwise, np.array(xs)))
+        return np.array(list(map(pointwise, np.array(xs))))
 
     return ufunclike
 
@@ -84,15 +84,19 @@ def normalize_names(name):
 
 def read_file(fname, compression=None):
     if compression == 'gzip':
-        lines = gzip.open(fname)
+        cfile = gzip.open(fname)
     elif compression == 'bz2':
-        lines = bz2.BZ2File(fname)
+        cfile = bz2.BZ2File(fname)
     elif compression == 'zip':
+        # NOTE: Zip format may contain more than one file in the archive
+        # (similar to tar), here we assume that there is just one file per
+        # zipfile!  Also, we ask for the name because it can be different from
+        # the zipfile file!!
         zfile = zipfile.ZipFile(fname)
-        # Zip format might contain more than one file in the archive (similar
-        # to tar), here we assume that there is just one file per zipfile.
         name = zfile.namelist()[0]
-        lines = StringIO(zfile.read(name))
+        cfile = zfile.open(name)
     else:
-        lines = open(fname)
-    return lines
+        cfile = open(fname, 'rb')
+    text = cfile.read().decode(encoding='utf-8', errors='replace')
+    cfile.close()
+    return StringIO(text)

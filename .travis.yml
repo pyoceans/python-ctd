@@ -19,4 +19,4 @@ install:
   - pip install gsw # Not in anaconda.
   - python setup.py install
 script:
-  - cd tests && nosetests --verbose --nocapture test_plotting.py test_ctd.py test_processing.py
+  - cd ctd/tests && nosetests --verbose --nocapture test_plotting.py test_ctd.py test_processing.py

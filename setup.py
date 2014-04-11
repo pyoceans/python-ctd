@@ -25,7 +25,7 @@ def read(*filenames, **kwargs):
     return sep.join(buf)
 
 long_description = read('README.txt', 'CHANGES.txt')
-LICENSE = open('LICENSE.txt').read()
+LICENSE = read('LICENSE.txt')
 
 
 source = 'http://pypi.python.org/packages/source'

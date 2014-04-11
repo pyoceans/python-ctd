@@ -5,7 +5,7 @@ import io
 import re
 from setuptools import setup
 
-VERSIONFILE="ctd/__init__.py"
+VERSIONFILE = "ctd/__init__.py"
 verstrline = open(VERSIONFILE, "rt").read()
 VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
 mo = re.search(VSRE, verstrline, re.M)

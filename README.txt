@@ -30,8 +30,9 @@ and then,
 
 .. code-block:: python
 
-    from ctd import DataFrame
-    cast = DataFrame.from_cnv('./test/data/CTD/g01l06s01.cnv.gz', compression='gzip')
+    kw = dict(compression='gzip')
+    fname = './test/data/CTD/g01l06s01.cnv.gz'
+    cast = DataFrame.from_cnv(fname, **kw)
     downcast, upcast = cast.split()
     fig, ax = downcast['t090C'].plot()
 
@@ -44,10 +45,11 @@ We can do
 .. code-block:: python
 
     from ctd import DataFrame, lp_filter, movingaverage
-    cast = DataFrame.from_cnv('./test/data/CTD/g01l06s01.cnv.gz', compression='gzip', below_water=True)
+    kw.update(below_water=True)
+    cast = DataFrame.from_cnv(fname, **kw)
     downcast, upcast = cast.split()
     temperature = downcast['t090C'].despike(n1=2, n2=20, block=100)
-    temperature.index = lp_filter(temperature.index.values, sample_rate=24.0, time_constant=0.15)
+    temperature.index = lp_filter(temperature.index.values)
     temperature = temperature.bindata(delta=1)
     temperature = temperature.interpolate()
     temperature = temperature.smooth(window_len=21, window='hanning')

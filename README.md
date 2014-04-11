@@ -1,11 +1,9 @@
-<!-- pandoc --from markdown_github README.md --to rst --output README.txt -->
-
 python-ctd
 ==========
 
-[![Build](https://badge.fury.io/py/ctd.png)](http://badge.fury.io/py/ctd)
+[![PyPI](https://badge.fury.io/py/ctd.png)](http://badge.fury.io/py/ctd)
 [![Build](https://api.travis-ci.org/ocefpaf/python-ctd.png?branch=master)](https://travis-ci.org/ocefpaf/python-ctd)
-[![Downloads](https://pypip.in/d/ctd/badge.png)](https://crate.io/packages/ctd/)
+[![Gittip](http://bottlepy.org/docs/dev/_static/Gittip.png)](https://www.gittip.com/ocefpaf/)
 
 Tools to load hydrographic data into pandas DataFrame (and some rudimentary methods for data pre-processing/analysis).
 
@@ -23,6 +21,8 @@ Quick intro
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.bash}
  pip install ctd
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+and then,
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.python .numberLines}
 from ctd import DataFrame

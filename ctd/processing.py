@@ -175,6 +175,10 @@ def bindata(self, delta=1., method='averaging'):
 
     Note that this method does not drop NA automatically.  Therefore, one can
     check the quality of the binned data.
+    TODO:
+    bins = range(0, max(int(depth)))
+    binned = pd.cut(cast.index, bins)
+    cast.groupby(binned).size().plot(kind='bar')
     """
     if method == 'averaging':
         start = np.floor(self.index[0])
@@ -286,12 +290,12 @@ def derive_cnv(self):
     """Compute SP, SA, CT, z, and GP from a cnv pre-processed cast."""
     cast = self.copy()  # FIXME: Use MetaDataFrame to propagate lon, lat.
     p = cast.index.values.astype(float)
-    cast['SP'] = gsw.SP_from_C(cast['c0S/m'] * 10., cast['t090C'], p)
-    cast['SA'] = gsw.SA_from_SP(cast['SP'], p, self.lon, self.lat)
-    cast['SR'] = gsw.SR_from_SP(cast['SP'])
-    cast['CT'] = gsw.CT_from_t(cast['SA'], cast['t090C'], p)
+    cast['SP'] = gsw.SP_from_C(cast['c0S/m'].values * 10., cast['t090C'].values, p)
+    cast['SA'] = gsw.SA_from_SP(cast['SP'].values, p, self.lon, self.lat)
+    cast['SR'] = gsw.SR_from_SP(cast['SP'].values)
+    cast['CT'] = gsw.CT_from_t(cast['SA'].values, cast['t090C'].values, p)
     cast['z'] = -gsw.z_from_p(p, self.lat)
-    cast['sigma0_CT'] = gsw.sigma0_CT_exact(cast['SA'], cast['CT'])
+    cast['sigma0_CT'] = gsw.sigma0_CT_exact(cast['SA'].values, cast['CT'].values)
     return cast
 
 if __name__ == '__main__':

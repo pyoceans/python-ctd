@@ -29,7 +29,8 @@ LICENSE = read('LICENSE.txt')
 
 
 source = 'http://pypi.python.org/packages/source'
-install_requires = ['numpy', 'scipy', 'matplotlib', 'pandas', 'gsw']
+install_requires = ['numpy', 'scipy', 'matplotlib', 'pandas', 'seawater',
+                    'gsw', 'ctd']
 
 classifiers = """\
 Development Status :: 5 - Production/Stable

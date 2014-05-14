@@ -31,7 +31,7 @@ __all__ = ['CTD',
            'from_fsi',
            'rosette_summary']
 
-
+#TODO: https://github.com/nilmtk/nilmtk/issues/83
 def asof(self, label):
     """FIXME: pandas index workaround."""
     if label not in self:

@@ -62,7 +62,7 @@ config = dict(name='ctd',
               url='http://pypi.python.org/pypi/ctd/',
               download_url='%s/c/ctd/ctd-%s.tar.gz' % (source, verstr),
               platforms='any',
-              keywords=['oceanography', 'data analysis', 'cnv', 'DataFrame'],
+              keywords=['oceanography', 'data analysis', 'DataFrame'],
               install_requires=install_requires)
 
 setup(**config)

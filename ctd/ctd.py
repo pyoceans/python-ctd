@@ -100,7 +100,7 @@ def from_edf(fname, compression=None, below_water=False, lon=None,
         line = line.strip()
         if line.startswith('Serial Number'):
             serial = line.strip().split(':')[1].strip()
-        elif line.startswith('Latitude'):
+        elif (lat == None) and (line.startswith('Latitude')):
             hemisphere = line[-1]
             lat = line.strip(hemisphere).split(':')[1].strip()
             lat = np.float_(lat.split())
@@ -110,7 +110,7 @@ def from_edf(fname, compression=None, below_water=False, lon=None,
                 lat = lat[0] + lat[1] / 60.
             else:
                 raise ValueError("Latitude not recognized.")
-        elif line.startswith('Longitude'):
+        elif (lon == None) and (line.startswith('Longitude')):
             hemisphere = line[-1]
             lon = line.strip(hemisphere).split(':')[1].strip()
             lon = np.float_(lon.split())

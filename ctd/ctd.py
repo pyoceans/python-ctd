@@ -130,7 +130,7 @@ def from_edf(fname, compression=None, below_water=False, lon=None,
             break
 
     f.seek(0)
-    cast = read_table(f, header=None, index_col=None, names=names, dtype=float,
+    cast = read_table(f, header=None, index_col=None, names=names,
                       skiprows=skiprows, delim_whitespace=True)
     f.close()
 

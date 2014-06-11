@@ -150,6 +150,20 @@ class DataFrameTests(unittest.TestCase):
     def test_cnv_is_not_empty(self):
         self.assertFalse(self.cnv.empty)
 
+class HeaderTest(unittest.TestCase):
+    def tearDown(self):
+        unittest.TestCase.tearDown(self)
+
+    def test_header_parse(self):
+        lon, lat = '-42', '42'
+        xbt1 = DataFrame.from_edf(fname='data/C3_00005.edf',
+                                  lon=lon, lat=lat)
+        self.assertTrue((xbt1.longitude, xbt1.latitude) ==
+                        (float(lon), float(lat)))
+
+        with self.assertRaises(ValueError):
+            xbt2 = DataFrame.from_edf(fname='data/C3_00005.edf',
+                                      lon=None, lat=None)
 
 class SectionTest(unittest.TestCase):
     def setUp(self):

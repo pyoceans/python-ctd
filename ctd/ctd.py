@@ -100,26 +100,34 @@ def from_edf(fname, compression=None, below_water=False, lon=None,
         line = line.strip()
         if line.startswith('Serial Number'):
             serial = line.strip().split(':')[1].strip()
-        elif (lat == None) and (line.startswith('Latitude')):
-            hemisphere = line[-1]
-            lat = line.strip(hemisphere).split(':')[1].strip()
-            lat = np.float_(lat.split())
-            if hemisphere == 'S':
-                lat = -(lat[0] + lat[1] / 60.)
-            elif hemisphere == 'N':
-                lat = lat[0] + lat[1] / 60.
-            else:
-                raise ValueError("Latitude not recognized.")
-        elif (lon == None) and (line.startswith('Longitude')):
-            hemisphere = line[-1]
-            lon = line.strip(hemisphere).split(':')[1].strip()
-            lon = np.float_(lon.split())
-            if hemisphere == 'W':
-                lon = -(lon[0] + lon[1] / 60.)
-            elif hemisphere == 'E':
-                lon = lon[0] + lon[1] / 60.
-            else:
-                raise ValueError("Longitude not recognized.")
+        elif line.startswith('Latitude'):
+            if not lat:
+                try:
+                    hemisphere = line[-1]
+                    lat = line.strip(hemisphere).split(':')[1].strip()
+                    lat = np.float_(lat.split())
+                    if hemisphere == 'S':
+                        lat = -(lat[0] + lat[1] / 60.)
+                    elif hemisphere == 'N':
+                        lat = lat[0] + lat[1] / 60.
+                except (IndexError, ValueError) as e:
+                    msg = 'Ill formed or not present latitude in the header. '
+                    msg += 'Try specifying one with the keyword `lat=`.'
+                    raise ValueError('%s\n%s' % (msg, e))
+        elif line.startswith('Longitude'):
+            if not lon:
+                try:
+                    hemisphere = line[-1]
+                    lon = line.strip(hemisphere).split(':')[1].strip()
+                    lon = np.float_(lon.split())
+                    if hemisphere == 'W':
+                        lon = -(lon[0] + lon[1] / 60.)
+                    elif hemisphere == 'E':
+                        lon = lon[0] + lon[1] / 60.
+                except (IndexError, ValueError) as e:
+                    msg = 'Ill formed or not present Longitude in the header.'
+                    msg += 'Try specifying one with the keyword `lon=`.'
+                    raise ValueError('%s\n%s' % (msg, e))
         else:
             header.append(line)
             if line.startswith('Field'):
@@ -139,8 +147,8 @@ def from_edf(fname, compression=None, below_water=False, lon=None,
     name = basename(fname)[1]
     if below_water:
         cast = remove_above_water(cast)
-    return CTD(cast, longitude=lon, latitude=lat, serial=serial,
-               name=name, header=header)
+    return CTD(cast, longitude=float(lon), latitude=float(lat),
+               serial=serial, name=name, header=header)
 
 
 def from_cnv(fname, compression=None, below_water=False, lon=None,

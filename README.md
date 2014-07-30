@@ -1,5 +1,4 @@
-python-ctd
-==========
+# python-ctd
 
 [![PyPI](https://badge.fury.io/py/ctd.png)](http://badge.fury.io/py/ctd)
 [![Build](https://api.travis-ci.org/ocefpaf/python-ctd.png?branch=master)](https://travis-ci.org/ocefpaf/python-ctd)
@@ -16,28 +15,27 @@ and [Falmouth CTD (ASCII)][FSI] formats.
 
 [FSI]: http://www.falmouth.com/
 
-Quick intro
------------
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.bash}
+## Quick intro
+```bash
  pip install ctd
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 and then,
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.python .numberLines}
+```python
 from ctd import DataFrame
 kw = dict(compression='gzip')
 fname = './test/data/CTD/g01l06s01.cnv.gz'
 cast = DataFrame.from_cnv(fname, **kw)
 downcast, upcast = cast.split()
 fig, ax = downcast['t090C'].plot()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 ![Bad Processing](https://raw.githubusercontent.com/ocefpaf/python-ctd/master/docs/readme_01.png)
 
 We can do [better](http://www.go-ship.org/Manual/McTaggart_et_al_CTD.pdf):
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.python .numberLines}
+```python
 from ctd import DataFrame, lp_filter, movingaverage
 kw.update(below_water=True)
 cast = DataFrame.from_cnv(fname, **kw)
@@ -51,14 +49,14 @@ fig, ax = temperature.plot()
 ax.axis([0, 30, 2000, 0])
 ax.set_ylabel("Pressure [dbar]")
 ax.set_xlabel(u'Temperature [\u00b0C]')
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 ![Good Processing](https://raw.githubusercontent.com/ocefpaf/python-ctd/master/docs/readme_02.png)
 
 
-Not so quick intro
-------------------
-[Check out the IPython Notebook.](http://nbviewer.ipython.org/urls/raw.github.com/ocefpaf/python4oceanographers/master/content/downloads/notebooks/ctd_proc_example.ipynb)
+## Not so quick intro
+[Profiles](http://ocefpaf.github.io/python4oceanographers/blog/2013/05/27/CTD2DataFrame/)
+and [sections](http://ocefpaf.github.io/python4oceanographers/blog/2013/07/29/python-ctd/).
 
 Author
 ------

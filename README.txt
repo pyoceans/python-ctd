@@ -64,8 +64,8 @@ We can do
 Not so quick intro
 ------------------
 
-`Check out the IPython
-Notebook. <http://nbviewer.ipython.org/urls/raw.github.com/ocefpaf/python4oceanographers/master/content/downloads/notebooks/ctd_proc_example.ipynb>`_
+`Profiles <http://ocefpaf.github.io/python4oceanographers/blog/2013/05/27/CTD2DataFrame/>`_ and
+`sections <http://ocefpaf.github.io/python4oceanographers/blog/2013/07/29/python-ctd/>`_.
 
 Author
 ------

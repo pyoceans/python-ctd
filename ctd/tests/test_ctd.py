@@ -150,6 +150,7 @@ class DataFrameTests(unittest.TestCase):
     def test_cnv_is_not_empty(self):
         self.assertFalse(self.cnv.empty)
 
+
 class HeaderTest(unittest.TestCase):
     def tearDown(self):
         unittest.TestCase.tearDown(self)
@@ -164,6 +165,16 @@ class HeaderTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             xbt2 = DataFrame.from_edf(fname='data/C3_00005.edf',
                                       lon=None, lat=None)
+
+    def test_pressure_field_labels(self):
+        """Support different pressure field labels encountered in Sea-Bird cnv files (issue #3) 
+        """
+        for fname in sorted(glob('./data/CTD/issue3prlabworks*.cnv')):
+            DataFrame.from_cnv(fname)
+        for fname in sorted(glob('./data/CTD/issue3prlabfails*.cnv')):
+            with self.assertRaises(KeyError):
+                DataFrame.from_cnv(fname)
+
 
 class SectionTest(unittest.TestCase):
     def setUp(self):

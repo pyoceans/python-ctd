@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+Version 0.2.x
+
+* Support for different searbird `cnv` pressure spellings ('prDM' and 'prdM')
+  thanks @j08lue.
+
 Version 0.2.1
 
 * None is assigned to position data when it is not available.

@@ -208,13 +208,15 @@ def from_cnv(fname, compression=None, below_water=False, lon=None,
     f.close()
 
     key_set = False
-    for prkey in ['prDM','prdM']:
+    prkeys = ['prDM','prdM']
+    for prkey in prkeys:
         try:
             cast.set_index(prkey, drop=True, inplace=True)
             key_set = True
         except KeyError:
             continue
-    if not key_set: raise
+    if not key_set: raise KeyError(
+            'Could not find pressure field (supported names are {}).'.format(prkeys))
     cast.index.name = 'Pressure [dbar]'
 
     name = basename(fname)[0]

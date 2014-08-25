@@ -2,6 +2,8 @@
 
 [![PyPI](https://badge.fury.io/py/ctd.png)](http://badge.fury.io/py/ctd)
 [![Build](https://api.travis-ci.org/ocefpaf/python-ctd.png?branch=master)](https://travis-ci.org/ocefpaf/python-ctd)
+[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.11396.png)](http://dx.doi.org/10.5281/zenodo.11396)
+
 [![Gittip](http://bottlepy.org/docs/dev/_static/Gittip.png)](https://www.gittip.com/ocefpaf/)
 
 Tools to load hydrographic data into pandas DataFrame (and some rudimentary methods for data pre-processing/analysis).

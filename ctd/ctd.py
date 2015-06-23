@@ -1,28 +1,17 @@
-# -*- coding: utf-8 -*-
-#
-# ctd.py
-#
-# purpose:  Some classes and functions to work with CTD data.
-# author:   Filipe P. A. Fernandes
-# e-mail:   ocefpaf@gmail
-# web:      http://ocefpaf.tiddlyspot.com/
-# created:  22-Jun-2012
-# modified: Fri 19 Jul 2013 06:24:21 PM BRT
-#
-# obs: New constructors and methods for pandas DataFrame and Series.
-#
-
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 # Standard library.
+import os
 import warnings
 
 # Scientific stack.
 import numpy as np
-from pandas import Series, DataFrame
+from pandas import DataFrame
 from pandas import read_table
 
 from .utilities import read_file, basename, normalize_names
+
+data_path = os.path.join(os.path.dirname(__file__), 'tests', 'data')
 
 __all__ = ['CTD',
            'asof',
@@ -31,7 +20,8 @@ __all__ = ['CTD',
            'from_fsi',
            'rosette_summary']
 
-#TODO: https://github.com/nilmtk/nilmtk/issues/83
+
+# TODO: https://github.com/nilmtk/nilmtk/issues/83
 def asof(self, label):
     """FIXME: pandas index workaround."""
     if label not in self:
@@ -59,7 +49,7 @@ class CTD(DataFrame):
 
     def __reduce__(self):
         return self.__class__, (
-            DataFrame(self), # NOTE Using that type(data)==DataFrame and the
+            DataFrame(self),  # NOTE Using that type(data)==DataFrame and the
                               # the rest of the arguments of DataFrame.__init__
                               # to defaults, the constructors acts as a
                               # copy constructor.
@@ -88,10 +78,10 @@ def from_edf(fname, compression=None, below_water=False, lon=None,
     Examples
     --------
     >>> from ctd import DataFrame
-    >>> cast = DataFrame.from_edf('../test/data/XBT.EDF.gz',
+    >>> cast = DataFrame.from_edf('{}/{}'.format(data_path, 'XBT.EDF.gz'),
     ...                           compression='gzip')
     >>> fig, ax = cast['temperature'].plot()
-    >>> ax.axis([20, 24, 19, 0])
+    >>> _ = ax.axis([20, 24, 19, 0])
     >>> ax.grid(True)
     """
     f = read_file(fname, compression=compression)
@@ -159,10 +149,11 @@ def from_cnv(fname, compression=None, below_water=False, lon=None,
     Examples
     --------
     >>> from ctd import DataFrame
-    >>> cast = DataFrame.from_cnv('../test/data/CTD_big.cnv.bz2',
+    >>> cast = DataFrame.from_cnv('{}/{}'.format(data_path,
+    ...                                          'CTD_big.cnv.bz2'),
     ...                           compression='bz2')
     >>> downcast, upcast = cast.split()
-    >>> fig, ax = downcast['t090c'].plot()
+    >>> fig, ax = downcast['t090C'].plot()
     >>> ax.grid(True)
     """
 
@@ -172,7 +163,7 @@ def from_cnv(fname, compression=None, below_water=False, lon=None,
         line = line.strip()
         if '# name' in line:  # Get columns names.
             name, unit = line.split('=')[1].split(':')
-            name, unit = map(normalize_names, (name, unit))
+            name, unit = list(map(normalize_names, (name, unit)))
             names.append(name)
         if line.startswith('*'):  # Get header.
             header.append(line)
@@ -208,15 +199,16 @@ def from_cnv(fname, compression=None, below_water=False, lon=None,
     f.close()
 
     key_set = False
-    prkeys = ['prDM','prdM']
+    prkeys = ['prDM', 'prdM']
     for prkey in prkeys:
         try:
             cast.set_index(prkey, drop=True, inplace=True)
             key_set = True
         except KeyError:
             continue
-    if not key_set: raise KeyError(
-            'Could not find pressure field (supported names are {}).'.format(prkeys))
+    if not key_set:
+        msg = 'Could not find pressure field (supported names are {}).'
+        raise KeyError(msg.format(prkeys))
     cast.index.name = 'Pressure [dbar]'
 
     name = basename(fname)[0]
@@ -245,8 +237,8 @@ def from_fsi(fname, compression=None, skiprows=9, below_water=False,
     Examples
     --------
     >>> from ctd import DataFrame
-    >>> cast = DataFrame.from_fsi('../test/data/FSI.txt.zip',
-    ...                           compression='zip')
+    >>> cast = DataFrame.from_fsi('{}/{}'.format(data_path, 'FSI.txt.gz'),
+    ...                           compression='gzip')
     >>> downcast, upcast = cast.split()
     >>> fig, ax = downcast['TEMP'].plot()
     >>> ax.grid(True)
@@ -275,7 +267,7 @@ def rosette_summary(fname):
 
     Examples
     --------
-    >>> fname = '../test/data/CTD/g01l01s01.ros'
+    >>> fname = '{}/{}'.format(data_path, 'CTD/g01l01s01.ros')
     >>> ros = rosette_summary(fname)
     >>> ros = ros.groupby(ros.index).mean()
     >>> np.int_(ros.pressure.values)

@@ -1,16 +1,4 @@
-# -*- coding: utf-8 -*-
-#
-# test_processing.py
-#
-# purpose:  Test processing step from ctd.py
-# author:   Filipe P. A. Fernandes
-# e-mail:   ocefpaf@gmail
-# web:      http://ocefpaf.tiddlyspot.com/
-# created:  01-Mar-2013
-# modified: Thu 22 Aug 2013 01:21:28 PM BRT
-#
-# obs:
-#
+from __future__ import absolute_import, unicode_literals
 
 import os
 import re
@@ -30,19 +18,22 @@ data_path = os.path.join(os.path.dirname(__file__), 'data')
 
 def alphanum_key(s):
     key = re.split(r"(\d+)", s)
-    key[1::2] = map(int, key[1::2])
+    key[1::2] = list(map(int, key[1::2]))
     return key
 
 
 def proc_ctd(fname, compression='gzip', below_water=True):
-    """Quick-n-dirty CTD processing."""
+    """
+    CTD processing steps.
+
+    """
     # 00-Split, clean 'bad pump' data, and apply flag.
     cast = DataFrame.from_cnv(fname, compression=compression,
                               below_water=below_water).split()[0]
-    if 'pumps' in df.columns:
+    if 'pumps' in cast.columns:
         # True for good values.
         cast = cast[cast['pumps']]
-    if 'flag' in df.columns:
+    if 'flag' in cast.columns:
         # True for bad values.
         cast = cast[~cast['flag']]
     name = os.path.basename(fname).split('.')[0]
@@ -53,7 +44,7 @@ def proc_ctd(fname, compression='gzip', below_water=True):
                 'oxsatMm/Kg', 'par', 'pla', 'sva', 't090C', 't190C', 'tsa',
                 'sbeox0V'])
 
-    null = map(cast.pop, keep.symmetric_difference(cast.columns))
+    null = list(map(cast.pop, keep.symmetric_difference(cast.columns)))
     del null
 
     # Smooth velocity with a 2 seconds windows.
@@ -105,9 +96,11 @@ def proc_ctd(fname, compression='gzip', below_water=True):
 
 class BasicProcessingTests(unittest.TestCase):
     def setUp(self):
-        self.raw = DataFrame.from_cnv('data/CTD-spiked-unfiltered.cnv.bz2',
+        name = 'CTD-spiked-unfiltered.cnv.bz2'
+        self.raw = DataFrame.from_cnv('{}/{}'.format(data_path, name),
                                       compression='bz2')
-        self.prc = DataFrame.from_cnv(fname='data/CTD-spiked-filtered.cnv.bz2',
+        name = 'CTD-spiked-filtered.cnv.bz2'
+        self.prc = DataFrame.from_cnv('{}/{}'.format(data_path, name),
                                       compression='bz2')
 
     def tearDown(self):

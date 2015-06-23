@@ -1,27 +1,14 @@
-# -*- coding: utf-8 -*-
-#
-# processing.py
-#
-# purpose:  Functions and methods for CTD data processing.
-# author:   Filipe P. A. Fernandes
-# e-mail:   ocefpaf@gmail
-# web:      http://ocefpaf.tiddlyspot.com/
-# created:  23-Jul-2013
-# modified: Wed 24 Jul 2013 08:17:22 PM BRT
-#
-# obs:
-#
-
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 # Scientific stack.
-import gsw
+import os
 import numpy as np
 import numpy.ma as ma
 
-from scipy import signal
 from pandas import Series, Index
 from .utilities import rolling_window
+
+data_path = os.path.join(os.path.dirname(__file__), 'tests', 'data')
 
 __all__ = ['data_conversion',  # TODO: Add as a constructor.
            'align',
@@ -76,8 +63,9 @@ def despike(self, n1=2, n2=20, block=100, keep=0):
     # Use the last value to fill-up.
     std = np.r_[std, np.tile(std[-1], block - 1)]
     mean = np.r_[mean, np.tile(mean[-1], block - 1)]
-    mask = (np.abs(self.values.astype(float) - mean.filled(fill_value=np.NaN))
-            > std.filled(fill_value=np.NaN))
+    values = self.values.astype(float)
+    mask = (np.abs(values - mean.filled(fill_value=np.NaN)) >
+            std.filled(fill_value=np.NaN))
 
     clean = self.astype(float).copy()
     clean[mask] = np.NaN
@@ -94,29 +82,30 @@ def lp_filter(data, sample_rate=24.0, time_constant=0.15):
     --------
     >>> import matplotlib.pyplot as plt
     >>> from ctd import DataFrame, lp_filter
-    >>> raw = DataFrame.from_cnv('../test/data/CTD-spiked-unfiltered.cnv.bz2',
+    >>> name = 'CTD-spiked-unfiltered.cnv.bz2'
+    >>> raw = DataFrame.from_cnv('{}/{}'.format(data_path, name),
     ...                          compression='bz2')
-    >>> prc = DataFrame.from_cnv('../test/data/CTD-spiked-filtered.cnv.bz2',
+    >>> name = 'CTD-spiked-filtered.cnv.bz2'
+    >>> prc = DataFrame.from_cnv('{}/{}'.format(data_path, name),
     ...                          compression='bz2')
     >>> kw = dict(sample_rate=24.0, time_constant=0.15)
     >>> original = prc.index.values
     >>> unfiltered = raw.index.values
     >>> filtered = lp_filter(unfiltered, **kw)
     >>> fig, ax = plt.subplots()
-    >>> ax.plot(original, 'k', label='original')
-    >>> ax.plot(unfiltered, 'r', label='unfiltered')
-    >>> ax.plot(filtered, 'g', label='filtered')
-    >>> ax.legend()
-    >>> ax.axis([33564, 33648, 1034, 1035])
-    >>> plt.show()
+    >>> l1, = ax.plot(original, 'k', label='original')
+    >>> l2, = ax.plot(unfiltered, 'r', label='unfiltered')
+    >>> l3, = ax.plot(filtered, 'g', label='filtered')
+    >>> leg = ax.legend()
+    >>> _ = ax.axis([33564, 33648, 1034, 1035])
 
     NOTES
     -----
     http://wiki.scipy.org/Cookbook/FIRFilter
+
     """
 
-    if False:  # FIXME:
-        cosine = signal.cosine(Wn)
+    from scipy import signal
 
     if True:  # Butter is closer to what SBE is doing with their cosine filter.
         Wn = (1. / time_constant) / (sample_rate * 2.)
@@ -130,8 +119,9 @@ def cell_thermal_mass(temperature, conductivity):
     """
     FIXME: UNFINISHED!
     Sample interval is measured in seconds.
-    Temperature in °C
+    Temperature in degrees.
     CTM is calculated in S/m.
+
     """
 
     alpha = 0.03  # Thermal anomaly amplitude.
@@ -149,9 +139,10 @@ def cell_thermal_mass(temperature, conductivity):
 def press_check(self, column='index'):
     """
     Remove pressure reversals.
+
     """
     data = self.copy()
-    if column is not 'index':
+    if column != 'index':
         press = data[column]
     else:
         press = data.index.values.astype(float)
@@ -219,7 +210,7 @@ def pmel_inversion_check():
     Look for inversions in the processed, binned via computing the centered
     square of the buoyancy frequency, N2, for each bin and linearly
     interpolating temperature, conductivity, and oxygen over those records
-    where N2 ≤ -1 x 10-5 s-2, where there appear to be density inversions.
+    where N2 <= -1 x 10-5 s-2, where there appear to be density inversions.
 
     NOTE: While these could be actual inversions in the CTD records, it is much
     more likely that shed wakes cause these anomalies.  Records that fail the
@@ -246,7 +237,7 @@ def smooth(self, window_len=11, window='hanning'):
     if window_len < 3:
         return Series(data, index=self.index, name=self.name)
 
-    if not window in windows.keys():
+    if window not in list(windows.keys()):
         raise ValueError("""window must be one of 'flat', 'hanning',
                          'hamming', 'bartlett', 'blackman'""")
 
@@ -274,7 +265,9 @@ def barrier_layer_thickness(SA, CT):
     thermocline.  A more precise definition would be the difference between
     mixed layer depth (MLD) calculated from temperature minus the mixed layer
     depth calculated using density.
+
     """
+    import gsw
     sigma_theta = gsw.sigma0_CT_exact(SA, CT)
     mask = mixed_layer_depth(CT)
     mld = np.where(mask)[0][-1]
@@ -287,15 +280,21 @@ def barrier_layer_thickness(SA, CT):
 
 
 def derive_cnv(self):
-    """Compute SP, SA, CT, z, and GP from a cnv pre-processed cast."""
+    """
+    Compute SP, SA, CT, z, and GP from a cnv pre-processed cast.
+
+    """
+    import gsw
     cast = self.copy()  # FIXME: Use MetaDataFrame to propagate lon, lat.
     p = cast.index.values.astype(float)
-    cast['SP'] = gsw.SP_from_C(cast['c0S/m'].values * 10., cast['t090C'].values, p)
+    cast['SP'] = gsw.SP_from_C(cast['c0S/m'].values * 10.,
+                               cast['t090C'].values, p)
     cast['SA'] = gsw.SA_from_SP(cast['SP'].values, p, self.lon, self.lat)
     cast['SR'] = gsw.SR_from_SP(cast['SP'].values)
     cast['CT'] = gsw.CT_from_t(cast['SA'].values, cast['t090C'].values, p)
     cast['z'] = -gsw.z_from_p(p, self.lat)
-    cast['sigma0_CT'] = gsw.sigma0_CT_exact(cast['SA'].values, cast['CT'].values)
+    cast['sigma0_CT'] = gsw.sigma0_CT_exact(cast['SA'].values,
+                                            cast['CT'].values)
     return cast
 
 if __name__ == '__main__':

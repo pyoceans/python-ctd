@@ -1,16 +1,4 @@
-# -*- coding: utf-8 -*-
-#
-# utilities.py
-#
-# purpose:  Utilities functions
-# author:   Filipe P. A. Fernandes
-# e-mail:   ocefpaf@gmail
-# web:      http://ocefpaf.tiddlyspot.com/
-# created:  23-Jul-2013
-# modified: Thu 25 Jul 2013 01:13:03 PM BRT
-#
-# obs:
-#
+from __future__ import absolute_import, unicode_literals
 
 # Standard library.
 import os
@@ -30,13 +18,15 @@ def header(xml):
 
 
 def basename(fname):
-    """Return filename without path.
+    """
+    Return file name without path.
 
     Examples
     --------
     >>> fname = '../test/data/FSI.txt.zip'
-    >>> basename(fname)
-    ('../test/data', 'FSI.txt', '.zip')
+    >>> print('{}, {}, {}'.format(*basename(fname)))
+    ../test/data, FSI.txt, .zip
+
     """
     path, name = os.path.split(fname)
     name, ext = os.path.splitext(name)
@@ -47,6 +37,7 @@ def rolling_window(data, block):
     """
     http://stackoverflow.com/questions/4936620/
     Using strides for an efficient moving average filter.
+
     """
     shape = data.shape[:-1] + (data.shape[-1] - block + 1, block)
     strides = data.strides + (data.strides[-1],)
@@ -56,8 +47,9 @@ def rolling_window(data, block):
 def extrap1d(interpolator):
     """
     http://stackoverflow.com/questions/2745329/
-    How to make scipy.interpolate give an extrapolated result beyond the
+    How to make scipy.interpolate return an extrapolated result beyond the
     input range.
+
     """
     xs, ys = interpolator.x, interpolator.y
 

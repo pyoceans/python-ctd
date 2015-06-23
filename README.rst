@@ -10,9 +10,12 @@ python-ctd
 .. image:: http://bottlepy.org/docs/dev/_static/Gittip.png
    :target: https://www.gittip.com/ocefpaf/
    :alt: Gittip
+.. image:: https://zenodo.org/badge/doi/10.5281/zenodo.11396.png
+   :target: http://dx.doi.org/10.5281/zenodo.11396
+   :alt: DOI
 
-Tools to load hydrographic data into pandas DataFrame (and some
-rudimentary methods for data pre-processing/analysis).
+Tools to load hydrographic data as pandas DataFrame with some handy methods for
+data pre-processing and analysis
 
 This module can load `SeaBird CTD
 (CNV) <http://www.seabird.com/software/SBEDataProcforWindows.htm>`_,

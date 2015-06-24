@@ -1,25 +1,20 @@
 language: python
-python:
-  - "2.7"
-  - "3.3"
-# Setup Anaconda.
+
+env:
+    - CONDA="python=2.7"
+    - CONDA="python=3.4"
+
 before_install:
-  - wget http://repo.continuum.io/miniconda/Miniconda-2.2.2-Linux-x86_64.sh -O miniconda.sh
-  - chmod +x miniconda.sh
-  - ./miniconda.sh -b
-  - export PATH=/home/travis/anaconda/bin:$PATH
-  # Update conda itself.
-  - conda update --yes conda
-  # The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda.
-  - sudo rm -rf /dev/shm
-  - sudo ln -s /run/shm /dev/shm
-  # GUI
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-install:
-  - conda create --yes -n env_name python=$TRAVIS_PYTHON_VERSION pip numpy scipy matplotlib pandas nose
-  - source activate env_name
-  - pip install gsw # Not in anaconda.
-  - python setup.py install
+    - wget http://bit.ly/miniconda -O miniconda.sh
+    - bash miniconda.sh -b -p $HOME/miniconda
+    - export PATH="$HOME/miniconda/bin:$PATH"
+    - conda update --yes conda
+    - travis_retry conda create --yes -n test $CONDA --file requirements.txt
+    - source activate test
+    - travis_retry conda install --yes pip
+    - travis_retry pip install gsw pytest
+    # GUI
+    - "export DISPLAY=:99.0"
+    - "sh -e /etc/init.d/xvfb start"
 script:
-  - cd ctd/tests && nosetests --verbose --nocapture test_plotting.py test_ctd.py test_processing.py
+    - python setup.py test

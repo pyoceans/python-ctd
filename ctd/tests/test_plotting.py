@@ -1,15 +1,4 @@
-#
-# test_processing.py
-#
-# purpose:  Test processing step from ctd.py
-# author:   Filipe P. A. Fernandes
-# e-mail:   ocefpaf@gmail
-# web:      http://ocefpaf.tiddlyspot.com/
-# created:  01-Mar-2013
-# modified: Fri 04 Oct 2013 09:10:39 AM BRT
-#
-# obs:
-#
+from __future__ import absolute_import, unicode_literals
 
 import matplotlib
 matplotlib.use('Agg')
@@ -24,7 +13,6 @@ try:
     from collections import OrderedDict
 except ImportError:
     raise nose.SkipTest
-from pandas.util.testing import ensure_clean
 
 from pandas import Panel
 import matplotlib.pyplot as plt
@@ -54,9 +42,7 @@ def _check_plot_works(f, *args, **kwargs):
 
     assert fig is not None
     assert_is_valid_plot_return_object(ax)
-
-    with ensure_clean() as path:
-        plt.savefig(path)
+    plt.close()
 
 
 def _check_section_works(f, **kwargs):
@@ -64,19 +50,20 @@ def _check_section_works(f, **kwargs):
 
     assert fig is not None
     assert_is_valid_plot_return_object(ax)
-
-    with ensure_clean() as path:
-        plt.savefig(path)
+    plt.close()
 
 
 def alphanum_key(s):
     key = re.split(r"(\d+)", s)
-    key[1::2] = map(int, key[1::2])
+    key[1::2] = list(map(int, key[1::2]))
     return key
 
 
 def proc_ctd(fname):
-    """Quick-n-dirty CTD processing."""
+    """
+    CTD processing.
+
+    """
     cast = DataFrame.from_cnv(fname, compression='gzip',
                               below_water=True).split()[0]
     cast = cast[cast['pumps']]
@@ -129,11 +116,12 @@ class BasicPlotting(unittest.TestCase):
             raise nose.SkipTest
 
     def setUp(self):
-        self.xbt = DataFrame.from_edf(fname='data/XBT.EDF.zip',
+        self.xbt = DataFrame.from_edf('{}/{}'.format(data_path, 'XBT.EDF.zip'),
                                       compression='zip')
-        self.fsi = DataFrame.from_fsi(fname='data/FSI.txt.gz',
+        self.fsi = DataFrame.from_fsi('{}/{}'.format(data_path, 'FSI.txt.gz'),
                                       compression='gzip', skiprows=9)
-        self.cnv = DataFrame.from_cnv(fname='data/CTD_big.cnv.bz2',
+        self.cnv = DataFrame.from_cnv('{}/{}'.format(data_path,
+                                                     'CTD_big.cnv.bz2'),
                                       compression='bz2')
 
     def tearDown(self):

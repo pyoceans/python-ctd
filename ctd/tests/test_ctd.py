@@ -1,20 +1,7 @@
-#
-# test_ctd.py
-#
-# purpose:  Test basic read/load and save from ctd.py
-# author:   Filipe P. A. Fernandes
-# e-mail:   ocefpaf@gmail
-# web:      http://ocefpaf.tiddlyspot.com/
-# created:  01-Mar-2013
-# modified: Thu 22 Aug 2013 01:20:51 PM BRT
-#
-# obs: TODO: to_nc test.
-#
+from __future__ import absolute_import, unicode_literals
 
 import re
 import os
-import bz2
-import gzip
 import nose
 import unittest
 from io import StringIO
@@ -30,6 +17,8 @@ from ctd.utilities import read_file
 from ctd import (DataFrame, Series, rosette_summary, lp_filter, movingaverage,
                  derive_cnv, plot_section)
 
+data_path = os.path.join(os.path.dirname(__file__), 'data')
+
 
 def alphanum_key(s):
     key = re.split(r"(\d+)", s)
@@ -38,22 +27,18 @@ def alphanum_key(s):
 
 
 def proc_ctd(fname, compression='gzip', below_water=True):
-    """Quick `proc_ctd` function."""
+    """
+    Quick `proc_ctd` function.
+
+    """
     # 00-Split, clean 'bad pump' data, and apply flag.
+
     cast = DataFrame.from_cnv(fname, compression=compression,
                               below_water=below_water).split()[0]
+
+    name = os.path.basename(fname).split('.')[0]
     cast = cast[cast['pumps']]
     cast = cast[~cast['flag']]  # True for bad values.
-    name = os.path.basename(fname).split('.')[0]
-
-    # Removed unwanted columns.
-    keep = set(['altM', 'c0S/m', 'dz/dtM', 'wetCDOM', 'latitude',
-                'longitude', 'sbeox0Mm/Kg', 'sbeox1Mm/Kg', 'oxsolMm/Kg',
-                'oxsatMm/Kg', 'par', 'pla', 'sva', 't090C', 't190C', 'tsa',
-                'sbeox0V'])
-    drop = keep.symmetric_difference(cast.columns)
-
-    cast.drop(drop, axis=1, inplace=True)
 
     # Smooth velocity with a 2 seconds windows.
     cast['dz/dtM'] = movingaverage(cast['dz/dtM'], window_size=48)
@@ -101,31 +86,39 @@ def proc_ctd(fname, compression='gzip', below_water=True):
 
 class ReadFile(unittest.TestCase):
     def test_zip(self):
-        cfile = read_file('data/XBT.EDF.zip', compression='zip')
+        cfile = read_file('{}/{}'.format(data_path, 'XBT.EDF.zip'),
+                          compression='zip')
         self.assertIsInstance(cfile, StringIO)
 
     def test_gzip(self):
-        cfile = read_file('data/XBT.EDF.gz', compression='gzip')
+        cfile = read_file('{}/{}'.format(data_path, 'XBT.EDF.gz'),
+                          compression='gzip')
         self.assertIsInstance(cfile, StringIO)
 
     def test_bz2(self):
-        cfile = read_file('data/XBT.EDF.bz2', compression='bz2')
+        cfile = read_file('{}/{}'.format(data_path, 'XBT.EDF.bz2'),
+                          compression='bz2')
         self.assertIsInstance(cfile, StringIO)
 
     def test_uncompresed(self):
-        cfile = read_file('data/XBT.EDF', compression=None)
+        cfile = read_file('{}/{}'.format(data_path, 'XBT.EDF'),
+                          compression=None)
         self.assertIsInstance(cfile, StringIO)
 
 
 class DataFrameTests(unittest.TestCase):
     def setUp(self):
-        self.xbt = DataFrame.from_edf(fname='data/XBT.EDF.zip',
+        self.xbt = DataFrame.from_edf('{}/{}'.format(data_path,
+                                                     'XBT.EDF.zip'),
                                       compression='zip')
-        self.fsi = DataFrame.from_fsi(fname='data/FSI.txt.gz',
+        self.fsi = DataFrame.from_fsi('{}/{}'.format(data_path,
+                                                     'FSI.txt.gz'),
                                       compression='gzip', skiprows=9)
-        self.cnv = DataFrame.from_cnv(fname='data/CTD_big.cnv.bz2',
+        self.cnv = DataFrame.from_cnv('{}/{}'.format(data_path,
+                                                     'CTD_big.cnv.bz2'),
                                       compression='bz2')
-        self.ros = rosette_summary(fname='data/CTD/g01l03s01m-m2.ros')
+        self.ros = rosette_summary('{}/{}'.format(data_path,
+                                                  'CTD/g01l03s01m-m2.ros'))
 
     def tearDown(self):
         unittest.TestCase.tearDown(self)
@@ -157,21 +150,27 @@ class HeaderTest(unittest.TestCase):
 
     def test_header_parse(self):
         lon, lat = '-42', '42'
-        xbt1 = DataFrame.from_edf(fname='data/C3_00005.edf',
+        xbt1 = DataFrame.from_edf('{}/{}'.format(data_path, 'C3_00005.edf'),
                                   lon=lon, lat=lat)
         self.assertTrue((xbt1.longitude, xbt1.latitude) ==
                         (float(lon), float(lat)))
 
         with self.assertRaises(ValueError):
-            xbt2 = DataFrame.from_edf(fname='data/C3_00005.edf',
-                                      lon=None, lat=None)
+            DataFrame.from_edf('{}/{}'.format(data_path,
+                                              'C3_00005.edf'),
+                               lon=None, lat=None)
 
     def test_pressure_field_labels(self):
-        """Support different pressure field labels encountered in Sea-Bird cnv files (issue #3) 
         """
-        for fname in sorted(glob('./data/CTD/issue3prlabworks*.cnv')):
+        Support different pressure field labels encountered in
+        Sea-Bird cnv files (issue #3)
+
+        """
+        for fname in sorted(glob('{}/{}'.format(data_path,
+                                                'issue3prlabworks*.cnv'))):
             DataFrame.from_cnv(fname)
-        for fname in sorted(glob('./data/CTD/issue3prlabfails*.cnv')):
+        for fname in sorted(glob('{}/{}'.format(data_path,
+                                                'issue3prlabfails*.cnv'))):
             with self.assertRaises(KeyError):
                 DataFrame.from_cnv(fname)
 
@@ -179,7 +178,7 @@ class HeaderTest(unittest.TestCase):
 class SectionTest(unittest.TestCase):
     def setUp(self):
         lon, lat = [], []
-        pattern = './data/CTD/g01mcan*c.cnv.gz'
+        pattern = '{}/{}'.format(data_path, 'CTD/g01mcan*c.cnv.gz')
         fnames = sorted(glob(pattern), key=alphanum_key)
         try:
             section = OrderedDict()

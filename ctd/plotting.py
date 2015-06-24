@@ -1,28 +1,14 @@
 # -*- coding: utf-8 -*-
-#
-# plotting.py
-#
-# purpose:  Plotting methods for ctd DataFrame.
-# author:   Filipe P. A. Fernandes
-# e-mail:   ocefpaf@gmail
-# web:      http://ocefpaf.tiddlyspot.com/
-# created:  23-Jul-2013
-# modified: Tue 23 Jul 2013 01:31:06 PM BRT
-#
-# obs:
-#
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 # Scientific stack.
-import gsw
 import numpy as np
 import numpy.ma as ma
 import matplotlib.pyplot as plt
 import mpl_toolkits.axisartist as AA
 
 from pandas import Series
-from scipy.interpolate import interp1d
 from mpl_toolkits.axes_grid1 import host_subplot
 
 from .utilities import extrap1d
@@ -64,11 +50,9 @@ def extrap_sec(data, dist, depth, w1=1., w2=0):
     Sec_extrap : array_like
                  Extrapolated variable
 
-    Examples
-    --------
-    >>> import data, dist, z
-    >>> Sec_extrap = extrap_sec(data, dist, z, fd=1.)
     """
+    from scipy.interpolate import interp1d
+
     new_data1 = []
     for row in data:
         mask = ~np.isnan(row)
@@ -128,28 +112,16 @@ def gen_topomask(h, lon, lat, dx=1., kind='linear', plot=False):
     hm : array
          Local depth [m].
 
-    Examples
-    --------
-    >>> import gsw
-    >>> import df  # FIXME: Add a dataset.
-    >>> h = df.get_maxdepth()
-    >>> # TODO: method to output distance.
-    >>> x = np.append(0, np.cumsum(gsw.distance(df.lon, df.lat)[0] / 1e3))
-    >>> xm, hm = gen_topomask(h, df.lon, df.lat, dx=1., kind='linear')
-    >>> fig, ax = plt.subplots()
-    >>> ax.plot(xm, hm, 'k', linewidth=1.5)
-    >>> ax.plot(x, h, 'ro')
-    >>> ax.set_xlabel('Distance [km]')
-    >>> ax.set_ylabel('Depth [m]')
-    >>> ax.grid(True)
-    >>> plt.show()
-
     Author
     ------
     André Palóczy Filho (paloczy@gmail.com) --  October/2012
+
     """
 
-    h, lon, lat = map(np.asanyarray, (h, lon, lat))
+    import gsw
+    from scipy.interpolate import interp1d
+
+    h, lon, lat = list(map(np.asanyarray, (h, lon, lat)))
     # Distance in km.
     x = np.append(0, np.cumsum(gsw.distance(lon, lat)[0] / 1e3))
     h = -gsw.z_from_p(h, lat.mean())
@@ -195,7 +167,7 @@ def plot_vars(self, variables=None, **kwds):
     ax1.plot(self[variables[1]], self.index, 'b.', label='Salinity')
 
     ax0.set_ylabel("Pressure [dbar]")
-    ax0.set_xlabel(u"Temperature [\u00b0C]")
+    ax0.set_xlabel("Temperature [\u00b0C]")
     ax1.set_xlabel("Salinity [kg g$^{-1}$]")
     ax1.invert_yaxis()
 
@@ -219,7 +191,10 @@ def plot_vars(self, variables=None, **kwds):
 
 
 def plot_section(self, reverse=False, filled=False, **kw):
-    lon, lat, data = map(np.asanyarray, (self.lon, self.lat, self.values))
+    import gsw
+
+    lon, lat, data = list(map(np.asanyarray,
+                              (self.lon, self.lat, self.values)))
     data = ma.masked_invalid(data)
     h = self.get_maxdepth()
     if reverse:
@@ -255,9 +230,9 @@ def plot_section(self, reverse=False, filled=False, **kw):
     linewidth = kw.pop('linewidth', 1.5)
 
     # Station symbols key words.
+    station_marker = kw.pop('station_marker', None)
     color = kw.pop('color', 'k')
     offset = kw.pop('offset', -5)
-    marker = kw.pop('marker', 'v')
     alpha = kw.pop('alpha', 0.5)
 
     # Figure.
@@ -267,9 +242,9 @@ def plot_section(self, reverse=False, filled=False, **kw):
     ax.plot(xm, hm, color='black', linewidth=linewidth, zorder=3)
     ax.fill_between(xm, hm, y2=hm.max(), color='0.9', zorder=3)
 
-    if marker:
-        ax.plot(x, [offset] * len(h), color=color, marker=marker, alpha=alpha,
-                zorder=5)
+    if station_marker:
+        ax.plot(x, [offset] * len(h), color=color, marker=station_marker,
+                alpha=alpha, zorder=5)
     ax.set_xlabel('Cross-shore distance [km]', fontsize=fontsize)
     ax.set_ylabel('Depth [m]', fontsize=fontsize)
     ax.set_ylim(offset, hm.max())

@@ -1,68 +1,81 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
 
-import io
-import re
-from setuptools import setup
-
-VERSIONFILE = "ctd/__init__.py"
-verstrline = open(VERSIONFILE, "rt").read()
-VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
-mo = re.search(VSRE, verstrline, re.M)
-if mo:
-    verstr = mo.group(1)
-else:
-    raise RuntimeError("Unable to find version string in %s." % (VERSIONFILE,))
+import os
+import sys
+try:
+    from setuptools import setup
+    from setuptools.command.test import test as TestCommand
+except ImportError:
+    from distutils.core import setup
 
 
-def read(*filenames, **kwargs):
-    encoding = kwargs.get('encoding', 'utf-8')
-    sep = kwargs.get('sep', '\n')
-    buf = []
-    for filename in filenames:
-        with io.open(filename, encoding=encoding) as f:
-            buf.append(f.read())
-    return sep.join(buf)
+class PyTest(TestCommand):
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = ['--verbose']
+        self.test_suite = True
 
-long_description = read('README.rst', 'CHANGES.txt')
+    def run_tests(self):
+        import pytest
+        errno = pytest.main(self.test_args)
+        sys.exit(errno)
+
+
+def extract_version():
+    version = None
+    fdir = os.path.dirname(__file__)
+    fnme = os.path.join(fdir, 'ctd', '__init__.py')
+    with open(fnme) as fd:
+        for line in fd:
+            if (line.startswith('__version__')):
+                _, version = line.split('=')
+                # Remove quotation characters.
+                version = version.strip()[1:-1]
+                break
+    return version
+
+rootpath = os.path.abspath(os.path.dirname(__file__))
+
+
+def read(*parts):
+    return open(os.path.join(rootpath, *parts), 'r').read()
+
+
+long_description = '{}\n{}'.format(read('README.rst'), read('CHANGES.txt'))
 LICENSE = read('LICENSE.txt')
 
 
-source = 'http://pypi.python.org/packages/source'
-install_requires = ['numpy', 'scipy', 'matplotlib', 'pandas', 'seawater',
-                    'gsw', 'ctd']
-
-classifiers = """\
-Development Status :: 5 - Production/Stable
-Environment :: Console
-Intended Audience :: Science/Research
-Intended Audience :: Developers
-Intended Audience :: Education
-License :: OSI Approved :: MIT License
-Operating System :: OS Independent
-Programming Language :: Python
-Topic :: Scientific/Engineering
-Topic :: Education
-Topic :: Software Development :: Libraries :: Python Modules
-"""
+with open('requirements.txt') as f:
+    require = f.readlines()
+install_requires = [r.strip() for r in require]
 
 config = dict(name='ctd',
-              version=verstr,
+              version=extract_version(),
               packages=['ctd'],
-              test_suite='tests',
-              use_2to3=True,
               license=LICENSE,
               long_description=long_description,
-              classifiers=filter(None, classifiers.split("\n")),
+              classifiers=['Development Status :: 5 - Production/Stable',
+                           'Environment :: Console',
+                           'Intended Audience :: Science/Research',
+                           'Intended Audience :: Developers',
+                           'Intended Audience :: Education',
+                           'License :: OSI Approved :: MIT License',
+                           'Operating System :: OS Independent',
+                           'Programming Language :: Python',
+                           'Topic :: Scientific/Engineering',
+                           'Topic :: Education',
+                           ],
               description='Tools to load hydrographic data as DataFrames',
               author='Filipe Fernandes',
               author_email='ocefpaf@gmail.com',
               maintainer='Filipe Fernandes',
               maintainer_email='ocefpaf@gmail.com',
-              url='http://pypi.python.org/pypi/ctd/',
-              download_url='%s/c/ctd/ctd-%s.tar.gz' % (source, verstr),
+              url='https://github.com/pyoceans/python-ctd',
+              download_url='http://pypi.python.org/pypi/ctd/',
               platforms='any',
               keywords=['oceanography', 'data analysis', 'DataFrame'],
-              install_requires=install_requires)
+              install_requires=install_requires,
+              tests_require=['pytest'],
+              cmdclass={'test': PyTest},)
 
 setup(**config)

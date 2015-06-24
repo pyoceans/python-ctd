@@ -1,10 +1,12 @@
 Changelog
 ---------
 
-Version 0.2.x
+Version 0.2.2
 
 * Support for different searbird `cnv` pressure spellings ('prDM' and 'prdM')
   thanks @j08lue.
+* Lazy import for optinal dependencies (`gsw` and `scipy`).
+* Several small bug fixes
 
 Version 0.2.1
 

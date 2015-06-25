@@ -7,12 +7,13 @@ python-ctd
 .. image:: https://api.travis-ci.org/pyoceans/python-ctd.png?branch=master
    :target: https://travis-ci.org/pyoceans/python-ctd
    :alt: Travs-CI
-.. image:: http://bottlepy.org/docs/dev/_static/Gittip.png
-   :target: https://www.gittip.com/ocefpaf/
-   :alt: Gittip
 .. image:: https://zenodo.org/badge/doi/10.5281/zenodo.11396.png
    :target: http://dx.doi.org/10.5281/zenodo.11396
    :alt: DOI
+
+.. image:: http://bottlepy.org/docs/dev/_static/Gittip.png
+   :target: https://www.gittip.com/ocefpaf/
+   :alt: Gittip
 
 Tools to load hydrographic data as pandas DataFrame with some handy methods for
 data pre-processing and analysis

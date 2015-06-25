@@ -4,8 +4,8 @@ python-ctd
 .. image:: https://badge.fury.io/py/ctd.png
    :target: http://badge.fury.io/py/ctd
    :alt: Latest version
-.. image:: https://api.travis-ci.org/ocefpaf/python-ctd.png?branch=master
-   :target: https://travis-ci.org/ocefpaf/python-ctd
+.. image:: https://api.travis-ci.org/pyoceans/python-ctd.png?branch=master
+   :target: https://travis-ci.org/pyoceans/python-ctd
    :alt: Travs-CI
 .. image:: http://bottlepy.org/docs/dev/_static/Gittip.png
    :target: https://www.gittip.com/ocefpaf/

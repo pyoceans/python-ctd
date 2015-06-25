@@ -121,7 +121,7 @@ class BasicPlotting(unittest.TestCase):
         self.fsi = DataFrame.from_fsi('{}/{}'.format(data_path, 'FSI.txt.gz'),
                                       compression='gzip', skiprows=9)
         self.cnv = DataFrame.from_cnv('{}/{}'.format(data_path,
-                                                     'CTD_big.cnv.bz2'),
+                                                     'small.cnv.bz2'),
                                       compression='bz2')
 
     def tearDown(self):

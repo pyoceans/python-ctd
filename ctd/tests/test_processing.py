@@ -164,7 +164,6 @@ class BasicProcessingTests(unittest.TestCase):
 
 
 class AdvancedProcessingTests(unittest.TestCase):
-
     def setUp(self):
         lon, lat = [], []
         pattern = '%s/CTD/g01mcan*c.cnv.gz' % data_path

@@ -1,12 +1,7 @@
-from __future__ import absolute_import, unicode_literals
-
 import os
 import sys
-try:
-    from setuptools import setup
-    from setuptools.command.test import test as TestCommand
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup
+from setuptools.command.test import test as TestCommand
 
 
 class PyTest(TestCommand):
@@ -49,33 +44,32 @@ with open('requirements.txt') as f:
     require = f.readlines()
 install_requires = [r.strip() for r in require]
 
-config = dict(name='ctd',
-              version=extract_version(),
-              packages=['ctd'],
-              license=LICENSE,
-              long_description=long_description,
-              classifiers=['Development Status :: 5 - Production/Stable',
-                           'Environment :: Console',
-                           'Intended Audience :: Science/Research',
-                           'Intended Audience :: Developers',
-                           'Intended Audience :: Education',
-                           'License :: OSI Approved :: MIT License',
-                           'Operating System :: OS Independent',
-                           'Programming Language :: Python',
-                           'Topic :: Scientific/Engineering',
-                           'Topic :: Education',
-                           ],
-              description='Tools to load hydrographic data as DataFrames',
-              author='Filipe Fernandes',
-              author_email='ocefpaf@gmail.com',
-              maintainer='Filipe Fernandes',
-              maintainer_email='ocefpaf@gmail.com',
-              url='https://github.com/pyoceans/python-ctd',
-              download_url='http://pypi.python.org/pypi/ctd/',
-              platforms='any',
-              keywords=['oceanography', 'data analysis', 'DataFrame'],
-              install_requires=install_requires,
-              tests_require=['pytest'],
-              cmdclass={'test': PyTest},)
-
-setup(**config)
+setup(name='ctd',
+      version=extract_version(),
+      license=LICENSE,
+      long_description=long_description,
+      classifiers=['Development Status :: 5 - Production/Stable',
+                  'Environment :: Console',
+                  'Intended Audience :: Science/Research',
+                  'Intended Audience :: Developers',
+                  'Intended Audience :: Education',
+                  'License :: OSI Approved :: MIT License',
+                  'Operating System :: OS Independent',
+                  'Programming Language :: Python',
+                  'Topic :: Scientific/Engineering',
+                  'Topic :: Education',
+                  ],
+      description='Tools to load hydrographic data as DataFrames',
+      author='Filipe Fernandes',
+      author_email='ocefpaf@gmail.com',
+      maintainer='Filipe Fernandes',
+      maintainer_email='ocefpaf@gmail.com',
+      url='https://github.com/pyoceans/python-ctd',
+      download_url='http://pypi.python.org/pypi/ctd/',
+      platforms='any',
+      keywords=['oceanography', 'data analysis', 'DataFrame'],
+      install_requires=install_requires,
+      tests_require=['pytest'],
+      cmdclass=dict(test=PyTest),
+      packages=['ctd', 'ctd/tests'],
+      )

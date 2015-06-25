@@ -115,7 +115,7 @@ class DataFrameTests(unittest.TestCase):
                                                      'FSI.txt.gz'),
                                       compression='gzip', skiprows=9)
         self.cnv = DataFrame.from_cnv('{}/{}'.format(data_path,
-                                                     'CTD_big.cnv.bz2'),
+                                                     'small.cnv.bz2'),
                                       compression='bz2')
         self.ros = rosette_summary('{}/{}'.format(data_path,
                                                   'CTD/g01l03s01m-m2.ros'))
@@ -123,7 +123,7 @@ class DataFrameTests(unittest.TestCase):
     def tearDown(self):
         unittest.TestCase.tearDown(self)
 
-    """Check if a DataFrame is returned."""
+    # Check if a DataFrame is returned.
     def test_fsi_is_dataframe(self):
         self.assertIsInstance(self.fsi, DataFrame)
 
@@ -133,7 +133,7 @@ class DataFrameTests(unittest.TestCase):
     def test_cnv_is_dataframe(self):
         self.assertIsInstance(self.cnv, DataFrame)
 
-    """Check if DataFrame is not empty."""
+    # Check if DataFrame is not empty
     def test_fsi_is_not_empty(self):
         self.assertFalse(self.fsi.empty)
 

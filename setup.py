@@ -16,10 +16,10 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 
-def extract_version():
+def extract_version(module='ctd'):
     version = None
     fdir = os.path.dirname(__file__)
-    fnme = os.path.join(fdir, 'ctd', '__init__.py')
+    fnme = os.path.join(fdir, module, '__init__.py')
     with open(fnme) as fd:
         for line in fd:
             if (line.startswith('__version__')):
@@ -65,7 +65,7 @@ setup(name='ctd',
       maintainer='Filipe Fernandes',
       maintainer_email='ocefpaf@gmail.com',
       url='https://github.com/pyoceans/python-ctd',
-      download_url='http://pypi.python.org/pypi/ctd/',
+      download_url='http://pypi.python.org/pypi/ctd',
       platforms='any',
       keywords=['oceanography', 'data analysis', 'DataFrame'],
       install_requires=install_requires,

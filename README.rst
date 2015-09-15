@@ -1,18 +1,23 @@
 python-ctd
 ==========
 
-.. image:: https://badge.fury.io/py/ctd.png
-   :target: http://badge.fury.io/py/ctd
-   :alt: Latest version
-.. image:: https://api.travis-ci.org/pyoceans/python-ctd.png?branch=master
-   :target: https://travis-ci.org/pyoceans/python-ctd
-   :alt: Travs-CI
 .. image:: https://zenodo.org/badge/doi/10.5281/zenodo.11396.png
    :target: http://dx.doi.org/10.5281/zenodo.11396
    :alt: DOI
-
+.. image:: http://img.shields.io/pypi/v/ctd.svg?style=flat
+   :target: https://pypi.python.org/pypi/ctd
+   :alt: Version_status
+.. image:: http://img.shields.io/pypi/dm/ctd.svg?style=flat
+   :target: https://pypi.python.org/pypi/ctd
+   :alt: Downloads
+.. image:: http://img.shields.io/travis/pyoceans/python-ctd/master.svg?style=flat
+   :target: https://travis-ci.org/pyoceans/python-ctd
+   :alt: Build_status
+.. image:: http://img.shields.io/badge/license-MIT-blue.svg?style=flat
+   :target: https://github.com/pyoceans/python-ctd/blob/master/LICENSE.txt
+   :alt: license
 .. image:: http://bottlepy.org/docs/dev/_static/Gittip.png
-   :target: https://www.gittip.com/ocefpaf/
+   :target: https://gratipay.com/~ocefpaf/
    :alt: Gittip
 
 Tools to load hydrographic data as pandas DataFrame with some handy methods for

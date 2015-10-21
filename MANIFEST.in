@@ -1,4 +1,3 @@
 include README.rst
 include *.txt
 include ctd/*.py
-include test/*.py

@@ -7,8 +7,7 @@ from setuptools.command.test import test as TestCommand
 class PyTest(TestCommand):
     def finalize_options(self):
         TestCommand.finalize_options(self)
-        self.test_args = ['--verbose']
-        self.test_suite = True
+        self.verbose = True
 
     def run_tests(self):
         import pytest

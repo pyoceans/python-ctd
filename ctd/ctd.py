@@ -242,6 +242,7 @@ def from_fsi(fname, compression=None, skiprows=9, below_water=False,
     >>> downcast, upcast = cast.split()
     >>> fig, ax = downcast['TEMP'].plot()
     >>> ax.grid(True)
+
     """
     f = read_file(fname, compression=compression)
     cast = read_table(f, header='infer', index_col=None, skiprows=skiprows,

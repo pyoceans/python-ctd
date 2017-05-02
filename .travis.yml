@@ -33,7 +33,7 @@ install:
 
 script:
   - if [[ $TEST_TARGET == 'default' ]]; then
-      py.test -vv ;
+      py.test -s -rxs -v test;
     fi
 
   - if [[ $TEST_TARGET == 'coding_standards' ]]; then

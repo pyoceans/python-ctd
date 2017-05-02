@@ -10,7 +10,7 @@ python-ctd
 .. image:: http://img.shields.io/travis/pyoceans/python-ctd/master.svg?style=flat
    :target: https://travis-ci.org/pyoceans/python-ctd
    :alt: Build_status
-.. image:: http://img.shields.io/badge/license-MIT-blue.svg?style=flat
+.. image:: http://img.shields.io/badge/license-BSD-blue.svg?style=flat
    :target: https://github.com/pyoceans/python-ctd/blob/master/LICENSE.txt
    :alt: license
 

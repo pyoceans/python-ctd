@@ -3,18 +3,6 @@ from __future__ import (absolute_import, division, print_function)
 import os
 import sys
 from setuptools import setup
-from setuptools.command.test import test as TestCommand
-
-
-class PyTest(TestCommand):
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.verbose = True
-
-    def run_tests(self):
-        import pytest
-        errno = pytest.main(self.test_args)
-        sys.exit(errno)
 
 
 def extract_version(module='ctd'):
@@ -71,6 +59,5 @@ setup(name='ctd',
       keywords=['oceanography', 'data analysis', 'DataFrame'],
       install_requires=install_requires,
       tests_require=['pytest'],
-      cmdclass=dict(test=PyTest),
-      packages=['ctd', 'ctd/tests'],
+      packages=['ctd'],
       )

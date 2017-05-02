@@ -1,27 +1,26 @@
 from __future__ import (absolute_import, division, print_function)
 
-import re
 import os
-import nose
+import re
 import unittest
+
+from collections import OrderedDict
+from glob import glob
 from io import StringIO
 
-from glob import glob
-try:
-    from collections import OrderedDict
-except ImportError:
-    pass
+from ctd import (DataFrame, Series, derive_cnv, lp_filter, movingaverage,
+                 plot_section, rosette_summary)
+from ctd.utilities import read_file
 
 from pandas import Panel
-from ctd.utilities import read_file
-from ctd import (DataFrame, Series, rosette_summary, lp_filter, movingaverage,
-                 derive_cnv, plot_section)
+
 
 data_path = os.path.join(os.path.dirname(__file__), 'data')
 
 
 def alphanum_key(s):
-    key = re.split(r"(\d+)", s)
+    """Order files in a 'human' expected fashion."""
+    key = re.split(r'(\d+)', s)
     key[1::2] = list(map(int, key[1::2]))
     return key
 
@@ -180,10 +179,7 @@ class SectionTest(unittest.TestCase):
         lon, lat = [], []
         pattern = '{}/{}'.format(data_path, 'CTD/g01mcan*c.cnv.gz')
         fnames = sorted(glob(pattern), key=alphanum_key)
-        try:
-            section = OrderedDict()
-        except:
-            raise nose.SkipTest
+        section = OrderedDict()
         for fname in fnames:
             cast = proc_ctd(fname)
             name = os.path.basename(fname).split('.')[0]

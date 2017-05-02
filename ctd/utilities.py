@@ -1,18 +1,17 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import (absolute_import, division, print_function)
 
-# Standard library.
-import os
 import bz2
 import gzip
+import os
 import zipfile
+
 from io import StringIO
+
 from xml.etree import cElementTree as etree
 
-# Scientific stack.
 import numpy as np
 
 
-# Utilities.
 def header(xml):
     return etree(xml)
 

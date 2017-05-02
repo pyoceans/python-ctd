@@ -1,24 +1,20 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import absolute_import, unicode_literals
 
-# Scientific stack.
-import numpy as np
-import numpy.ma as ma
+from __future__ import (absolute_import, division, print_function)
+
 import matplotlib.pyplot as plt
+
 import mpl_toolkits.axisartist as AA
 
-from pandas import Series
 from mpl_toolkits.axes_grid1 import host_subplot
 
-from .utilities import extrap1d
+import numpy as np
+import numpy.ma as ma
 
-__all__ = ['get_maxdepth',
-           'extrap_sec',
-           'gen_topomask',
-           'plot',
-           'plot_vars',
-           'plot_section']
+from pandas import Series
+
+from .utilities import extrap1d
 
 
 def get_maxdepth(self):
@@ -159,20 +155,20 @@ def plot_vars(self, variables=None, **kwds):
 
     # Axis location.
     host_new_axis = ax0.get_grid_helper().new_fixed_axis
-    ax0.axis["bottom"] = host_new_axis(loc="top", axes=ax0, offset=(0, 0))
+    ax0.axis['bottom'] = host_new_axis(loc='top', axes=ax0, offset=(0, 0))
     par_new_axis = ax1.get_grid_helper().new_fixed_axis
-    ax1.axis["top"] = par_new_axis(loc="bottom", axes=ax1, offset=(0, 0))
+    ax1.axis['top'] = par_new_axis(loc='bottom', axes=ax1, offset=(0, 0))
 
     ax0.plot(self[variables[0]], self.index, 'r.', label='Temperature')
     ax1.plot(self[variables[1]], self.index, 'b.', label='Salinity')
 
-    ax0.set_ylabel("Pressure [dbar]")
-    ax0.set_xlabel("Temperature [\u00b0C]")
-    ax1.set_xlabel("Salinity [kg g$^{-1}$]")
+    ax0.set_ylabel('Pressure [dbar]')
+    ax0.set_xlabel('Temperature [\u00b0C]')
+    ax1.set_xlabel('Salinity [kg g$^{-1}$]')
     ax1.invert_yaxis()
 
-    try:  # FIXME with metadata.
-        fig.suptitle(r"Station %s profile" % self.name)
+    try:
+        fig.suptitle(r'Station %s profile' % self.name)
     except AttributeError:
         pass
 
@@ -202,10 +198,11 @@ def plot_section(self, reverse=False, filled=False, **kw):
         lat = lat[::-1]
         data = data.T[::-1].T
         h = h[::-1]
+    lon, lat = map(np.atleast_2d, (lon, lat))
     x = np.append(0, np.cumsum(gsw.distance(lon, lat)[0] / 1e3))
     z = self.index.values.astype(float)
 
-    if filled:  # FIXME: Cause discontinuities.
+    if filled:  # CAVEAT: this method cause discontinuities.
         data = data.filled(fill_value=np.nan)
         data = extrap_sec(data, x, z, w1=0.97, w2=0.03)
 
@@ -257,18 +254,13 @@ def plot_section(self, reverse=False, filled=False, **kw):
     ax.xaxis.set_tick_params(tickdir='out', labelsize=labelsize, pad=1)
     ax.yaxis.set_tick_params(tickdir='out', labelsize=labelsize, pad=1)
 
-    if False:  # TODO: +/- Black-and-White version.
-        cs = ax.contour(x, z, data, colors='grey', levels=levels,
-                        extend=extend, linewidths=1., alpha=1., zorder=2)
-        ax.clabel(cs, fontsize=8, colors='grey', fmt=fmt, zorder=1)
-        cb = None
-    if True:  # Color version.
-        cs = ax.contourf(x, z, data, cmap=cmap, levels=levels, alpha=1.,
-                         extend=extend, zorder=2)  # manual=True
-        # Colorbar.
-        cb = fig.colorbar(mappable=cs, ax=ax, orientation='vertical',
-                          aspect=aspect, shrink=shrink, fraction=fraction,
-                          pad=pad)
+    # Color version.
+    cs = ax.contourf(x, z, data, cmap=cmap, levels=levels, alpha=1.,
+                     extend=extend, zorder=2)  # manual=True
+    # Colorbar.
+    cb = fig.colorbar(mappable=cs, ax=ax, orientation='vertical',
+                      aspect=aspect, shrink=shrink, fraction=fraction,
+                      pad=pad)
     return fig, ax, cb
 
 

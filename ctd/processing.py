@@ -1,39 +1,17 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import (absolute_import, division, print_function)
 
-# Scientific stack.
 import os
+
 import numpy as np
 import numpy.ma as ma
 
-from pandas import Series, Index
+from pandas import Index, Series
+
 from .utilities import rolling_window
 
-data_path = os.path.join(os.path.dirname(__file__), 'tests', 'data')
-
-__all__ = ['data_conversion',  # TODO: Add as a constructor.
-           'align',
-           'despike',
-           'lp_filter',
-           'cell_thermal_mass',
-           'press_check',  # TODO: Loop edit + velocity_check
-           'bindata',
-           'split',
-           'pmel_inversion_check',
-           'smooth',
-           'mixed_layer_depth',
-           'barrier_layer_thickness',
-           'derive_cnv']
-
-
-# Pre-processing.
-def data_conversion(hexfile):
-    """TODO: Read SBE hexadecimal file (Option for from_cnv)."""
-    pass
-
-
-def align(conductivity):
-    """TODO: Align conductivity and temperature."""
-    pass
+data_path = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)), 'tests', 'data'
+)
 
 
 def despike(self, n1=2, n2=20, block=100, keep=0):
@@ -117,7 +95,6 @@ def lp_filter(data, sample_rate=24.0, time_constant=0.15):
 
 def cell_thermal_mass(temperature, conductivity):
     """
-    FIXME: UNFINISHED!
     Sample interval is measured in seconds.
     Temperature in degrees.
     CTM is calculated in S/m.
@@ -166,10 +143,7 @@ def bindata(self, delta=1., method='averaging'):
 
     Note that this method does not drop NA automatically.  Therefore, one can
     check the quality of the binned data.
-    TODO:
-    bins = range(0, max(int(depth)))
-    binned = pd.cut(cast.index, bins)
-    cast.groupby(binned).size().plot(kind='bar')
+
     """
     if method == 'averaging':
         start = np.floor(self.index[0])
@@ -179,9 +153,6 @@ def bindata(self, delta=1., method='averaging'):
         new_index = Index(new_index)
         newdf = self.groupby(new_index.asof).mean()
         newdf.index += shift  # Not shifted.
-    elif method == 'interpolate':
-        # TODO:
-        newdf = self.copy()
     else:
         newdf = self.copy()
 
@@ -200,29 +171,6 @@ def split(self):
 def movingaverage(series, window_size=48):
     window = np.ones(int(window_size)) / float(window_size)
     return Series(np.convolve(series, window, 'same'), index=series.index)
-
-
-# Pos-processing.
-def pmel_inversion_check():
-    """
-    FIXME: UNFINISHED!.
-    Additional clean-up and flagging of data after the SBE Processing.
-    Look for inversions in the processed, binned via computing the centered
-    square of the buoyancy frequency, N2, for each bin and linearly
-    interpolating temperature, conductivity, and oxygen over those records
-    where N2 <= -1 x 10-5 s-2, where there appear to be density inversions.
-
-    NOTE: While these could be actual inversions in the CTD records, it is much
-    more likely that shed wakes cause these anomalies.  Records that fail the
-    density inversion criteria in the top 20 meters are retained, but flagged
-    as questionable.
-
-    FIXME: The codes also manually remove spikes or glitches from profiles as
-    necessary, and linearly interpolate over them.
-    """
-
-    # TODO
-    pass
 
 
 def smooth(self, window_len=11, window='hanning'):
@@ -268,11 +216,11 @@ def barrier_layer_thickness(SA, CT):
 
     """
     import gsw
-    sigma_theta = gsw.sigma0_CT_exact(SA, CT)
+    sigma_theta = gsw.sigma0(SA, CT)
     mask = mixed_layer_depth(CT)
     mld = np.where(mask)[0][-1]
     sig_surface = sigma_theta[0]
-    sig_bottom_mld = gsw.sigma0_CT_exact(SA[0], CT[mld])
+    sig_bottom_mld = gsw.sigma0(SA[0], CT[mld])
     d_sig_t = sig_surface - sig_bottom_mld
     d_sig = sigma_theta - sig_bottom_mld
     mask = d_sig < d_sig_t  # Barrier layer.
@@ -285,7 +233,7 @@ def derive_cnv(self):
 
     """
     import gsw
-    cast = self.copy()  # FIXME: Use MetaDataFrame to propagate lon, lat.
+    cast = self.copy()
     p = cast.index.values.astype(float)
     cast['SP'] = gsw.SP_from_C(cast['c0S/m'].values * 10.,
                                cast['t090C'].values, p)
@@ -293,9 +241,9 @@ def derive_cnv(self):
     cast['SR'] = gsw.SR_from_SP(cast['SP'].values)
     cast['CT'] = gsw.CT_from_t(cast['SA'].values, cast['t090C'].values, p)
     cast['z'] = -gsw.z_from_p(p, self.lat)
-    cast['sigma0_CT'] = gsw.sigma0_CT_exact(cast['SA'].values,
-                                            cast['CT'].values)
+    cast['sigma0_CT'] = gsw.sigma0(cast['SA'].values, cast['CT'].values)
     return cast
+
 
 if __name__ == '__main__':
     import doctest

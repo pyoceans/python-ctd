@@ -1,18 +1,10 @@
+from __future__ import (absolute_import, division, print_function)
+
 import os
-import sys
+
 from setuptools import setup
-from setuptools.command.test import test as TestCommand
 
-
-class PyTest(TestCommand):
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.verbose = True
-
-    def run_tests(self):
-        import pytest
-        errno = pytest.main(self.test_args)
-        sys.exit(errno)
+rootpath = os.path.abspath(os.path.dirname(__file__))
 
 
 def extract_version(module='ctd'):
@@ -27,8 +19,6 @@ def extract_version(module='ctd'):
                 version = version.strip()[1:-1]
                 break
     return version
-
-rootpath = os.path.abspath(os.path.dirname(__file__))
 
 
 def read(*parts):
@@ -47,17 +37,18 @@ setup(name='ctd',
       version=extract_version(),
       license=LICENSE,
       long_description=long_description,
-      classifiers=['Development Status :: 5 - Production/Stable',
-                  'Environment :: Console',
-                  'Intended Audience :: Science/Research',
-                  'Intended Audience :: Developers',
-                  'Intended Audience :: Education',
-                  'License :: OSI Approved :: MIT License',
-                  'Operating System :: OS Independent',
-                  'Programming Language :: Python',
-                  'Topic :: Scientific/Engineering',
-                  'Topic :: Education',
-                  ],
+      classifiers=[
+          'Development Status :: 5 - Production/Stable',
+          'Environment :: Console',
+          'Intended Audience :: Science/Research',
+          'Intended Audience :: Developers',
+          'Intended Audience :: Education',
+          'License :: OSI Approved :: BSD',
+          'Operating System :: OS Independent',
+          'Programming Language :: Python',
+          'Topic :: Scientific/Engineering',
+          'Topic :: Education',
+      ],
       description='Tools to load hydrographic data as DataFrames',
       author='Filipe Fernandes',
       author_email='ocefpaf@gmail.com',
@@ -69,6 +60,5 @@ setup(name='ctd',
       keywords=['oceanography', 'data analysis', 'DataFrame'],
       install_requires=install_requires,
       tests_require=['pytest'],
-      cmdclass=dict(test=PyTest),
-      packages=['ctd', 'ctd/tests'],
+      packages=['ctd'],
       )

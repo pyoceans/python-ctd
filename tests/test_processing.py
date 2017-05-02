@@ -1,23 +1,21 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import (absolute_import, division, print_function)
 
 import os
 import re
-import nose
 import unittest
+
+from collections import OrderedDict
 from glob import glob
-try:
-    from collections import OrderedDict
-except ImportError:
-    raise nose.SkipTest
+
+from ctd import DataFrame, Series, derive_cnv, lp_filter, movingaverage
 
 import numpy as np
-from ctd import DataFrame, Series, lp_filter, derive_cnv, movingaverage
 
 data_path = os.path.join(os.path.dirname(__file__), 'data')
 
 
 def alphanum_key(s):
-    key = re.split(r"(\d+)", s)
+    key = re.split(r'(\d+)', s)
     key[1::2] = list(map(int, key[1::2]))
     return key
 
@@ -39,10 +37,9 @@ def proc_ctd(fname, compression='gzip', below_water=True):
     name = os.path.basename(fname).split('.')[0]
 
     # Removed unwanted columns.
-    keep = set(['altM', 'c0S/m', 'dz/dtM', 'wetCDOM', 'latitude',
-                'longitude', 'sbeox0Mm/Kg', 'sbeox1Mm/Kg', 'oxsolMm/Kg',
-                'oxsatMm/Kg', 'par', 'pla', 'sva', 't090C', 't190C', 'tsa',
-                'sbeox0V'])
+    keep = {'altM', 'c0S/m', 'dz/dtM', 'wetCDOM', 'latitude', 'longitude',
+            'sbeox0Mm/Kg', 'sbeox1Mm/Kg', 'oxsolMm/Kg', 'oxsatMm/Kg', 'par',
+            'pla', 'sva', 't090C', 't190C', 'tsa', 'sbeox0V'}
 
     null = list(map(cast.pop, keep.symmetric_difference(cast.columns)))
     del null
@@ -86,10 +83,7 @@ def proc_ctd(fname, compression='gzip', below_water=True):
     # 08-Derive.
     cast.lat = cast['latitude'].mean()
     cast.lon = cast['longitude'].mean()
-    try:
-        cast = derive_cnv(cast)
-    except:
-        raise nose.SkipTest
+    cast = derive_cnv(cast)
     cast.name = name
     return cast
 
@@ -128,7 +122,7 @@ class BasicProcessingTests(unittest.TestCase):
         kw = dict(sample_rate=24.0, time_constant=0.15)
         unfiltered = self.raw.index.values
         filtered = lp_filter(unfiltered, **kw)
-        # FIXME: Not a good test...
+        # Caveat: Not really a good test...
         np.testing.assert_almost_equal(filtered, self.prc.index.values,
                                        decimal=1)
 
@@ -146,16 +140,6 @@ class BasicProcessingTests(unittest.TestCase):
         down = down.bindata(delta=delta)
         self.assertTrue(np.unique(np.diff(down.index.values)) == delta)
 
-    # PostProcessingTests.
-    def test_smooth(self):
-        pass  # TODO
-
-    def test_mixed_layer_depth(self):
-        pass  # TODO
-
-    def test_barrier_layer_thickness(self):
-        pass  # TODO
-
     def derive_cnv(self):
         derived = derive_cnv(self.raw)
         new_cols = set(derived).symmetric_difference(self.raw.columns)
@@ -168,17 +152,13 @@ class AdvancedProcessingTests(unittest.TestCase):
         lon, lat = [], []
         pattern = '%s/CTD/g01mcan*c.cnv.gz' % data_path
         fnames = sorted(glob(pattern), key=alphanum_key)
-        try:
-            section = OrderedDict()
-        except:
-            raise nose.SkipTest
+        section = OrderedDict()
         for fname in fnames:
             cast = proc_ctd(fname)
             name = os.path.basename(fname).split('.')[0]
             section.update({name: cast})
             lon.append(cast.longitude.mean())
             lat.append(cast.latitude.mean())
-    # TODO: Write section tests.
 
 
 if __name__ == '__main__':

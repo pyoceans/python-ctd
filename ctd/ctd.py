@@ -1,29 +1,22 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import (absolute_import, division, print_function)
 
-# Standard library.
 import os
 import warnings
 
-# Scientific stack.
 import numpy as np
+
 from pandas import DataFrame
 from pandas import read_table
 
-from .utilities import read_file, basename, normalize_names
+from .utilities import basename, normalize_names, read_file
 
-data_path = os.path.join(os.path.dirname(__file__), 'tests', 'data')
-
-__all__ = ['CTD',
-           'asof',
-           'from_edf',
-           'from_cnv',
-           'from_fsi',
-           'rosette_summary']
+data_path = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)), 'tests', 'data'
+)
 
 
-# TODO: https://github.com/nilmtk/nilmtk/issues/83
 def asof(self, label):
-    """FIXME: pandas index workaround."""
+    """pandas index workaround."""
     if label not in self:
         loc = self.searchsorted(label, side='left')
         if loc > 0:
@@ -178,7 +171,7 @@ def from_cnv(fname, compression=None, below_water=False, lon=None,
             elif hemisphere == 'N':
                 lat = lat[0] + lat[1] / 60.
             else:
-                raise ValueError("Latitude not recognized.")
+                raise ValueError('Latitude not recognized.')
         if 'NMEA Longitude' in line:
             hemisphere = line[-1]
             lon = line.strip(hemisphere).split('=')[1].strip()
@@ -188,7 +181,7 @@ def from_cnv(fname, compression=None, below_water=False, lon=None,
             elif hemisphere == 'E':
                 lon = lon[0] + lon[1] / 60.
             else:
-                raise ValueError("Latitude not recognized.")
+                raise ValueError('Latitude not recognized.')
         if line == '*END*':  # Get end of header.
             skiprows = k + 1
             break
@@ -279,6 +272,7 @@ def rosette_summary(fname):
     ros['nbf'] = ros['nbf'].astype(int)
     ros.set_index('nbf', drop=True, inplace=True, verify_integrity=False)
     return ros
+
 
 if __name__ == '__main__':
     import doctest

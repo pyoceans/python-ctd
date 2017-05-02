@@ -1,10 +1,12 @@
 from __future__ import (absolute_import, division, print_function)
 
 import os
+
 import numpy as np
 import numpy.ma as ma
 
-from pandas import Series, Index
+from pandas import Index, Series
+
 from .utilities import rolling_window
 
 data_path = os.path.join(os.path.dirname(__file__), 'tests', 'data')
@@ -295,6 +297,7 @@ def derive_cnv(self):
     cast['sigma0_CT'] = gsw.sigma0_CT_exact(cast['SA'].values,
                                             cast['CT'].values)
     return cast
+
 
 if __name__ == '__main__':
     import doctest

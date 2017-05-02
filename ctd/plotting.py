@@ -1,12 +1,15 @@
 from __future__ import (absolute_import, division, print_function)
 
-import numpy as np
-import numpy.ma as ma
 import matplotlib.pyplot as plt
+
 import mpl_toolkits.axisartist as AA
 
-from pandas import Series
 from mpl_toolkits.axes_grid1 import host_subplot
+
+import numpy as np
+import numpy.ma as ma
+
+from pandas import Series
 
 from .utilities import extrap1d
 
@@ -156,20 +159,20 @@ def plot_vars(self, variables=None, **kwds):
 
     # Axis location.
     host_new_axis = ax0.get_grid_helper().new_fixed_axis
-    ax0.axis["bottom"] = host_new_axis(loc="top", axes=ax0, offset=(0, 0))
+    ax0.axis['bottom'] = host_new_axis(loc='top', axes=ax0, offset=(0, 0))
     par_new_axis = ax1.get_grid_helper().new_fixed_axis
-    ax1.axis["top"] = par_new_axis(loc="bottom", axes=ax1, offset=(0, 0))
+    ax1.axis['top'] = par_new_axis(loc='bottom', axes=ax1, offset=(0, 0))
 
     ax0.plot(self[variables[0]], self.index, 'r.', label='Temperature')
     ax1.plot(self[variables[1]], self.index, 'b.', label='Salinity')
 
-    ax0.set_ylabel("Pressure [dbar]")
-    ax0.set_xlabel("Temperature [\u00b0C]")
-    ax1.set_xlabel("Salinity [kg g$^{-1}$]")
+    ax0.set_ylabel('Pressure [dbar]')
+    ax0.set_xlabel('Temperature [\u00b0C]')
+    ax1.set_xlabel('Salinity [kg g$^{-1}$]')
     ax1.invert_yaxis()
 
     try:  # FIXME with metadata.
-        fig.suptitle(r"Station %s profile" % self.name)
+        fig.suptitle(r'Station %s profile' % self.name)
     except AttributeError:
         pass
 

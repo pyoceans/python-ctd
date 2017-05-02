@@ -16,7 +16,7 @@ data_path = os.path.join(
 
 
 def asof(self, label):
-    """FIXME: pandas index workaround."""
+    """pandas index workaround."""
     if label not in self:
         loc = self.searchsorted(label, side='left')
         if loc > 0:

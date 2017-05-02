@@ -14,29 +14,24 @@ from .plotting import (
     plot_vars,
 )
 from .processing import (
-    align,
     barrier_layer_thickness,
     bindata,
     cell_thermal_mass,
-    data_conversion,
     derive_cnv,
     despike,
     lp_filter,
     mixed_layer_depth,
     movingaverage,
-    pmel_inversion_check,
     press_check,
     smooth,
     split,
 )
 
 __all__ = [
-    align,
     asof,
     barrier_layer_thickness,
     bindata,
     cell_thermal_mass,
-    data_conversion,
     derive_cnv,
     despike,
     extrap_sec,
@@ -51,7 +46,6 @@ __all__ = [
     plot,
     plot_section,
     plot_vars,
-    pmel_inversion_check,
     press_check,
     rosette_summary,
     smooth,

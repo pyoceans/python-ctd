@@ -122,7 +122,7 @@ class BasicProcessingTests(unittest.TestCase):
         kw = dict(sample_rate=24.0, time_constant=0.15)
         unfiltered = self.raw.index.values
         filtered = lp_filter(unfiltered, **kw)
-        # FIXME: Not a good test...
+        # Caveat: Not really a good test...
         np.testing.assert_almost_equal(filtered, self.prc.index.values,
                                        decimal=1)
 
@@ -139,16 +139,6 @@ class BasicProcessingTests(unittest.TestCase):
         down = self.prc['t090C'].split()[0]
         down = down.bindata(delta=delta)
         self.assertTrue(np.unique(np.diff(down.index.values)) == delta)
-
-    # PostProcessingTests.
-    def test_smooth(self):
-        pass  # TODO
-
-    def test_mixed_layer_depth(self):
-        pass  # TODO
-
-    def test_barrier_layer_thickness(self):
-        pass  # TODO
 
     def derive_cnv(self):
         derived = derive_cnv(self.raw)
@@ -169,7 +159,6 @@ class AdvancedProcessingTests(unittest.TestCase):
             section.update({name: cast})
             lon.append(cast.longitude.mean())
             lat.append(cast.latitude.mean())
-    # TODO: Write section tests.
 
 
 if __name__ == '__main__':

@@ -91,7 +91,6 @@ def make_section(data_path=data_path, variable='t090C'):
 
     section = Panel.fromDict(section)
     section = section.minor_xs(variable)
-    # Section (FIXME: Propagate lon, lat with MetaDataFrame).
     section.lon, section.lat = lon, lat
     return section
 

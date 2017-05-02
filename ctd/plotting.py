@@ -13,13 +13,6 @@ from pandas import Series
 
 from .utilities import extrap1d
 
-__all__ = ['get_maxdepth',
-           'extrap_sec',
-           'gen_topomask',
-           'plot',
-           'plot_vars',
-           'plot_section']
-
 
 def get_maxdepth(self):
     valid_last_depth = self.apply(Series.notnull).values.T
@@ -171,7 +164,7 @@ def plot_vars(self, variables=None, **kwds):
     ax1.set_xlabel('Salinity [kg g$^{-1}$]')
     ax1.invert_yaxis()
 
-    try:  # FIXME with metadata.
+    try:
         fig.suptitle(r'Station %s profile' % self.name)
     except AttributeError:
         pass
@@ -205,7 +198,7 @@ def plot_section(self, reverse=False, filled=False, **kw):
     x = np.append(0, np.cumsum(gsw.distance(lon, lat)[0] / 1e3))
     z = self.index.values.astype(float)
 
-    if filled:  # FIXME: Cause discontinuities.
+    if filled:  # CAVEAT: this method cause discontinuities.
         data = data.filled(fill_value=np.nan)
         data = extrap_sec(data, x, z, w1=0.97, w2=0.03)
 
@@ -257,18 +250,13 @@ def plot_section(self, reverse=False, filled=False, **kw):
     ax.xaxis.set_tick_params(tickdir='out', labelsize=labelsize, pad=1)
     ax.yaxis.set_tick_params(tickdir='out', labelsize=labelsize, pad=1)
 
-    if False:  # TODO: +/- Black-and-White version.
-        cs = ax.contour(x, z, data, colors='grey', levels=levels,
-                        extend=extend, linewidths=1., alpha=1., zorder=2)
-        ax.clabel(cs, fontsize=8, colors='grey', fmt=fmt, zorder=1)
-        cb = None
-    if True:  # Color version.
-        cs = ax.contourf(x, z, data, cmap=cmap, levels=levels, alpha=1.,
-                         extend=extend, zorder=2)  # manual=True
-        # Colorbar.
-        cb = fig.colorbar(mappable=cs, ax=ax, orientation='vertical',
-                          aspect=aspect, shrink=shrink, fraction=fraction,
-                          pad=pad)
+    # Color version.
+    cs = ax.contourf(x, z, data, cmap=cmap, levels=levels, alpha=1.,
+                     extend=extend, zorder=2)  # manual=True
+    # Colorbar.
+    cb = fig.colorbar(mappable=cs, ax=ax, orientation='vertical',
+                      aspect=aspect, shrink=shrink, fraction=fraction,
+                      pad=pad)
     return fig, ax, cb
 
 

@@ -1,6 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
 
-# Scientific stack.
 import numpy as np
 import numpy.ma as ma
 import matplotlib.pyplot as plt

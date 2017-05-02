@@ -1,10 +1,8 @@
 from __future__ import (absolute_import, division, print_function)
 
-# Standard library.
 import os
 import warnings
 
-# Scientific stack.
 import numpy as np
 from pandas import DataFrame
 from pandas import read_table
@@ -13,12 +11,14 @@ from .utilities import read_file, basename, normalize_names
 
 data_path = os.path.join(os.path.dirname(__file__), 'tests', 'data')
 
-__all__ = ['CTD',
-           'asof',
-           'from_edf',
-           'from_cnv',
-           'from_fsi',
-           'rosette_summary']
+__all__ = [
+    'CTD',
+    'asof',
+    'from_edf',
+    'from_cnv',
+    'from_fsi',
+    'rosette_summary'
+    ]
 
 
 # TODO: https://github.com/nilmtk/nilmtk/issues/83

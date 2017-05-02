@@ -1,6 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
 
-# Scientific stack.
 import os
 import numpy as np
 import numpy.ma as ma

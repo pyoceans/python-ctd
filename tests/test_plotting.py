@@ -80,7 +80,7 @@ def proc_ctd(fname):
 def make_section(data_path=data_path, variable='t090C'):
     lon, lat = [], []
     section = OrderedDict()
-    pattern = '%s/CTD/g01mcan*c.cnv.gz' % data_path
+    pattern = '{}/CTD/g01mcan*c.cnv.gz'.format(data_path)
     fnames = sorted(glob(pattern), key=alphanum_key)
     for fname in fnames:
         cast = proc_ctd(fname)

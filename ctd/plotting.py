@@ -198,6 +198,7 @@ def plot_section(self, reverse=False, filled=False, **kw):
         lat = lat[::-1]
         data = data.T[::-1].T
         h = h[::-1]
+    lon, lat = map(np.atleast_2d, (lon, lat))
     x = np.append(0, np.cumsum(gsw.distance(lon, lat)[0] / 1e3))
     z = self.index.values.astype(float)
 

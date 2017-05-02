@@ -216,11 +216,11 @@ def barrier_layer_thickness(SA, CT):
 
     """
     import gsw
-    sigma_theta = gsw.sigma0_CT_exact(SA, CT)
+    sigma_theta = gsw.sigma0(SA, CT)
     mask = mixed_layer_depth(CT)
     mld = np.where(mask)[0][-1]
     sig_surface = sigma_theta[0]
-    sig_bottom_mld = gsw.sigma0_CT_exact(SA[0], CT[mld])
+    sig_bottom_mld = gsw.sigma0(SA[0], CT[mld])
     d_sig_t = sig_surface - sig_bottom_mld
     d_sig = sigma_theta - sig_bottom_mld
     mask = d_sig < d_sig_t  # Barrier layer.
@@ -241,8 +241,7 @@ def derive_cnv(self):
     cast['SR'] = gsw.SR_from_SP(cast['SP'].values)
     cast['CT'] = gsw.CT_from_t(cast['SA'].values, cast['t090C'].values, p)
     cast['z'] = -gsw.z_from_p(p, self.lat)
-    cast['sigma0_CT'] = gsw.sigma0_CT_exact(cast['SA'].values,
-                                            cast['CT'].values)
+    cast['sigma0_CT'] = gsw.sigma0(cast['SA'].values, cast['CT'].values)
     return cast
 
 

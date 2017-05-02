@@ -10,19 +10,11 @@ from pandas import read_table
 
 from .utilities import basename, normalize_names, read_file
 
-data_path = os.path.join(os.path.dirname(__file__), 'tests', 'data')
-
-__all__ = [
-    'CTD',
-    'asof',
-    'from_edf',
-    'from_cnv',
-    'from_fsi',
-    'rosette_summary'
-    ]
+data_path = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)), 'tests', 'data'
+)
 
 
-# TODO: https://github.com/nilmtk/nilmtk/issues/83
 def asof(self, label):
     """FIXME: pandas index workaround."""
     if label not in self:

@@ -34,6 +34,7 @@ install:
 script:
   - if [[ $TEST_TARGET == 'default' ]]; then
       py.test -s -rxs -v tests ;
+      py.test -s -rxs --doctest-modules -vv ctd ;
     fi
 
   - if [[ $TEST_TARGET == 'coding_standards' ]]; then

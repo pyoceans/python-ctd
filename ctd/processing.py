@@ -9,21 +9,9 @@ from pandas import Index, Series
 
 from .utilities import rolling_window
 
-data_path = os.path.join(os.path.dirname(__file__), 'tests', 'data')
-
-__all__ = ['data_conversion',  # TODO: Add as a constructor.
-           'align',
-           'despike',
-           'lp_filter',
-           'cell_thermal_mass',
-           'press_check',  # TODO: Loop edit + velocity_check
-           'bindata',
-           'split',
-           'pmel_inversion_check',
-           'smooth',
-           'mixed_layer_depth',
-           'barrier_layer_thickness',
-           'derive_cnv']
+data_path = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)), 'tests', 'data'
+)
 
 
 # Pre-processing.

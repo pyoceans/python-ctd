@@ -2,4 +2,4 @@ numpy
 scipy
 matplotlib
 pandas
-gsw
+gsw ==3.0.6

@@ -199,7 +199,7 @@ def from_cnv(fname, compression=None, below_water=False, lon=None,
     f.close()
 
     key_set = False
-    prkeys = ['prDM', 'prdM']
+    prkeys = ['prDM', 'prdM', 'pr']
     for prkey in prkeys:
         try:
             cast.set_index(prkey, drop=True, inplace=True)

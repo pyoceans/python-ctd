@@ -12,6 +12,8 @@ matrix:
   - python: 3.6
     env: TEST_TARGET=default
   - python: 3.6
+    env: TEST_TARGET=doctest
+  - python: 3.6
     env: TEST_TARGET=coding_standards
 
 before_install:
@@ -34,6 +36,9 @@ install:
 script:
   - if [[ $TEST_TARGET == 'default' ]]; then
       py.test -s -rxs -v tests ;
+    fi
+
+  - if [[ $TEST_TARGET == 'doctest' ]]; then
       py.test -s -rxs --doctest-modules -vv ctd ;
     fi
 

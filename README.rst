@@ -9,7 +9,10 @@ python-ctd
    :alt: Version_status
 .. image:: http://img.shields.io/travis/pyoceans/python-ctd/master.svg?style=flat
    :target: https://travis-ci.org/pyoceans/python-ctd
-   :alt: Build_status
+   :alt: travis
+.. image:: https://ci.appveyor.com/api/projects/status/m1wxtsb8gpm96i53/branch/master?svg=true
+   :target: https://ci.appveyor.com/project/ocefpaf/python-ctd/branch/master
+   :alt: appveyor
 .. image:: http://img.shields.io/badge/license-BSD-blue.svg?style=flat
    :target: https://github.com/pyoceans/python-ctd/blob/master/LICENSE.txt
    :alt: license

@@ -5,7 +5,7 @@ Version 0.3.0
 
 * Changed license from `MIT` to BSD 3-Clause
 * Fixed `gsw 3.1.1` compatibility issues
-* Fixed reading pressure coliumn from Sea Bird MicroCat SBE 37SM
+* Fixed reading pressure column from Sea Bird MicroCat SBE 37SM
 * Fixed Python 2/3 encoding issues
 * Improved CI test framework
 

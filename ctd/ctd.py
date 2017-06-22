@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import os
 import warnings
+from datetime import datetime
 
 import numpy as np
 
@@ -27,12 +28,29 @@ def asof(self, label):
 
 
 class CTD(DataFrame):
-    def __init__(self, data=None, index=None, columns=None, name=None,
-                 longitude=None, latitude=None, header=None, serial=None,
-                 config=None, dtype=None, copy=False):
-        super(CTD, self).__init__(data=data, index=index,
-                                  columns=columns, dtype=dtype,
-                                  copy=copy)
+    def __init__(
+        self,
+        data=None,
+        index=None,
+        columns=None,
+        name=None,
+        time=None,
+        longitude=None,
+        latitude=None,
+        header=None,
+        serial=None,
+        config=None,
+        dtype=None,
+        copy=False
+    ):
+        super(CTD, self).__init__(
+            data=data,
+            index=index,
+            columns=columns,
+            dtype=dtype,
+            copy=copy
+        )
+        self.time = time
         self.longitude = longitude
         self.latitude = latitude
         self.header = header
@@ -48,6 +66,7 @@ class CTD(DataFrame):
                               # copy constructor.
             None,
             None,
+            self.time,
             self.longitude,
             self.latitude,
             self.header,
@@ -134,8 +153,8 @@ def from_edf(fname, compression=None, below_water=False, lon=None,
                serial=serial, name=name, header=header)
 
 
-def from_cnv(fname, compression=None, below_water=False, lon=None,
-             lat=None):
+def from_cnv(fname, compression=None, below_water=False, time=None,
+             lon=None, lat=None):
     """
     DataFrame constructor to open Seabird CTD CNV-ASCII format.
 
@@ -182,6 +201,10 @@ def from_cnv(fname, compression=None, below_water=False, lon=None,
                 lon = lon[0] + lon[1] / 60.
             else:
                 raise ValueError('Latitude not recognized.')
+        if 'NMEA UTC (Time)' in line:
+            time = line.split('=')[-1].strip()
+            # Should use some fuzzy datetime parser to make this more robust.
+            time = datetime.strptime(time, '%b %d %Y %H:%M:%S')
         if line == '*END*':  # Get end of header.
             skiprows = k + 1
             break
@@ -221,8 +244,15 @@ def from_cnv(fname, compression=None, below_water=False, lon=None,
                 warnings.warn('Could not convert %s to float.' % column)
     if below_water:
         cast = remove_above_water(cast)
-    return CTD(cast, longitude=lon, latitude=lat, name=name, header=header,
-               config=config)
+    return CTD(
+        cast,
+        time=time,
+        longitude=lon,
+        latitude=lat,
+        name=name,
+        header=header,
+        config=config
+        )
 
 
 def from_fsi(fname, compression=None, skiprows=9, below_water=False,

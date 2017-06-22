@@ -36,6 +36,8 @@ and then,
 
 .. code-block:: python
 
+    from ctd import DataFrame
+
     kw = dict(compression='gzip')
     fname = './test/data/CTD/g01l06s01.cnv.gz'
     cast = DataFrame.from_cnv(fname, **kw)
@@ -51,6 +53,7 @@ We can do
 .. code-block:: python
 
     from ctd import DataFrame, lp_filter, movingaverage
+
     kw.update(below_water=True)
     cast = DataFrame.from_cnv(fname, **kw)
     downcast, upcast = cast.split()

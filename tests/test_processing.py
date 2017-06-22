@@ -48,7 +48,10 @@ def proc_ctd(fname, compression='gzip', below_water=True):
     cast['dz/dtM'] = movingaverage(cast['dz/dtM'], window_size=48)
 
     # 01-Filter pressure.
-    kw = dict(sample_rate=24.0, time_constant=0.15)
+    kw = {
+        'sample_rate': 24.0,
+        'time_constant': 0.15
+    }
     cast.index = lp_filter(cast.index, **kw)
 
     # 02-Remove pressure reversals.
@@ -59,11 +62,15 @@ def proc_ctd(fname, compression='gzip', below_water=True):
     cast = cast[cast['dz/dtM'] >= 0.25]  # Threshold velocity.
 
     # 04-Remove spikes.
-    kw = dict(n1=2, n2=20, block=100)
+    kw = {
+        'n1': 2,
+        'n2': 20,
+        'block': 100
+    }
     cast = cast.apply(Series.despike, **kw)
 
     # 05-Bin-average.
-    cast = cast.apply(Series.bindata, **dict(delta=1.))
+    cast = cast.apply(Series.bindata, **{'delta': 1.})
 
     # 06-interpolate.
     cast = cast.apply(Series.interpolate)
@@ -77,7 +84,10 @@ def proc_ctd(fname, compression='gzip', below_water=True):
             window_len = 11
         else:
             window_len = 5
-        kw = dict(window_len=window_len, window='hanning')
+        kw = {
+            'window_len': window_len,
+            'window': 'hanning'
+        }
         cast = cast.apply(Series.smooth, **kw)
 
     # 08-Derive.
@@ -119,7 +129,10 @@ class BasicProcessingTests(unittest.TestCase):
 
     # Filter.
     def test_lp_filter(self):
-        kw = dict(sample_rate=24.0, time_constant=0.15)
+        kw = {
+            'sample_rate': 24.0,
+            'time_constant': 0.15
+        }
         unfiltered = self.raw.index.values
         filtered = lp_filter(unfiltered, **kw)
         # Caveat: Not really a good test...

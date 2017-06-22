@@ -178,8 +178,13 @@ def smooth(self, window_len=11, window='hanning'):
     Smooth the data using a window with requested size.
     """
 
-    windows = dict(flat=np.ones, hanning=np.hanning, hamming=np.hamming,
-                   bartlett=np.bartlett, blackman=np.blackman)
+    windows = {
+        'flat': np.ones,
+        'hanning': np.hanning,
+        'hamming': np.hamming,
+        'bartlett': np.bartlett,
+        'blackman': np.blackman
+    }
     data = self.values.copy()
 
     if window_len < 3:

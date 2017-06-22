@@ -207,7 +207,6 @@ def plot_section(self, reverse=False, filled=False, **kw):
         data = extrap_sec(data, x, z, w1=0.97, w2=0.03)
 
     # Contour key words.
-    fmt = kw.pop('fmt', '%1.0f')
     extend = kw.pop('extend', 'both')
     fontsize = kw.pop('fontsize', 12)
     labelsize = kw.pop('labelsize', 11)

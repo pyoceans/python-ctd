@@ -71,7 +71,7 @@ def proc_ctd(fname):
     keep = {'t090C', 't190C', 'longitude', 'latitude'}
     drop = keep.symmetric_difference(cast.columns)
     cast.drop(drop, axis=1, inplace=True)
-    cast = cast.apply(Series.bindata, **dict(delta=1.))
+    cast = cast.apply(Series.bindata, **{'delta': 1.})
     cast = cast.apply(Series.interpolate)
     cast.name = name
     return cast

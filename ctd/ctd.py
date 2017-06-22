@@ -206,7 +206,11 @@ def from_cnv(fname, compression=None, below_water=False, lon=None,
 
     name = basename(fname)[0]
 
-    dtypes = dict(bpos=int, pumps=bool, flag=bool)
+    dtypes = {
+        'bpos': int,
+        'pumps': bool,
+        'flag': bool
+    }
     for column in cast.columns:
         if column in dtypes:
             cast[column] = cast[column].astype(dtypes[column])

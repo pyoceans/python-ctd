@@ -258,7 +258,7 @@ def from_cnv(fname, compression=None, below_water=False, time=None,
 def from_btl(fname, compression=None, below_water=False, lon=None,
              lat=None):
     """
-    DataFrame constructor to open Seabird CTD CNV-ASCII format.
+    DataFrame constructor to open Seabird CTD BTL-ASCII format.
 
     Examples
     --------

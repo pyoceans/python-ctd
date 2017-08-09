@@ -255,6 +255,115 @@ def from_cnv(fname, compression=None, below_water=False, time=None,
         )
 
 
+def from_btl(fname, compression=None, below_water=False, lon=None,
+             lat=None):
+    """
+    DataFrame constructor to open Seabird CTD CNV-ASCII format.
+
+    Examples
+    --------
+    >>> from ctd import DataFrame
+    >>> bottles = DataFrame.from_btl(filepath)
+    """
+
+    f = read_file(fname, compression=compression)
+    header, config, names = [], [], []
+    for k, line in enumerate(f.readlines()):
+        line = line.strip()
+        ''' #bottle files can't get variable names like this
+        if '# name' in line:  # Get columns names.
+            name, unit = line.split('=')[1].split(':')
+            name, unit = list(map(normalize_names, (name, unit)))
+            names.append(name)
+        '''
+        if line.startswith('*'):  # Get header.
+            header.append(line)
+        if line.startswith('#'):  # Get configuration file.
+            config.append(line)
+        if 'NMEA Latitude' in line:
+            hemisphere = line[-1]
+            lat = line.strip(hemisphere).split('=')[1].strip()
+            lat = np.float_(lat.split())
+            if hemisphere == 'S':
+                lat = -(lat[0] + lat[1] / 60.)
+            elif hemisphere == 'N':
+                lat = lat[0] + lat[1] / 60.
+            else:
+                raise ValueError('Latitude not recognized.')
+        if 'NMEA Longitude' in line:
+            hemisphere = line[-1]
+            lon = line.strip(hemisphere).split('=')[1].strip()
+            lon = np.float_(lon.split())
+            if hemisphere == 'W':
+                lon = -(lon[0] + lon[1] / 60.)
+            elif hemisphere == 'E':
+                lon = lon[0] + lon[1] / 60.
+            else:
+                raise ValueError('Latitude not recognized.')
+        if not (line.startswith('*') | line.startswith('#') ):  #there is no *END* like in a .cnv file, skip two after header info
+            names = line.split()
+            skiprows = k + 2
+            break
+
+    f.seek(0)
+
+    names.append('Rowtype')
+
+    df = read_fwf(f, header=None, index_col=False, names=names,
+                      skiprows=skiprows)
+    f.close()
+
+    '''
+    At this point the data frame is not correctly lined up (multiple rows for avg,std,min,max or just avg,std,etc)
+     also needs date,time,and bottle number to be converted to one per line.
+    '''
+
+    #add new column and put values in it
+    df.insert(2, 'Time', df['Date'])
+
+    # get row types, see what you have: avg,std,min,max or just avg,std
+    rowtypes = df[df.columns[-1]].unique()
+    dates = df.iloc[::len(rowtypes), 1] #get dates which occur on second line of each bottle
+    times = df.iloc[1::len(rowtypes), 1]  # get times which occur on second line of each bottle
+
+    #add times to first rows
+    df['Time'].iloc[::4] = times.values
+
+    #remove time from date column
+    df['Date'].iloc[1::4] = dates.values
+
+    #fill missing rows
+    df['Bottle'] = df['Bottle'].fillna(method='ffill')
+    df['Date'] = df['Date'].fillna(method='ffill')
+    df['Time'] = df['Time'].fillna(method='ffill')
+
+
+    df['Bottle'] = df['Bottle'].astype(int)
+
+    #avg_df = df.iloc[::4, :]
+    #cast = avg_df #return just avg as cast
+
+    cast = df
+
+    #not setting pressure as index
+
+    name = basename(fname)[0]
+
+    dtypes = dict(bpos=int, pumps=bool, flag=bool)
+    for column in cast.columns:
+        if column in dtypes:
+            cast[column] = cast[column].astype(dtypes[column])
+        else:
+            try:
+                cast[column] = cast[column].astype(float)
+            except ValueError:
+                warnings.warn('Could not convert %s to float.' % column)
+    if below_water:
+        cast = remove_above_water(cast)
+    return CTD(cast, longitude=lon, latitude=lat, name=name, header=header,
+               config=config)
+
+
 def from_fsi(fname, compression=None, skiprows=9, below_water=False,
              lon=None, lat=None):
     """

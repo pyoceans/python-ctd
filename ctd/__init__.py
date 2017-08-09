@@ -4,7 +4,7 @@ __version__ = '0.3.0'
 
 from pandas import DataFrame, Index, Series
 
-from .ctd import asof, from_cnv, from_edf, from_fsi, rosette_summary
+from .ctd import asof, from_cnv, from_btl, from_edf, from_fsi, rosette_summary
 from .plotting import (
     extrap_sec,
     gen_topomask,
@@ -36,6 +36,7 @@ __all__ = [
     despike,
     extrap_sec,
     from_cnv,
+	from_btl,
     from_edf,
     from_fsi,
     gen_topomask,
@@ -64,6 +65,7 @@ Series.press_check = press_check
 
 DataFrame.split = split
 DataFrame.from_cnv = staticmethod(from_cnv)
+DataFrame.from_btl = staticmethod(from_btl)
 DataFrame.from_edf = staticmethod(from_edf)
 DataFrame.from_fsi = staticmethod(from_fsi)
 DataFrame.plot_vars = plot_vars

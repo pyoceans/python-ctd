@@ -338,7 +338,7 @@ def from_btl(fname, compression=None, below_water=False, lon=None,
     df['Time'] = df['Time'].fillna(method='ffill')
 
 
-    df['Bottle'] = df['Bottle'].astype(int)
+
 
     #avg_df = df.iloc[::4, :]
     #cast = avg_df #return just avg as cast
@@ -360,6 +360,8 @@ def from_btl(fname, compression=None, below_water=False, lon=None,
                 warnings.warn('Could not convert %s to float.' % column)
     if below_water:
         cast = remove_above_water(cast)
+
+    cast['Bottle'] = cast['Bottle'].astype(int)
     return CTD(cast, longitude=lon, latitude=lat, name=name, header=header,
                config=config)
 

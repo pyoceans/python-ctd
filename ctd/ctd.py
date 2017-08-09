@@ -7,7 +7,7 @@ from datetime import datetime
 import numpy as np
 
 from pandas import DataFrame
-from pandas import read_table
+from pandas import read_table, read_fwf
 
 from .utilities import basename, normalize_names, read_file
 

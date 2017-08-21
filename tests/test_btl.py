@@ -15,7 +15,7 @@ from ctd.utilities import read_file
 from pandas import Panel
 
 
-data_path = os.path.join(os.path.dirname(__file__), 'data')
+data_path = os.path.join(os.path.dirname(__file__), 'data','btl')
 
 
 def alphanum_key(s):
@@ -94,72 +94,34 @@ def proc_ctd(fname, compression='gzip', below_water=True):
 
 
 class ReadFile(unittest.TestCase):
-    def test_zip(self):
-        cfile = read_file('{}/{}'.format(data_path, 'XBT.EDF.zip'),
-                          compression='zip')
-        self.assertIsInstance(cfile, StringIO)
-
-    def test_gzip(self):
-        cfile = read_file('{}/{}'.format(data_path, 'XBT.EDF.gz'),
-                          compression='gzip')
-        self.assertIsInstance(cfile, StringIO)
-
-    def test_bz2(self):
-        cfile = read_file('{}/{}'.format(data_path, 'XBT.EDF.bz2'),
-                          compression='bz2')
-        self.assertIsInstance(cfile, StringIO)
 
     def test_uncompresed(self):
-        cfile = read_file('{}/{}'.format(data_path, 'XBT.EDF'),
+        cfile = read_file('{}/{}'.format(data_path, 'km1312_s51_c01_ctd059.btl'),
                           compression=None)
         self.assertIsInstance(cfile, StringIO)
 
 
 class DataFrameTests(unittest.TestCase):
     def setUp(self):
-        self.xbt = DataFrame.from_edf('{}/{}'.format(data_path,
-                                                     'XBT.EDF.zip'),
-                                      compression='zip')
-        self.fsi = DataFrame.from_fsi('{}/{}'.format(data_path,
-                                                     'FSI.txt.gz'),
-                                      compression='gzip', skiprows=9)
-        self.cnv = DataFrame.from_cnv('{}/{}'.format(data_path,
-                                                     'small.cnv.bz2'),
-                                      compression='bz2')
-        self.ros = rosette_summary('{}/{}'.format(data_path,
-                                                  'CTD/g01l03s01m-m2.ros'))
 
-        self.btl = DataFrame.from_btl('{}/{}'.format(data_path,'btl/Krause01.btl'),compression=None)
+        self.btl = DataFrame.from_btl('{}/{}'.format(data_path,
+                                                     'km1312_s51_c01_ctd059.btl'),
+                                      compression='none')
 
 
     def tearDown(self):
         unittest.TestCase.tearDown(self)
 
     # Check if a DataFrame is returned.
-    def test_fsi_is_dataframe(self):
-        self.assertIsInstance(self.fsi, DataFrame)
-
-    def test_xbt_is_dataframe(self):
-        self.assertIsInstance(self.xbt, DataFrame)
 
     def test_cnv_is_dataframe(self):
         self.assertIsInstance(self.cnv, DataFrame)
-
-   # def test_btl_is_dataframe(self):
-    #    self.assertIsInstance(self.btl, DataFrame)
 
     # Check if DataFrame is not empty
     def test_fsi_is_not_empty(self):
         self.assertFalse(self.fsi.empty)
 
-    def test_xbt_is_not_empty(self):
-        self.assertFalse(self.xbt.empty)
 
-    def test_cnv_is_not_empty(self):
-        self.assertFalse(self.cnv.empty)
-
-    #def test_btl_is_not_empty(self):
-     #   self.assertFalse(self.btl.empty)
 
 class HeaderTest(unittest.TestCase):
     def tearDown(self):
@@ -192,11 +154,10 @@ class HeaderTest(unittest.TestCase):
                 DataFrame.from_cnv(fname)
 
 
-
 class SectionTest(unittest.TestCase):
     def setUp(self):
         lon, lat = [], []
-        pattern = '{}/{}'.format(data_path, 'CTD/g01mcan*c.cnv.gz')
+        pattern = '{}/{}'.format(data_path, 'btl/g01mcan*c.cnv.gz')
         fnames = sorted(glob(pattern), key=alphanum_key)
         section = OrderedDict()
         for fname in fnames:

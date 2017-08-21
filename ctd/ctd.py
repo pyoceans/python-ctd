@@ -1,8 +1,9 @@
 from __future__ import (absolute_import, division, print_function)
 
-import os
+import os,re
 import warnings
 from datetime import datetime
+
 
 import numpy as np
 
@@ -25,7 +26,6 @@ def asof(self, label):
         else:
             return np.nan
     return label
-
 
 class CTD(DataFrame):
     def __init__(
@@ -301,15 +301,22 @@ def from_btl(fname, compression=None, below_water=False, lon=None,
             else:
                 raise ValueError('Latitude not recognized.')
         if not (line.startswith('*') | line.startswith('#') ):  #there is no *END* like in a .cnv file, skip two after header info
+            '''fix commonly occurring problem when Sbeox.* exists in the file
+            the name is concatenated to previous parameter
+            example:
+                CStarAt0Sbeox0Mm/Kg to CStarAt0 Sbeox0Mm/Kg (really two different params)
+            '''
+            line = re.sub(r'(\S)Sbeox', '\\1 Sbeox', line)
+
             names = line.split()
             skiprows = k + 2
             break
 
     f.seek(0)
 
-    names.append('Rowtype')
+    names.append('Statistic') #capture stat names column
 
-    df = read_fwf(f, header=None, index_col=False, names=names,
+    df = read_fwf(f, header=None, index_col=False, names=names,parse_dates=False,
                       skiprows=skiprows)
     f.close()
 
@@ -337,9 +344,7 @@ def from_btl(fname, compression=None, below_water=False, lon=None,
     df['Date'] = df['Date'].fillna(method='ffill')
     df['Time'] = df['Time'].fillna(method='ffill')
 
-
-
-
+    df['Statistic'] = df['Statistic'].str.replace(r'\(|\)', '') #(avg) to avg
     #avg_df = df.iloc[::4, :]
     #cast = avg_df #return just avg as cast
 
@@ -357,11 +362,13 @@ def from_btl(fname, compression=None, below_water=False, lon=None,
             try:
                 cast[column] = cast[column].astype(float)
             except ValueError:
-                warnings.warn('Could not convert %s to float.' % column)
+                if column not in ('Bottle','Date','Time','Statistic'):
+                    warnings.warn('Could not convert %s to float.' % column)
     if below_water:
         cast = remove_above_water(cast)
 
     cast['Bottle'] = cast['Bottle'].astype(int)
+    cast['Scan'] = cast['Scan'].astype(int)
     return CTD(cast, longitude=lon, latitude=lat, name=name, header=header,
                config=config)
 

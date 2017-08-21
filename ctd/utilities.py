@@ -66,12 +66,10 @@ def extrap1d(interpolator):
 
     return ufunclike
 
-
 def normalize_names(name):
     name = name.strip()
     name = name.strip('*')
     return name
-
 
 def read_file(fname, compression=None):
     if compression == 'gzip':
@@ -87,7 +85,9 @@ def read_file(fname, compression=None):
         name = zfile.namelist()[0]
         cfile = zfile.open(name)
     else:
-        cfile = open(fname, 'rb')
-    text = cfile.read().decode(encoding='utf-8', errors='replace')
+        cfile = open(fname)#, 'rb')
+
+    text = cfile.read()#.decode(encoding='utf-8', errors='replace')
+
     cfile.close()
     return StringIO(text)

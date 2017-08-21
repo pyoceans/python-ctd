@@ -85,9 +85,13 @@ def read_file(fname, compression=None):
         name = zfile.namelist()[0]
         cfile = zfile.open(name)
     else:
+        # opening without 'rb' and reading without decode because you loose
+        #    the special charcters in seabird names like in sigma-é00
+        #cfile = open(fname, 'rb')
         cfile = open(fname)#, 'rb')
 
-    text = cfile.read()#.decode(encoding='utf-8', errors='replace')
+        #text = cfile.read().decode(encoding='utf-8', errors='replace')
+        text = cfile.read()#.decode(encoding='utf-8', errors='replace')
 
     cfile.close()
     return StringIO(text)

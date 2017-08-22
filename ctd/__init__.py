@@ -36,7 +36,7 @@ __all__ = [
     despike,
     extrap_sec,
     from_cnv,
-	from_btl,
+    from_btl,
     from_edf,
     from_fsi,
     gen_topomask,

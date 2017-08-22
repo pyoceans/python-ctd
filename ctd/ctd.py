@@ -4,7 +4,6 @@ import os,re
 import warnings
 from datetime import datetime
 
-
 import numpy as np
 
 from pandas import DataFrame
@@ -26,6 +25,7 @@ def asof(self, label):
         else:
             return np.nan
     return label
+
 
 class CTD(DataFrame):
     def __init__(
@@ -300,12 +300,12 @@ def from_btl(fname, compression=None, below_water=False, lon=None,
                 lon = lon[0] + lon[1] / 60.
             else:
                 raise ValueError('Latitude not recognized.')
-        if not (line.startswith('*') | line.startswith('#') ):  #there is no *END* like in a .cnv file, skip two after header info
-            '''fix commonly occurring problem when Sbeox.* exists in the file
-            the name is concatenated to previous parameter
-            example:
-                CStarAt0Sbeox0Mm/Kg to CStarAt0 Sbeox0Mm/Kg (really two different params)
-            '''
+        # There is no *END* like in a .cnv file, skip two after header info.
+        if not (line.startswith('*') | line.startswith('#') ):
+            # Fix commonly occurring problem when Sbeox.* exists in the file
+            # the name is concatenated to previous parameter
+            # example:
+            #   CStarAt0Sbeox0Mm/Kg to CStarAt0 Sbeox0Mm/Kg (really two different params)
             line = re.sub(r'(\S)Sbeox', '\\1 Sbeox', line)
 
             names = line.split()
@@ -313,44 +313,45 @@ def from_btl(fname, compression=None, below_water=False, lon=None,
             break
 
     f.seek(0)
-
-    names.append('Statistic') #capture stat names column
+    # Capture stat names column.
+    names.append('Statistic')
 
     df = read_fwf(f, header=None, index_col=False, names=names,parse_dates=False,
                       skiprows=skiprows)
     f.close()
 
-    '''
-    At this point the data frame is not correctly lined up (multiple rows for avg,std,min,max or just avg,std,etc)
-     also needs date,time,and bottle number to be converted to one per line.
-    '''
+    # At this point the data frame is not correctly lined up (multiple rows for avg, std, min, max or
+    # just avg, std, etc).
+    # Also needs date,time,and bottle number to be converted to one per line.
 
-    #add new column and put values in it
+    # Add new column and put values in it.
     df.insert(2, 'Time', df['Date'])
 
-    # get row types, see what you have: avg,std,min,max or just avg,std
+    # Get row types, see what you have: avg, std, min, max or just avg, std.
     rowtypes = df[df.columns[-1]].unique()
-    dates = df.iloc[::len(rowtypes), 1] #get dates which occur on second line of each bottle
-    times = df.iloc[1::len(rowtypes), 1]  # get times which occur on second line of each bottle
+    # Get dates which occur on second line of each bottle.
+    dates = df.iloc[::len(rowtypes), 1]
+    # Get times which occur on second line of each bottle.
+    times = df.iloc[1::len(rowtypes), 1]
 
-    #add times to first rows
+    # Add times to first rows.
     df['Time'].iloc[::4] = times.values
 
-    #remove time from date column
+    # Remove time from date column.
     df['Date'].iloc[1::4] = dates.values
 
-    #fill missing rows
+    # Fill missing rows.
     df['Bottle'] = df['Bottle'].fillna(method='ffill')
     df['Date'] = df['Date'].fillna(method='ffill')
     df['Time'] = df['Time'].fillna(method='ffill')
 
-    df['Statistic'] = df['Statistic'].str.replace(r'\(|\)', '') #(avg) to avg
-    #avg_df = df.iloc[::4, :]
-    #cast = avg_df #return just avg as cast
+    df['Statistic'] = df['Statistic'].str.replace(r'\(|\)', '')  # (avg) to avg
+    # avg_df = df.iloc[::4, :]
+    # cast = avg_df  # Return just avg as cast.
 
     cast = df
 
-    #not setting pressure as index
+    # Not setting pressure as index.
 
     name = basename(fname)[0]
 
@@ -362,7 +363,7 @@ def from_btl(fname, compression=None, below_water=False, lon=None,
             try:
                 cast[column] = cast[column].astype(float)
             except ValueError:
-                if column not in ('Bottle','Date','Time','Statistic'):
+                if column not in ('Bottle', 'Date', 'Time', 'Statistic'):
                     warnings.warn('Could not convert %s to float.' % column)
     if below_water:
         cast = remove_above_water(cast)

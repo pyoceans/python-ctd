@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 
-
-from __future__ import (absolute_import, division, print_function)
+from __future__ import absolute_import, division, print_function
 
 import matplotlib.pyplot as plt
 
 import mpl_toolkits.axisartist as AA
-
 from mpl_toolkits.axes_grid1 import host_subplot
 
 import numpy as np

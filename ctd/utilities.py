@@ -1,12 +1,10 @@
-from __future__ import (absolute_import, division, print_function)
+from __future__ import absolute_import, division, print_function
 
 import bz2
 import gzip
 import os
 import zipfile
-
 from io import StringIO
-
 from xml.etree import cElementTree as etree
 
 import numpy as np

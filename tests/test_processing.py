@@ -1,9 +1,8 @@
-from __future__ import (absolute_import, division, print_function)
+from __future__ import absolute_import, division, print_function
 
 import os
 import re
 import unittest
-
 from collections import OrderedDict
 from glob import glob
 

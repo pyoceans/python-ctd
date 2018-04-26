@@ -1,5 +1,6 @@
-numpy
-scipy
-matplotlib
-pandas
 gsw
+matplotlib
+numpy
+pandas
+pathlib2
+scipy

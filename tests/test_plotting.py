@@ -17,7 +17,7 @@ import pytest
 
 matplotlib.use('Agg', warn=True)
 
-data_path = Path(__file__).parents[0].joinpath('data')
+data_path = Path(__file__).parent.joinpath('data')
 
 
 def assert_is_valid_plot_return_object(objs):
@@ -55,7 +55,7 @@ def proc_ctd(fname):
     CTD processing.
 
     """
-    cast = DataFrame.from_cnv(fname, compression='gzip', below_water=True).split()[0]
+    cast = DataFrame.from_cnv(fname, below_water=True).split()[0]
     cast = cast[cast['pumps']]
     cast = cast[~cast['flag']]
     name = Path(fname).stem
@@ -89,19 +89,19 @@ def make_section(data_path=data_path, variable='t090C'):
 # BasicPlotting
 @pytest.fixture
 def xbt():
-    yield DataFrame.from_edf(data_path.joinpath('XBT.EDF.zip'), compression='zip')
+    yield DataFrame.from_edf(data_path.joinpath('XBT.EDF.zip'))
     plt.close('all')
 
 
 @pytest.fixture
 def fsi():
-    yield DataFrame.from_fsi(data_path.joinpath('FSI.txt.gz'), compression='gzip', skiprows=9)
+    yield DataFrame.from_fsi(data_path.joinpath('FSI.txt.gz'), skiprows=9)
     plt.close('all')
 
 
 @pytest.fixture
 def cnv():
-    yield DataFrame.from_cnv(data_path.joinpath('small.cnv.bz2'), compression='bz2')
+    yield DataFrame.from_cnv(data_path.joinpath('small.cnv.bz2'))
     plt.close('all')
 
 

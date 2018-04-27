@@ -9,12 +9,12 @@ import numpy as np
 import pytest
 
 
-data_path = Path(__file__).parents[0].joinpath('data')
+data_path = Path(__file__).parent.joinpath('data')
 
 
 @pytest.fixture
 def load_spiked_ctd(name):
-    return DataFrame.from_cnv(data_path.joinpath(name), compression='bz2')
+    return DataFrame.from_cnv(data_path.joinpath(name))
 
 
 # Split.

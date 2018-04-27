@@ -2,12 +2,19 @@ from __future__ import absolute_import, division, print_function
 
 import bz2
 import gzip
-import os
+import re
 import zipfile
 from io import StringIO
 from xml.etree import cElementTree as etree
 
 import numpy as np
+
+try:
+    from pathlib import Path
+except ImportError as e:
+    from pathlib2 import Path
+
+path_type = (Path, )
 
 
 def header(xml):
@@ -25,8 +32,9 @@ def basename(fname):
     ../test/data, FSI.txt, .zip
 
     """
-    path, name = os.path.split(fname)
-    name, ext = os.path.splitext(name)
+    if not isinstance(fname, path_type):
+        fname = Path(fname)
+    path, name, ext = fname.parent, fname.stem, fname.suffix
     return path, name, ext
 
 
@@ -72,6 +80,9 @@ def normalize_names(name):
 
 
 def read_file(fname, compression=None):
+    if isinstance(fname, path_type):
+        fname = str(fname)
+
     if compression == 'gzip':
         cfile = gzip.open(fname)
     elif compression == 'bz2':
@@ -89,3 +100,10 @@ def read_file(fname, compression=None):
     text = cfile.read().decode(encoding='utf-8', errors='replace')
     cfile.close()
     return StringIO(text)
+
+
+def alphanum_key(s):
+    """Order files in a 'human' expected fashion."""
+    key = re.split(r'(\d+)', s)
+    key[1::2] = list(map(int, key[1::2]))
+    return key

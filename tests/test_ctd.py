@@ -1,27 +1,24 @@
 from __future__ import absolute_import, division, print_function
 
-import os
-import re
-import unittest
 from collections import OrderedDict
-from glob import glob
 from io import StringIO
 
-from ctd import (DataFrame, Series, derive_cnv, lp_filter, movingaverage,
-                 plot_section, rosette_summary)
-from ctd.utilities import read_file
+from ctd import (
+    DataFrame,
+    Series,
+    derive_cnv,
+    lp_filter,
+    movingaverage,
+    plot_section,
+    rosette_summary
+    )
+from ctd.utilities import Path, read_file
 
 from pandas import Panel
 
+import pytest
 
-data_path = os.path.join(os.path.dirname(__file__), 'data')
-
-
-def alphanum_key(s):
-    """Order files in a 'human' expected fashion."""
-    key = re.split(r'(\d+)', s)
-    key[1::2] = list(map(int, key[1::2]))
-    return key
+data_path = Path(__file__).parents[0].joinpath('data')
 
 
 def proc_ctd(fname, compression='gzip', below_water=True):
@@ -31,10 +28,13 @@ def proc_ctd(fname, compression='gzip', below_water=True):
     """
     # 00-Split, clean 'bad pump' data, and apply flag.
 
-    cast = DataFrame.from_cnv(fname, compression=compression,
-                              below_water=below_water).split()[0]
+    cast = DataFrame.from_cnv(
+        fname,
+        compression=compression,
+        below_water=below_water
+        ).split()[0]
 
-    name = os.path.basename(fname).split('.')[0]
+    name = Path(fname).stem
     cast = cast[cast['pumps']]
     cast = cast[~cast['flag']]  # True for bad values.
 
@@ -92,123 +92,116 @@ def proc_ctd(fname, compression='gzip', below_water=True):
     return cast
 
 
-class ReadFile(unittest.TestCase):
-    def test_zip(self):
-        cfile = read_file('{}/{}'.format(data_path, 'XBT.EDF.zip'),
-                          compression='zip')
-        self.assertIsInstance(cfile, StringIO)
-
-    def test_gzip(self):
-        cfile = read_file('{}/{}'.format(data_path, 'XBT.EDF.gz'),
-                          compression='gzip')
-        self.assertIsInstance(cfile, StringIO)
-
-    def test_bz2(self):
-        cfile = read_file('{}/{}'.format(data_path, 'XBT.EDF.bz2'),
-                          compression='bz2')
-        self.assertIsInstance(cfile, StringIO)
-
-    def test_uncompresed(self):
-        cfile = read_file('{}/{}'.format(data_path, 'XBT.EDF'),
-                          compression=None)
-        self.assertIsInstance(cfile, StringIO)
+# Test read file
+def test_zip():
+    cfile = read_file(data_path.joinpath('XBT.EDF.zip'), compression='zip')
+    assert isinstance(cfile, StringIO)
 
 
-class DataFrameTests(unittest.TestCase):
-    def setUp(self):
-        self.xbt = DataFrame.from_edf('{}/{}'.format(data_path,
-                                                     'XBT.EDF.zip'),
-                                      compression='zip')
-        self.fsi = DataFrame.from_fsi('{}/{}'.format(data_path,
-                                                     'FSI.txt.gz'),
-                                      compression='gzip', skiprows=9)
-        self.cnv = DataFrame.from_cnv('{}/{}'.format(data_path,
-                                                     'small.cnv.bz2'),
-                                      compression='bz2')
-        self.ros = rosette_summary('{}/{}'.format(data_path,
-                                                  'CTD/g01l03s01m-m2.ros'))
-
-    def tearDown(self):
-        unittest.TestCase.tearDown(self)
-
-    # Check if a DataFrame is returned.
-    def test_fsi_is_dataframe(self):
-        self.assertIsInstance(self.fsi, DataFrame)
-
-    def test_xbt_is_dataframe(self):
-        self.assertIsInstance(self.xbt, DataFrame)
-
-    def test_cnv_is_dataframe(self):
-        self.assertIsInstance(self.cnv, DataFrame)
-
-    # Check if DataFrame is not empty
-    def test_fsi_is_not_empty(self):
-        self.assertFalse(self.fsi.empty)
-
-    def test_xbt_is_not_empty(self):
-        self.assertFalse(self.xbt.empty)
-
-    def test_cnv_is_not_empty(self):
-        self.assertFalse(self.cnv.empty)
+def test_gzip():
+    cfile = read_file(data_path.joinpath('XBT.EDF.gz'), compression='gzip')
+    assert isinstance(cfile, StringIO)
 
 
-class HeaderTest(unittest.TestCase):
-    def tearDown(self):
-        unittest.TestCase.tearDown(self)
+def test_bz2():
+    cfile = read_file(data_path.joinpath('XBT.EDF.bz2'), compression='bz2')
+    assert isinstance(cfile, StringIO)
 
-    def test_header_parse(self):
-        lon, lat = '-42', '42'
-        xbt1 = DataFrame.from_edf('{}/{}'.format(data_path, 'C3_00005.edf'),
-                                  lon=lon, lat=lat)
-        self.assertTrue((xbt1.longitude, xbt1.latitude) ==
-                        (float(lon), float(lat)))
 
-        with self.assertRaises(ValueError):
-            DataFrame.from_edf('{}/{}'.format(data_path,
-                                              'C3_00005.edf'),
-                               lon=None, lat=None)
+def test_uncompresed():
+    cfile = read_file(data_path.joinpath('XBT.EDF'), compression=None)
+    assert isinstance(cfile, StringIO)
 
-    def test_pressure_field_labels(self):
-        """
-        Support different pressure field labels encountered in
-        Sea-Bird cnv files (issue #3)
 
-        """
-        for fname in sorted(glob('{}/{}'.format(data_path,
-                                                'issue3prlabworks*.cnv'))):
+# DataFrame
+@pytest.fixture
+def xbt():
+    return DataFrame.from_edf(data_path.joinpath('XBT.EDF.zip'), compression='zip')
+
+
+@pytest.fixture
+def fsi():
+    return DataFrame.from_fsi(data_path.joinpath('FSI.txt.gz'), compression='gzip', skiprows=9)
+
+
+@pytest.fixture
+def cnv():
+    return DataFrame.from_cnv(data_path.joinpath('small.cnv.bz2'), compression='bz2')
+
+
+@pytest.fixture
+def ros():
+    return rosette_summary(data_path.joinpath('CTD/g01l03s01m-m2.ros'))
+
+
+# Check if a DataFrame is returned.
+def test_fsi_is_dataframe():
+    assert isinstance(fsi(), DataFrame)
+
+
+def test_xbt_is_dataframe():
+    assert isinstance(xbt(), DataFrame)
+
+
+def test_cnv_is_dataframe():
+    assert isinstance(cnv(), DataFrame)
+
+
+# Check if DataFrame is not empty
+def test_fsi_is_not_empty():
+    assert not fsi().empty
+
+
+def test_xbt_is_not_empty():
+    assert not xbt().empty
+
+
+def test_cnv_is_not_empty():
+    assert not cnv().empty
+
+
+# HeaderTest
+def test_header_parse():
+    lon, lat = '-42', '42'
+    xbt1 = DataFrame.from_edf(data_path.joinpath('C3_00005.edf'), lon=lon, lat=lat)
+    assert (xbt1.longitude, xbt1.latitude) == (float(lon), float(lat))
+
+    with pytest.raises(ValueError):
+        DataFrame.from_edf(data_path.joinpath('C3_00005.edf'), lon=None, lat=None)
+
+
+def test_pressure_field_labels():
+    """
+    Support different pressure field labels encountered in
+    Sea-Bird cnv files (issue #3)
+
+    """
+    for fname in sorted(data_path.glob('issue3prlabworks*.cnv')):
+        DataFrame.from_cnv(fname)
+    for fname in sorted(data_path.glob('issue3prlabfails*.cnv')):
+        with pytest.raises(KeyError):
             DataFrame.from_cnv(fname)
-        for fname in sorted(glob('{}/{}'.format(data_path,
-                                                'issue3prlabfails*.cnv'))):
-            with self.assertRaises(KeyError):
-                DataFrame.from_cnv(fname)
 
 
-class SectionTest(unittest.TestCase):
-    def setUp(self):
-        lon, lat = [], []
-        pattern = '{}/{}'.format(data_path, 'CTD/g01mcan*c.cnv.gz')
-        fnames = sorted(glob(pattern), key=alphanum_key)
-        section = OrderedDict()
-        for fname in fnames:
-            cast = proc_ctd(fname)
-            name = os.path.basename(fname).split('.')[0]
-            section.update({name: cast})
-            lon.append(cast.longitude.mean())
-            lat.append(cast.latitude.mean())
+@pytest.fixture
+def section():
+    lon, lat = [], []
+    fnames = sorted(data_path.glob('CTD/g01mcan*c.cnv.gz'))
+    section = OrderedDict()
+    for fname in fnames:
+        cast = proc_ctd(fname)
+        name = Path(fname).stem
+        section.update({name: cast})
+        lon.append(cast.longitude.mean())
+        lat.append(cast.latitude.mean())
 
-        # Section.
-        self.section = Panel.fromDict(section)
-        self.lon, self.lat = lon, lat
-
-    def test_section(self):
-        CT = self.section.minor_xs('CT')
-        CT.lon, CT.lat = self.lon, self.lat
-        fig, ax, cb = plot_section(CT, reverse=True)
+    # Section.
+    section = Panel.fromDict(section)
+    return {'section': section, 'lon': lon, 'lat': lat}
 
 
-def main():
-    unittest.main()
-
-
-if __name__ == '__main__':
-    main()
+def test_section():
+    data = section()
+    CT = data['section'].minor_xs('CT')
+    CT.lon, CT.lat = data['lon'], data['lat']
+    fig, ax, cb = plot_section(CT, reverse=True)

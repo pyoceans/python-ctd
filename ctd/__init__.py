@@ -1,7 +1,5 @@
 from __future__ import absolute_import, division, print_function
 
-__version__ = '0.3.0'
-
 from pandas import DataFrame, Index, Series
 
 from .ctd import (
@@ -33,6 +31,12 @@ from .processing import (
     smooth,
     split,
 )
+
+
+from ._version import get_versions  # noqa
+__version__ = get_versions()['version']
+del get_versions
+
 
 __all__ = [
     asof,

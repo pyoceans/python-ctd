@@ -79,27 +79,44 @@ def normalize_names(name):
     return name
 
 
-def read_file(fname, compression=None):
-    if isinstance(fname, path_type):
-        fname = str(fname)
-
-    if compression == 'gzip':
-        cfile = gzip.open(fname)
-    elif compression == 'bz2':
-        cfile = bz2.BZ2File(fname)
-    elif compression == 'zip':
+def _open_compressed(fname):
+    extension = fname.suffix.lower()
+    if extension in ['.gzip', '.gz']:
+        cfile = gzip.open(str(fname))
+    elif extension == '.bz2':
+        cfile = bz2.BZ2File(str(fname))
+    elif extension == '.zip':
         # NOTE: Zip format may contain more than one file in the archive
         # (similar to tar), here we assume that there is just one file per
         # zipfile!  Also, we ask for the name because it can be different from
         # the zipfile file!!
-        zfile = zipfile.ZipFile(fname)
+        zfile = zipfile.ZipFile(str(fname))
         name = zfile.namelist()[0]
         cfile = zfile.open(name)
     else:
-        cfile = open(fname)
-        text = cfile.read()#.decode(encoding='utf-8', errors='replace')
-
+        raise ValueError(
+            'Unrecognized file extension. Expected .gzip, .bz2, or .zip, got {}'.format(extension)
+            )
+    contents = cfile.read()
     cfile.close()
+    return contents
+
+
+def read_file(fname):
+    if not isinstance(fname, path_type):
+        fname = Path(fname).resolve()
+
+    extension = fname.suffix.lower()
+    if extension in ['.gzip', '.gz', '.bz2', '.zip']:
+        contents = _open_compressed(fname)
+    elif extension in ['.cnv', '.edf', '.txt', '.ros', '.btl']:
+        contents = fname.read_bytes()
+    else:
+        raise ValueError(
+            'Unrecognized file extension. Expected .cnv, .edf, .txt, .ros, or .btl got {}'.format(extension)
+            )
+    # Read as bytes but we need toreturn strings for the parsers.
+    text = contents.decode(encoding='utf-8', errors='replace')
     return StringIO(text)
 
 

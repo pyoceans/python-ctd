@@ -1,19 +1,21 @@
 from __future__ import absolute_import, division, print_function
 
-import os,re
+import re
 import warnings
 from datetime import datetime
 
 import numpy as np
 
-from pandas import DataFrame
-from pandas import read_table, read_fwf
+import pandas as pd
 
-from .utilities import basename, normalize_names, read_file
-
-data_path = os.path.join(
-    os.path.dirname(os.path.dirname(__file__)), 'tests', 'data'
+from .utilities import (
+    Path,
+    basename,
+    normalize_names,
+    read_file,
 )
+
+data_path = Path(__file__).parents[1].joinpath('tests', 'data')
 
 
 def asof(self, label):
@@ -27,7 +29,7 @@ def asof(self, label):
     return label
 
 
-class CTD(DataFrame):
+class CTD(pd.DataFrame):
     def __init__(
         self,
         data=None,
@@ -60,10 +62,10 @@ class CTD(DataFrame):
 
     def __reduce__(self):
         return self.__class__, (
-            DataFrame(self),  # NOTE Using that type(data)==DataFrame and the
-                              # the rest of the arguments of DataFrame.__init__
-                              # to defaults, the constructors acts as a
-                              # copy constructor.
+            pd.DataFrame(self),  # NOTE Using that type(data)==DataFrame and the
+                                 # the rest of the arguments of DataFrame.__init__
+                                 # to defaults, the constructors acts as a
+                                 # copy constructor.
             None,
             None,
             self.time,
@@ -82,21 +84,20 @@ def remove_above_water(cast):
     return cast[cast.index >= 0]
 
 
-def from_edf(fname, compression=None, below_water=False, lon=None,
-             lat=None):
+def from_edf(fname, below_water=False, lon=None, lat=None):
     """
     DataFrame constructor to open XBT EDF ASCII format.
 
     Examples
     --------
     >>> from ctd import DataFrame
-    >>> cast = DataFrame.from_edf('{}/{}'.format(data_path, 'XBT.EDF.gz'),
-    ...                           compression='gzip')
+    >>> cast = DataFrame.from_edf(data_path.joinpath('XBT.EDF.gz'))
     >>> fig, ax = cast['temperature'].plot()
     >>> _ = ax.axis([20, 24, 19, 0])
     >>> ax.grid(True)
+
     """
-    f = read_file(fname, compression=compression)
+    f = read_file(fname)
     header, names = [], []
     for k, line in enumerate(f.readlines()):
         line = line.strip()
@@ -140,8 +141,14 @@ def from_edf(fname, compression=None, below_water=False, lon=None,
             break
 
     f.seek(0)
-    cast = read_table(f, header=None, index_col=None, names=names,
-                      skiprows=skiprows, delim_whitespace=True)
+    cast = pd.read_table(
+        f,
+        header=None,
+        index_col=None,
+        names=names,
+        skiprows=skiprows,
+        delim_whitespace=True
+    )
     f.close()
 
     cast.set_index('depth', drop=True, inplace=True)
@@ -153,23 +160,21 @@ def from_edf(fname, compression=None, below_water=False, lon=None,
                serial=serial, name=name, header=header)
 
 
-def from_cnv(fname, compression=None, below_water=False, time=None,
-             lon=None, lat=None):
+def from_cnv(fname, below_water=False, time=None, lon=None, lat=None):
     """
     DataFrame constructor to open Seabird CTD CNV-ASCII format.
 
     Examples
     --------
     >>> from ctd import DataFrame
-    >>> cast = DataFrame.from_cnv('{}/{}'.format(data_path,
-    ...                                          'CTD_big.cnv.bz2'),
-    ...                           compression='bz2')
+    >>> cast = DataFrame.from_cnv(data_path.joinpath('CTD_big.cnv.bz2'))
     >>> downcast, upcast = cast.split()
     >>> fig, ax = downcast['t090C'].plot()
     >>> ax.grid(True)
+
     """
 
-    f = read_file(fname, compression=compression)
+    f = read_file(fname)
     header, config, names = [], [], []
     for k, line in enumerate(f.readlines()):
         line = line.strip()
@@ -210,8 +215,14 @@ def from_cnv(fname, compression=None, below_water=False, time=None,
             break
 
     f.seek(0)
-    cast = read_table(f, header=None, index_col=None, names=names,
-                      skiprows=skiprows, delim_whitespace=True)
+    cast = pd.read_table(
+        f,
+        header=None,
+        index_col=None,
+        names=names,
+        skiprows=skiprows,
+        delim_whitespace=True
+    )
     f.close()
 
     key_set = False
@@ -255,27 +266,26 @@ def from_cnv(fname, compression=None, below_water=False, time=None,
         )
 
 
-def from_btl(fname, compression=None, below_water=False, lon=None,
-             lat=None):
+def from_btl(fname, below_water=False, lon=None, lat=None):
     """
     DataFrame constructor to open Seabird CTD BTL-ASCII format.
 
     Examples
     --------
     >>> from ctd import DataFrame
-    >>> bottles = DataFrame.from_btl(filepath)
+    >>> bottles = DataFrame.from_btl(data_path.joinpath('btl', 'bottletest.btl'))
+
     """
 
-    f = read_file(fname, compression=compression)
+    f = read_file(fname)
     header, config, names = [], [], []
     for k, line in enumerate(f.readlines()):
         line = line.strip()
-        ''' #bottle files can't get variable names like this
-        if '# name' in line:  # Get columns names.
-            name, unit = line.split('=')[1].split(':')
-            name, unit = list(map(normalize_names, (name, unit)))
-            names.append(name)
-        '''
+        # Bottle files can't get variable names like this.
+        # if '# name' in line:  # Get columns names.
+        #     name, unit = line.split('=')[1].split(':')
+        #     name, unit = list(map(normalize_names, (name, unit)))
+        #     names.append(name)
         if line.startswith('*'):  # Get header.
             header.append(line)
         if line.startswith('#'):  # Get configuration file.
@@ -301,7 +311,7 @@ def from_btl(fname, compression=None, below_water=False, lon=None,
             else:
                 raise ValueError('Latitude not recognized.')
         # There is no *END* like in a .cnv file, skip two after header info.
-        if not (line.startswith('*') | line.startswith('#') ):
+        if not (line.startswith('*') | line.startswith('#')):
             # Fix commonly occurring problem when Sbeox.* exists in the file
             # the name is concatenated to previous parameter
             # example:
@@ -316,8 +326,14 @@ def from_btl(fname, compression=None, below_water=False, lon=None,
     # Capture stat names column.
     names.append('Statistic')
 
-    df = read_fwf(f, header=None, index_col=False, names=names,parse_dates=False,
-                      skiprows=skiprows)
+    df = pd.read_fwf(
+        f,
+        header=None,
+        index_col=False,
+        names=names,
+        parse_dates=False,
+        skiprows=skiprows
+    )
     f.close()
 
     # At this point the data frame is not correctly lined up (multiple rows for avg, std, min, max or
@@ -355,7 +371,11 @@ def from_btl(fname, compression=None, below_water=False, lon=None,
 
     name = basename(fname)[0]
 
-    dtypes = dict(bpos=int, pumps=bool, flag=bool)
+    dtypes = {
+        'bpos': int,
+        'pumps': bool,
+        'flag': bool
+    }
     for column in cast.columns:
         if column in dtypes:
             cast[column] = cast[column].astype(dtypes[column])
@@ -374,8 +394,7 @@ def from_btl(fname, compression=None, below_water=False, lon=None,
                config=config)
 
 
-def from_fsi(fname, compression=None, skiprows=9, below_water=False,
-             lon=None, lat=None):
+def from_fsi(fname, skiprows=9, below_water=False, lon=None, lat=None):
     """
     DataFrame constructor to open Falmouth Scientific, Inc. (FSI) CTD
     ASCII format.
@@ -383,16 +402,21 @@ def from_fsi(fname, compression=None, skiprows=9, below_water=False,
     Examples
     --------
     >>> from ctd import DataFrame
-    >>> cast = DataFrame.from_fsi('{}/{}'.format(data_path, 'FSI.txt.gz'),
-    ...                           compression='gzip')
+    >>> cast = DataFrame.from_fsi(data_path.joinpath('FSI.txt.gz'))
     >>> downcast, upcast = cast.split()
     >>> fig, ax = downcast['TEMP'].plot()
     >>> ax.grid(True)
 
     """
-    f = read_file(fname, compression=compression)
-    cast = read_table(f, header='infer', index_col=None, skiprows=skiprows,
-                      dtype=float, delim_whitespace=True)
+    f = read_file(fname)
+    cast = pd.read_table(
+        f,
+        header='infer',
+        index_col=None,
+        skiprows=skiprows,
+        dtype=float,
+        delim_whitespace=True
+    )
     f.close()
 
     cast.set_index('PRES', drop=True, inplace=True)
@@ -414,11 +438,12 @@ def rosette_summary(fname):
 
     Examples
     --------
-    >>> fname = '{}/{}'.format(data_path, 'CTD/g01l01s01.ros')
+    >>> fname = data_path.joinpath('CTD/g01l01s01.ros')
     >>> ros = rosette_summary(fname)
     >>> ros = ros.groupby(ros.index).mean()
     >>> np.int_(ros.pressure.values)
     array([835, 806, 705, 604, 503, 404, 303, 201, 151, 100,  51,   1])
+
     """
     ros = from_cnv(fname)
     ros['pressure'] = ros.index.values.astype(float)

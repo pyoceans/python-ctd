@@ -1,23 +1,20 @@
 from __future__ import absolute_import, division, print_function
 
-import os
-
 import numpy as np
 import numpy.ma as ma
 
 from pandas import Index, Series
 
-from .utilities import rolling_window
+from .utilities import Path, rolling_window
 
-data_path = os.path.join(
-    os.path.dirname(os.path.dirname(__file__)), 'tests', 'data'
-)
+data_path = Path(__file__).parents[1].joinpath('tests', 'data')
 
 
 def despike(self, n1=2, n2=20, block=100, keep=0):
     """
     Wild Edit Seabird-like function.  Passes with Standard deviation
     `n1` and `n2` with window size `block`.
+
     """
 
     data = self.values.astype(float).copy()
@@ -60,12 +57,8 @@ def lp_filter(data, sample_rate=24.0, time_constant=0.15):
     --------
     >>> import matplotlib.pyplot as plt
     >>> from ctd import DataFrame, lp_filter
-    >>> name = 'CTD-spiked-unfiltered.cnv.bz2'
-    >>> raw = DataFrame.from_cnv('{}/{}'.format(data_path, name),
-    ...                          compression='bz2')
-    >>> name = 'CTD-spiked-filtered.cnv.bz2'
-    >>> prc = DataFrame.from_cnv('{}/{}'.format(data_path, name),
-    ...                          compression='bz2')
+    >>> raw = DataFrame.from_cnv(data_path.joinpath('CTD-spiked-unfiltered.cnv.bz2'))
+    >>> prc = DataFrame.from_cnv(data_path.joinpath('CTD-spiked-filtered.cnv.bz2'))
     >>> kw = dict(sample_rate=24.0, time_constant=0.15)
     >>> original = prc.index.values
     >>> unfiltered = raw.index.values
@@ -77,9 +70,10 @@ def lp_filter(data, sample_rate=24.0, time_constant=0.15):
     >>> leg = ax.legend()
     >>> _ = ax.axis([33564, 33648, 1034, 1035])
 
-    NOTES
+    Notes
     -----
     http://wiki.scipy.org/Cookbook/FIRFilter
+
 
     """
 
@@ -160,9 +154,7 @@ def bindata(self, delta=1., method='averaging'):
 
 
 def split(self):
-    """
-    Returns a tuple with down/up-cast.
-    """
+    """Returns a tuple with down/up-cast."""
     down = self.iloc[:self.index.argmax()]
     up = self.iloc[self.index.argmax():][::-1]  # Reverse up index.
     return down, up
@@ -174,9 +166,7 @@ def movingaverage(series, window_size=48):
 
 
 def smooth(self, window_len=11, window='hanning'):
-    """
-    Smooth the data using a window with requested size.
-    """
+    """Smooth the data using a window with requested size."""
 
     windows = {
         'flat': np.ones,
@@ -233,10 +223,7 @@ def barrier_layer_thickness(SA, CT):
 
 
 def derive_cnv(self):
-    """
-    Compute SP, SA, CT, z, and GP from a cnv pre-processed cast.
-
-    """
+    """Compute SP, SA, CT, z, and GP from a cnv pre-processed cast."""
     import gsw
     cast = self.copy()
     p = cast.index.values.astype(float)

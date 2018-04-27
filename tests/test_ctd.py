@@ -18,10 +18,10 @@ from pandas import Panel
 
 import pytest
 
-data_path = Path(__file__).parents[0].joinpath('data')
+data_path = Path(__file__).parent.joinpath('data')
 
 
-def proc_ctd(fname, compression='gzip', below_water=True):
+def proc_ctd(fname, below_water=True):
     """
     Quick `proc_ctd` function.
 
@@ -30,7 +30,6 @@ def proc_ctd(fname, compression='gzip', below_water=True):
 
     cast = DataFrame.from_cnv(
         fname,
-        compression=compression,
         below_water=below_water
         ).split()[0]
 
@@ -94,70 +93,91 @@ def proc_ctd(fname, compression='gzip', below_water=True):
 
 # Test read file
 def test_zip():
-    cfile = read_file(data_path.joinpath('XBT.EDF.zip'), compression='zip')
+    cfile = read_file(data_path.joinpath('XBT.EDF.zip'))
     assert isinstance(cfile, StringIO)
 
 
 def test_gzip():
-    cfile = read_file(data_path.joinpath('XBT.EDF.gz'), compression='gzip')
+    cfile = read_file(data_path.joinpath('XBT.EDF.gz'))
     assert isinstance(cfile, StringIO)
 
 
 def test_bz2():
-    cfile = read_file(data_path.joinpath('XBT.EDF.bz2'), compression='bz2')
+    cfile = read_file(data_path.joinpath('XBT.EDF.bz2'))
     assert isinstance(cfile, StringIO)
 
 
 def test_uncompresed():
-    cfile = read_file(data_path.joinpath('XBT.EDF'), compression=None)
+    cfile = read_file(data_path.joinpath('XBT.EDF'))
     assert isinstance(cfile, StringIO)
 
 
 # DataFrame
 @pytest.fixture
 def xbt():
-    return DataFrame.from_edf(data_path.joinpath('XBT.EDF.zip'), compression='zip')
+    yield DataFrame.from_edf(data_path.joinpath('XBT.EDF.zip'))
 
 
 @pytest.fixture
 def fsi():
-    return DataFrame.from_fsi(data_path.joinpath('FSI.txt.gz'), compression='gzip', skiprows=9)
+    yield DataFrame.from_fsi(data_path.joinpath('FSI.txt.gz'), skiprows=9)
 
 
 @pytest.fixture
 def cnv():
-    return DataFrame.from_cnv(data_path.joinpath('small.cnv.bz2'), compression='bz2')
+    yield DataFrame.from_cnv(data_path.joinpath('small.cnv.bz2'))
+
+
+@pytest.fixture
+def btl():
+    yield DataFrame.from_btl(data_path.joinpath('btl', 'bottletest.btl'))
 
 
 @pytest.fixture
 def ros():
-    return rosette_summary(data_path.joinpath('CTD/g01l03s01m-m2.ros'))
+    yield rosette_summary(data_path.joinpath('CTD', 'g01l03s01m-m2.ros'))
 
 
 # Check if a DataFrame is returned.
-def test_fsi_is_dataframe():
-    assert isinstance(fsi(), DataFrame)
+def test_xbt_is_dataframe(xbt):
+    assert isinstance(xbt, DataFrame)
 
 
-def test_xbt_is_dataframe():
-    assert isinstance(xbt(), DataFrame)
+def test_fsi_is_dataframe(fsi):
+    assert isinstance(fsi, DataFrame)
 
 
-def test_cnv_is_dataframe():
-    assert isinstance(cnv(), DataFrame)
+def test_cnv_is_dataframe(cnv):
+    assert isinstance(cnv, DataFrame)
+
+
+def test_btl_is_dataframe(btl):
+    assert isinstance(btl, DataFrame)
+
+
+def test_ros_is_dataframe(ros):
+    assert isinstance(ros, DataFrame)
 
 
 # Check if DataFrame is not empty
-def test_fsi_is_not_empty():
-    assert not fsi().empty
+def test_xbt_is_not_empty(xbt):
+    assert not xbt.empty
 
 
-def test_xbt_is_not_empty():
-    assert not xbt().empty
+def test_fsi_is_not_empty(fsi):
+    assert not fsi.empty
 
 
-def test_cnv_is_not_empty():
-    assert not cnv().empty
+def test_cnv_is_not_empty(cnv):
+    assert not cnv.empty
+
+
+def test_btl_is_not_empty(btl):
+    assert not btl.empty
+
+
+def test_ros_is_not_empty(ros):
+    assert not ros.empty
 
 
 # HeaderTest

@@ -1,13 +1,13 @@
 from __future__ import absolute_import, division, print_function
 
-import os
+import os,re
 import warnings
 from datetime import datetime
 
 import numpy as np
 
 from pandas import DataFrame
-from pandas import read_table
+from pandas import read_table, read_fwf
 
 from .utilities import basename, normalize_names, read_file
 
@@ -253,6 +253,125 @@ def from_cnv(fname, compression=None, below_water=False, time=None,
         header=header,
         config=config
         )
+
+
+def from_btl(fname, compression=None, below_water=False, lon=None,
+             lat=None):
+    """
+    DataFrame constructor to open Seabird CTD BTL-ASCII format.
+
+    Examples
+    --------
+    >>> from ctd import DataFrame
+    >>> bottles = DataFrame.from_btl(filepath)
+    """
+
+    f = read_file(fname, compression=compression)
+    header, config, names = [], [], []
+    for k, line in enumerate(f.readlines()):
+        line = line.strip()
+        ''' #bottle files can't get variable names like this
+        if '# name' in line:  # Get columns names.
+            name, unit = line.split('=')[1].split(':')
+            name, unit = list(map(normalize_names, (name, unit)))
+            names.append(name)
+        '''
+        if line.startswith('*'):  # Get header.
+            header.append(line)
+        if line.startswith('#'):  # Get configuration file.
+            config.append(line)
+        if 'NMEA Latitude' in line:
+            hemisphere = line[-1]
+            lat = line.strip(hemisphere).split('=')[1].strip()
+            lat = np.float_(lat.split())
+            if hemisphere == 'S':
+                lat = -(lat[0] + lat[1] / 60.)
+            elif hemisphere == 'N':
+                lat = lat[0] + lat[1] / 60.
+            else:
+                raise ValueError('Latitude not recognized.')
+        if 'NMEA Longitude' in line:
+            hemisphere = line[-1]
+            lon = line.strip(hemisphere).split('=')[1].strip()
+            lon = np.float_(lon.split())
+            if hemisphere == 'W':
+                lon = -(lon[0] + lon[1] / 60.)
+            elif hemisphere == 'E':
+                lon = lon[0] + lon[1] / 60.
+            else:
+                raise ValueError('Latitude not recognized.')
+        # There is no *END* like in a .cnv file, skip two after header info.
+        if not (line.startswith('*') | line.startswith('#') ):
+            # Fix commonly occurring problem when Sbeox.* exists in the file
+            # the name is concatenated to previous parameter
+            # example:
+            #   CStarAt0Sbeox0Mm/Kg to CStarAt0 Sbeox0Mm/Kg (really two different params)
+            line = re.sub(r'(\S)Sbeox', '\\1 Sbeox', line)
+
+            names = line.split()
+            skiprows = k + 2
+            break
+
+    f.seek(0)
+    # Capture stat names column.
+    names.append('Statistic')
+
+    df = read_fwf(f, header=None, index_col=False, names=names,parse_dates=False,
+                      skiprows=skiprows)
+    f.close()
+
+    # At this point the data frame is not correctly lined up (multiple rows for avg, std, min, max or
+    # just avg, std, etc).
+    # Also needs date,time,and bottle number to be converted to one per line.
+
+    # Add new column and put values in it.
+    df.insert(2, 'Time', df['Date'])
+
+    # Get row types, see what you have: avg, std, min, max or just avg, std.
+    rowtypes = df[df.columns[-1]].unique()
+    # Get dates which occur on second line of each bottle.
+    dates = df.iloc[::len(rowtypes), 1]
+    # Get times which occur on second line of each bottle.
+    times = df.iloc[1::len(rowtypes), 1]
+
+    # Add times to first rows.
+    df['Time'].iloc[::4] = times.values
+
+    # Remove time from date column.
+    df['Date'].iloc[1::4] = dates.values
+
+    # Fill missing rows.
+    df['Bottle'] = df['Bottle'].fillna(method='ffill')
+    df['Date'] = df['Date'].fillna(method='ffill')
+    df['Time'] = df['Time'].fillna(method='ffill')
+
+    df['Statistic'] = df['Statistic'].str.replace(r'\(|\)', '')  # (avg) to avg
+    # avg_df = df.iloc[::4, :]
+    # cast = avg_df  # Return just avg as cast.
+
+    cast = df
+
+    # Not setting pressure as index.
+
+    name = basename(fname)[0]
+
+    dtypes = dict(bpos=int, pumps=bool, flag=bool)
+    for column in cast.columns:
+        if column in dtypes:
+            cast[column] = cast[column].astype(dtypes[column])
+        else:
+            try:
+                cast[column] = cast[column].astype(float)
+            except ValueError:
+                if column not in ('Bottle', 'Date', 'Time', 'Statistic'):
+                    warnings.warn('Could not convert %s to float.' % column)
+    if below_water:
+        cast = remove_above_water(cast)
+
+    cast['Bottle'] = cast['Bottle'].astype(int)
+    cast['Scan'] = cast['Scan'].astype(int)
+    return CTD(cast, longitude=lon, latitude=lat, name=name, header=header,
+               config=config)
 
 
 def from_fsi(fname, compression=None, skiprows=9, below_water=False,

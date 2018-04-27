@@ -128,6 +128,9 @@ class DataFrameTests(unittest.TestCase):
         self.ros = rosette_summary('{}/{}'.format(data_path,
                                                   'CTD/g01l03s01m-m2.ros'))
 
+        self.btl = DataFrame.from_btl('{}/{}'.format(data_path,'btl/Krause01.btl'),compression=None)
+
+
     def tearDown(self):
         unittest.TestCase.tearDown(self)
 
@@ -141,6 +144,9 @@ class DataFrameTests(unittest.TestCase):
     def test_cnv_is_dataframe(self):
         self.assertIsInstance(self.cnv, DataFrame)
 
+   # def test_btl_is_dataframe(self):
+    #    self.assertIsInstance(self.btl, DataFrame)
+
     # Check if DataFrame is not empty
     def test_fsi_is_not_empty(self):
         self.assertFalse(self.fsi.empty)
@@ -151,6 +157,8 @@ class DataFrameTests(unittest.TestCase):
     def test_cnv_is_not_empty(self):
         self.assertFalse(self.cnv.empty)
 
+    #def test_btl_is_not_empty(self):
+     #   self.assertFalse(self.btl.empty)
 
 class HeaderTest(unittest.TestCase):
     def tearDown(self):
@@ -181,6 +189,7 @@ class HeaderTest(unittest.TestCase):
                                                 'issue3prlabfails*.cnv'))):
             with self.assertRaises(KeyError):
                 DataFrame.from_cnv(fname)
+
 
 
 class SectionTest(unittest.TestCase):

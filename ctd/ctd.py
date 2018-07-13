@@ -340,8 +340,8 @@ def from_btl(fname, lon=None, lat=None):
     )
     f.close()
 
-    # At this point the data frame is not correctly lined up (multiple rows for avg, std, min, max or
-    # just avg, std, etc).
+    # At this point the data frame is not correctly lined up (multiple rows 
+    # for avg, std, min, max or just avg, std, etc).
     # Also needs date,time,and bottle number to be converted to one per line.
 
     # Get row types, see what you have: avg, std, min, max or just avg, std.
@@ -352,8 +352,8 @@ def from_btl(fname, lon=None, lat=None):
     datetimes = dates + ' ' + times
 
     # Fill the Date column with datetimes.
-    cast['Date'].iloc[::4] = datetimes.values
-    cast['Date'].iloc[1::4] = datetimes.values
+    cast['Date'].iloc[::len(rowtypes)] = datetimes.values
+    cast['Date'].iloc[1::len(rowtypes)] = datetimes.values
 
     # Fill missing rows.
     cast['Bottle'] = cast['Bottle'].fillna(method='ffill')

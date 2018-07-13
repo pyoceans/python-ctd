@@ -10,14 +10,22 @@ from .ctd import (
     from_fsi,
     rosette_summary
 )
-from .plotting import (
-    extrap_sec,
-    gen_topomask,
-    get_maxdepth,
-    plot,
-    plot_section,
-    plot_vars,
-)
+try:
+    from .plotting import (
+        extrap_sec,
+        gen_topomask,
+        get_maxdepth,
+        plot,
+        plot_section,
+        plot_vars,
+    )
+except RuntimeError:
+    print("""
+Plotting routines not imported due to error. See 
+https://matplotlib.org/faq/osx_framework.html
+if using MacOS and annaconda
+""")
+
 from .processing import (
     barrier_layer_thickness,
     bindata,

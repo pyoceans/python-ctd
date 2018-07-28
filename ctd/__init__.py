@@ -1,4 +1,5 @@
 from __future__ import absolute_import, division, print_function
+import warnings
 
 from pandas import DataFrame, Index, Series
 
@@ -10,14 +11,22 @@ from .ctd import (
     from_fsi,
     rosette_summary
 )
-from .plotting import (
-    extrap_sec,
-    gen_topomask,
-    get_maxdepth,
-    plot,
-    plot_section,
-    plot_vars,
-)
+try:
+    from .plotting import (
+        extrap_sec,
+        gen_topomask,
+        get_maxdepth,
+        plot,
+        plot_section,
+        plot_vars,
+    )
+    HAS_MATPLOTLIB = True
+except RuntimeError:
+    warnings.warn("""
+Plotting routines not accesible, probably due to problems with matplotlib. See 
+https://matplotlib.org/faq/osx_framework.html if you use MacOS and annaconda
+""")
+    HAS_MATPLOTLIB = False
 from .processing import (
     barrier_layer_thickness,
     bindata,
@@ -37,27 +46,32 @@ from ._version import get_versions  # noqa
 __version__ = get_versions()['version']
 del get_versions
 
+if HAS_MATPLOTLIB:
+    plotting_functions = [
+        extrap_sec,
+        gen_topomask,
+        get_maxdepth,
+        plot,
+        plot_section,
+        plot_vars
+    ]
+else:
+    plotting_functions = []
 
-__all__ = [
+__all__ = plotting_functions + [
     asof,
     barrier_layer_thickness,
     bindata,
     cell_thermal_mass,
     derive_cnv,
     despike,
-    extrap_sec,
     from_cnv,
     from_btl,
     from_edf,
     from_fsi,
-    gen_topomask,
-    get_maxdepth,
     lp_filter,
     mixed_layer_depth,
     movingaverage,
-    plot,
-    plot_section,
-    plot_vars,
     press_check,
     rosette_summary,
     smooth,
@@ -67,19 +81,21 @@ __all__ = [
 # Attach methods.
 Index.asof = asof
 
-Series.plot = plot
 Series.split = split
 Series.smooth = smooth
 Series.despike = despike
 Series.bindata = bindata
 Series.press_check = press_check
+if HAS_MATPLOTLIB:
+    Series.plot = plot
 
 DataFrame.split = split
 DataFrame.from_cnv = staticmethod(from_cnv)
 DataFrame.from_btl = staticmethod(from_btl)
 DataFrame.from_edf = staticmethod(from_edf)
 DataFrame.from_fsi = staticmethod(from_fsi)
-DataFrame.plot_vars = plot_vars
 DataFrame.press_check = press_check
-DataFrame.get_maxdepth = get_maxdepth
-DataFrame.plot_section = plot_section
+if HAS_MATPLOTLIB:
+    DataFrame.plot_vars = plot_vars
+    DataFrame.get_maxdepth = get_maxdepth
+    DataFrame.plot_section = plot_section

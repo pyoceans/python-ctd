@@ -340,7 +340,7 @@ def from_btl(fname, lon=None, lat=None):
     )
     f.close()
 
-    # At this point the data frame is not correctly lined up (multiple rows 
+    # At this point the data frame is not correctly lined up (multiple rows
     # for avg, std, min, max or just avg, std, etc).
     # Also needs date,time,and bottle number to be converted to one per line.
 

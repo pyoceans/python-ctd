@@ -5,6 +5,7 @@ from pandas import DataFrame, Index, Series
 from .ctd import (
     asof,
     from_btl,
+    from_bl,
     from_cnv,
     from_edf,
     from_fsi,
@@ -48,6 +49,7 @@ __all__ = [
     extrap_sec,
     from_cnv,
     from_btl,
+    from_bl,
     from_edf,
     from_fsi,
     gen_topomask,
@@ -77,6 +79,7 @@ Series.press_check = press_check
 DataFrame.split = split
 DataFrame.from_cnv = staticmethod(from_cnv)
 DataFrame.from_btl = staticmethod(from_btl)
+DataFrame.from_bt  = staticmethod(from_bl)
 DataFrame.from_edf = staticmethod(from_edf)
 DataFrame.from_fsi = staticmethod(from_fsi)
 DataFrame.plot_vars = plot_vars

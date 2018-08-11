@@ -326,7 +326,7 @@ def from_bl(filename):
     Example
     -------
     >>> from ctd import DataFrame
-    >>> bottles = DataFrame.from_bl(data_path.joinpath('bl', 'bottletest.bl'))
+    >>> df = DataFrame.from_bl(str(data_path.joinpath('bl', 'bottletest.bl')))
     >>> df.time_of_reset
     datetime.datetime(2018, 6, 25, 20, 8, 55)
 

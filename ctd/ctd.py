@@ -8,7 +8,7 @@ import linecache
 import numpy as np
 
 import pandas as pd
-if not "time_of_reset" in pd.DataFrame._metadata:
+if "time_of_reset" not in pd.DataFrame._metadata:
     pd.DataFrame._metadata.append("time_of_reset")
 
 

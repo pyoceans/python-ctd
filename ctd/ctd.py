@@ -332,7 +332,7 @@ def from_bl(filename):
 
     """
     df = pd.read_csv(filename, skiprows=2, parse_dates=[1], index_col=0,
-                     names=["bottle_number","time","startscan","endscan"])
+                     names=["bottle_number", "time", "startscan", "endscan"])
     df.time_of_reset = pd.to_datetime(
         linecache.getline(filename, 2)[6:-1]).to_pydatetime()
     return df

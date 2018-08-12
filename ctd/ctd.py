@@ -270,7 +270,7 @@ def from_cnv(fname, below_water=False, time=None, lon=None, lat=None):
         names=metadata['names'],
         skiprows=metadata['skiprows'],
         delim_whitespace=True,
-        widths=[11,] * len(metadata['names'])
+        widths=[11, ] * len(metadata['names'])
     )
     f.close()
 

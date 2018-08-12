@@ -77,8 +77,8 @@ def make_section(data_path=data_path, variable='t090C'):
         cast = proc_ctd(fname)
         name = fname.stem
         section.update({name: cast})
-        lon.append(cast.longitude.mean())
-        lat.append(cast.latitude.mean())
+        lon.append(cast["longitude"].mean())
+        lat.append(cast["latitude"].mean())
 
     section = Panel.fromDict(section)
     section = section.minor_xs(variable)

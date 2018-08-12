@@ -212,8 +212,8 @@ def section():
         cast = proc_ctd(fname)
         name = Path(fname).stem
         section.update({name: cast})
-        lon.append(cast.longitude.mean())
-        lat.append(cast.latitude.mean())
+        lon.append(cast["longitude"].mean())
+        lat.append(cast["latitude"].mean())
 
     # Section.
     section = Panel.fromDict(section)

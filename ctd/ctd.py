@@ -3,10 +3,14 @@ from __future__ import absolute_import, division, print_function
 import re
 import warnings
 from datetime import datetime
+import linecache
 
 import numpy as np
 
 import pandas as pd
+if "time_of_reset" not in pd.DataFrame._metadata:
+    pd.DataFrame._metadata.append("time_of_reset")
+
 
 from .utilities import (
     Path,
@@ -313,6 +317,26 @@ def from_cnv(fname, below_water=False, time=None, lon=None, lat=None):
         header=metadata['header'],
         config=metadata['config'],
         )
+
+
+def from_bl(filename):
+    """Read Seabird bottle-trip (bl) file
+
+    df.time_of_reset provides the time when seasave was reset.
+
+    Example
+    -------
+    >>> from ctd import DataFrame
+    >>> df = DataFrame.from_bl(str(data_path.joinpath('bl', 'bottletest.bl')))
+    >>> df.time_of_reset
+    datetime.datetime(2018, 6, 25, 20, 8, 55)
+
+    """
+    df = pd.read_csv(filename, skiprows=2, parse_dates=[1], index_col=0,
+                     names=["bottle_number", "time", "startscan", "endscan"])
+    df.time_of_reset = pd.to_datetime(
+        linecache.getline(filename, 2)[6:-1]).to_pydatetime()
+    return df
 
 
 def from_btl(fname, lon=None, lat=None):

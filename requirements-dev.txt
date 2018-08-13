@@ -5,5 +5,11 @@ flake8-import-order
 flake8-mutable
 flake8-print
 flake8-quotes
+ipykernel
+jupyter_client
+nbconvert
+nbsphinx
 pycodestyle
 pytest
+sphinx
+twine

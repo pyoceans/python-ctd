@@ -263,13 +263,14 @@ def from_cnv(fname, below_water=False, time=None, lon=None, lat=None):
     metadata = _parse_seabird(f.readlines(), ftype='cnv')
 
     f.seek(0)
-    cast = pd.read_table(
+    cast = pd.read_fwf(
         f,
         header=None,
         index_col=None,
         names=metadata['names'],
         skiprows=metadata['skiprows'],
         delim_whitespace=True,
+        widths=[11, ] * len(metadata['names'])
     )
     f.close()
 
@@ -352,8 +353,8 @@ def from_btl(fname, lon=None, lat=None):
     datetimes = dates + ' ' + times
 
     # Fill the Date column with datetimes.
-    cast['Date'].iloc[::len(rowtypes)] = datetimes.values
-    cast['Date'].iloc[1::len(rowtypes)] = datetimes.values
+    cast.loc[::len(rowtypes), 'Date'] = datetimes.values
+    cast.loc[1::len(rowtypes), 'Date'] = datetimes.values
 
     # Fill missing rows.
     cast['Bottle'] = cast['Bottle'].fillna(method='ffill')

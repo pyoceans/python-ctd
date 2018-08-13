@@ -32,15 +32,21 @@ Quick intro
 
      pip install ctd
 
+or
+
+.. code-block:: bash
+    
+     conda install ctd
+
+
 and then,
 
 .. code-block:: python
 
     from ctd import DataFrame
 
-    kw = dict(compression='gzip')
-    fname = './test/data/CTD/g01l06s01.cnv.gz'
-    cast = DataFrame.from_cnv(fname, **kw)
+    fname = './tests/data/CTD/g01l06s01.cnv.gz'
+    cast = DataFrame.from_cnv(fname)
     downcast, upcast = cast.split()
     fig, ax = downcast['t090C'].plot()
 
@@ -54,8 +60,7 @@ We can do
 
     from ctd import DataFrame, lp_filter, movingaverage
 
-    kw.update(below_water=True)
-    cast = DataFrame.from_cnv(fname, **kw)
+    cast = DataFrame.from_cnv(fname, below_water=True)
     downcast, upcast = cast.split()
     temperature = downcast['t090C'].despike(n1=2, n2=20, block=100)
     temperature.index = lp_filter(temperature.index.values)
@@ -63,9 +68,8 @@ We can do
     temperature = temperature.interpolate()
     temperature = temperature.smooth(window_len=21, window='hanning')
     fig, ax = temperature.plot()
-    ax.axis([0, 30, 2000, 0])
-    ax.set_ylabel("Pressure [dbar]")
-    ax.set_xlabel(u'Temperature [\u00b0C]')
+    ax.set_ylabel('Pressure (dbar)')
+    ax.set_xlabel(u'Temperature (°C)');
 
 .. image:: https://raw.githubusercontent.com/ocefpaf/python-ctd/master/docs/readme_02.png
    :alt: Good Processing

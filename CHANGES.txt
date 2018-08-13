@@ -1,6 +1,14 @@
 Changelog
 ---------
 
+Version 0.4.0
+
+* Read searbird `bl` files
+* Fixed some warnings for the latest pandas
+* Fixed hardcoded number of stats in `from_btl`
+* Added a seabird ASCII bottle reader
+* Unified bottle and cnv parsers
+
 Version 0.3.0
 
 * Changed license from `MIT` to BSD 3-Clause

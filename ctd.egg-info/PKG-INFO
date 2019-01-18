@@ -1,0 +1,162 @@
+Metadata-Version: 1.2
+Name: ctd
+Version: 0.4.0
+Summary: Tools to load hydrographic data as DataFrames
+Home-page: https://github.com/pyoceans/python-ctd
+Author: Filipe Fernandes
+Author-email: ocefpaf@gmail.com
+Maintainer: Filipe Fernandes
+Maintainer-email: ocefpaf@gmail.com
+License: Copyright 2017 Filipe Fernandes
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Download-URL: http://pypi.python.org/pypi/ctd
+Description: python-ctd
+        ==========
+        
+        .. image:: https://zenodo.org/badge/30728306.svg
+           :target: https://zenodo.org/badge/latestdoi/30728306
+           :alt: DOI
+        .. image:: http://img.shields.io/pypi/v/ctd.svg?style=flat
+           :target: https://pypi.python.org/pypi/ctd
+           :alt: Version_status
+        .. image:: http://img.shields.io/travis/pyoceans/python-ctd/master.svg?style=flat
+           :target: https://travis-ci.org/pyoceans/python-ctd
+           :alt: travis
+        .. image:: https://ci.appveyor.com/api/projects/status/m1wxtsb8gpm96i53/branch/master?svg=true
+           :target: https://ci.appveyor.com/project/ocefpaf/python-ctd/branch/master
+           :alt: appveyor
+        .. image:: http://img.shields.io/badge/license-BSD-blue.svg?style=flat
+           :target: https://github.com/pyoceans/python-ctd/blob/master/LICENSE.txt
+           :alt: license
+        
+        Tools to load hydrographic data as pandas DataFrame with some handy methods for
+        data pre-processing and analysis
+        
+        This module can load `SeaBird CTD
+        (CNV) <http://www.seabird.com/software/SBEDataProcforWindows.htm>`_,
+        `Sippican XBT (EDF) <http://www.sippican.com/>`_, and `Falmouth CTD
+        (ASCII) <http://www.falmouth.com/>`_ formats.
+        
+        Quick intro
+        -----------
+        
+        .. code-block:: bash
+        
+             pip install ctd
+        
+        or
+        
+        .. code-block:: bash
+            
+             conda install ctd
+        
+        
+        and then,
+        
+        .. code-block:: python
+        
+            from ctd import DataFrame
+        
+            fname = './tests/data/CTD/g01l06s01.cnv.gz'
+            cast = DataFrame.from_cnv(fname)
+            downcast, upcast = cast.split()
+            fig, ax = downcast['t090C'].plot()
+        
+        .. image:: https://raw.githubusercontent.com/ocefpaf/python-ctd/master/docs/readme_01.png
+           :alt: Bad Processing
+        
+        We can do
+        `better <http://www.go-ship.org/Manual/McTaggart_et_al_CTD.pdf>`_:
+        
+        .. code-block:: python
+        
+            from ctd import DataFrame, lp_filter, movingaverage
+        
+            cast = DataFrame.from_cnv(fname, below_water=True)
+            downcast, upcast = cast.split()
+            temperature = downcast['t090C'].despike(n1=2, n2=20, block=100)
+            temperature.index = lp_filter(temperature.index.values)
+            temperature = temperature.bindata(delta=1)
+            temperature = temperature.interpolate()
+            temperature = temperature.smooth(window_len=21, window='hanning')
+            fig, ax = temperature.plot()
+            ax.set_ylabel('Pressure (dbar)')
+            ax.set_xlabel(u'Temperature (°C)');
+        
+        .. image:: https://raw.githubusercontent.com/ocefpaf/python-ctd/master/docs/readme_02.png
+           :alt: Good Processing
+        
+        Not so quick intro
+        ------------------
+        
+        `Profiles <http://ocefpaf.github.io/python4oceanographers/blog/2013/05/27/CTD2DataFrame/>`_ and
+        `sections <http://ocefpaf.github.io/python4oceanographers/blog/2013/07/29/python-ctd/>`_.
+        
+        Author
+        ------
+        
+        Filipe Fernandes
+        
+        Changelog
+        ---------
+        
+        Version 0.4.0
+        
+        * Read searbird `bl` files
+        * Fixed some warnings for the latest pandas
+        * Fixed hardcoded number of stats in `from_btl`
+        * Added a seabird ASCII bottle reader
+        * Unified bottle and cnv parsers
+        
+        Version 0.3.0
+        
+        * Changed license from `MIT` to BSD 3-Clause
+        * Fixed `gsw 3.1.1` compatibility issues
+        * Fixed reading pressure column from Sea Bird MicroCat SBE 37SM
+        * Fixed Python 2/3 encoding issues
+        * Improved CI test framework
+        
+        This will be the past version using `pandas` b/c the `Panel` class is deprecated.
+        The next version will probably use `xarray` to store and serialized the CTD data.
+        
+        Version 0.2.2
+        
+        * Support for different searbird `cnv` pressure spellings ('prDM' and 'prdM')
+          thanks @j08lue.
+        * Lazy import for optinal dependencies (`gsw` and `scipy`).
+        * Several small bug fixes
+        
+        Version 0.2.1
+        
+        * None is assigned to position data when it is not available.
+        
+        Version 0.2.0
+        
+        * Fixed compatibility fir 0.13.
+        
+        Version 0.1.0
+        
+        * First version derived from oceans package.
+        
+Keywords: oceanography,data analysis,DataFrame
+Platform: any
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Education
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Scientific/Engineering
+Classifier: Topic :: Education

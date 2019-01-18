@@ -1,0 +1,34 @@
+package:
+  name: ctd
+  version: {{ GIT_DESCRIBE_TAG|replace("v","") }}
+
+source:
+  path: ../
+
+build:
+  number: 0
+  script: python -m pip install --no-deps --ignore-installed .
+
+requirements:
+  build:
+    - python
+    - pip
+  run:
+    - python
+    - numpy
+    - scipy
+    - matplotlib
+    - pandas
+    - gsw
+
+test:
+  source_files:
+    - ctd
+    - tests
+  requires:
+    - pytest
+  imports:
+    - ctd
+  commands:
+    - py.test -s -rxs -v tests
+    - py.test -s -rxs --doctest-modules -vv ctd

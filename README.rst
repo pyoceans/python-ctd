@@ -9,8 +9,11 @@ python-ctd
    :alt: Version_status
 .. image:: http://img.shields.io/travis/pyoceans/python-ctd/master.svg?style=flat
    :target: https://travis-ci.org/pyoceans/python-ctd
-   :alt: Build_status
-.. image:: http://img.shields.io/badge/license-MIT-blue.svg?style=flat
+   :alt: travis
+.. image:: https://ci.appveyor.com/api/projects/status/m1wxtsb8gpm96i53/branch/master?svg=true
+   :target: https://ci.appveyor.com/project/ocefpaf/python-ctd/branch/master
+   :alt: appveyor
+.. image:: http://img.shields.io/badge/license-BSD-blue.svg?style=flat
    :target: https://github.com/pyoceans/python-ctd/blob/master/LICENSE.txt
    :alt: license
 
@@ -29,13 +32,21 @@ Quick intro
 
      pip install ctd
 
+or
+
+.. code-block:: bash
+    
+     conda install ctd
+
+
 and then,
 
 .. code-block:: python
 
-    kw = dict(compression='gzip')
-    fname = './test/data/CTD/g01l06s01.cnv.gz'
-    cast = DataFrame.from_cnv(fname, **kw)
+    from ctd import DataFrame
+
+    fname = './tests/data/CTD/g01l06s01.cnv.gz'
+    cast = DataFrame.from_cnv(fname)
     downcast, upcast = cast.split()
     fig, ax = downcast['t090C'].plot()
 
@@ -48,8 +59,8 @@ We can do
 .. code-block:: python
 
     from ctd import DataFrame, lp_filter, movingaverage
-    kw.update(below_water=True)
-    cast = DataFrame.from_cnv(fname, **kw)
+
+    cast = DataFrame.from_cnv(fname, below_water=True)
     downcast, upcast = cast.split()
     temperature = downcast['t090C'].despike(n1=2, n2=20, block=100)
     temperature.index = lp_filter(temperature.index.values)
@@ -57,9 +68,8 @@ We can do
     temperature = temperature.interpolate()
     temperature = temperature.smooth(window_len=21, window='hanning')
     fig, ax = temperature.plot()
-    ax.axis([0, 30, 2000, 0])
-    ax.set_ylabel("Pressure [dbar]")
-    ax.set_xlabel(u'Temperature [\u00b0C]')
+    ax.set_ylabel('Pressure (dbar)')
+    ax.set_xlabel(u'Temperature (°C)');
 
 .. image:: https://raw.githubusercontent.com/ocefpaf/python-ctd/master/docs/readme_02.png
    :alt: Good Processing

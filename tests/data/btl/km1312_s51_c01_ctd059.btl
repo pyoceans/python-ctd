@@ -282,7 +282,7 @@
 # datcnv_scans_per_bottle = 49
 # bottlesum_date = Jul 27 2013 16:52:22, 7.22.4
 # bottlesum_in = C:\Users\zij\Desktop\2013-POWOW3-HNL2SanDiego\data\CTD\km1312_s51_c01_ctd059.ros C:\Users\zij\Desktop\2013-POWOW3-HNL2SanDiego\data\CTD\km1312_s51_c01_ctd059.XMLCON C:\Users\zij\Desktop\2013-POWOW3-HNL2SanDiego\data\CTD\km1312_s51_c01_ctd059.BL
-    Bottle        Date       PrDM      T068C      C0S/mSbeox0Mm/Kg  FlECO-AFL   CStarAt0      Sal00  Sigma-é00 Potemp090C      T168C      C1S/mSbeox1Mm/Kg       FlSP      Sal11  Sigma-é11 Potemp168C        Par
+    Bottle        Date       PrDM      T068C      C0S/mSbeox0Mm/Kg  FlECO-AFL   CStarAt0      Sal00  Sigma-ï¿½00 Potemp090C      T168C      C1S/mSbeox1Mm/Kg       FlSP      Sal11  Sigma-ï¿½11 Potemp168C        Par
   Position        Time                                                                                                                                                                                           
       1    Jul 27 2013     15.393    14.1760   4.053788    226.643     1.5303     0.2193    33.5408    25.0240    14.1704    14.2172   4.057603    232.968 1.2359e+00    33.5401    25.0148    14.2150 6.8547e+01 (avg)
               16:31:15      0.100     0.0326   0.003096      0.412     0.0507     0.0039     0.0025     0.0070     0.0326     0.0441   0.004015      0.254 1.3411e-01     0.0037     0.0107     0.0441 5.3874e-01 (sdev)

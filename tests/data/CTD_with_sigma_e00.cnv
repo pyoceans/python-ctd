@@ -36,7 +36,7 @@
 # name 6 = CStarAt0: Beam Attenuation, WET Labs C-Star [1/m]
 # name 7 = nbf: Bottles Fired
 # name 8 = sal00: Salinity, Practical [PSU]
-# name 9 = sigma-é00: Density [sigma-theta, Kg/m^3]
+# name 9 = sigma-ï¿½00: Density [sigma-theta, Kg/m^3]
 # name 10 = potemp090C: Potential Temperature [ITS-90, deg C]
 # name 11 = scan: Scan Count
 # name 12 = t168C: Temperature, 2 [ITS-68, deg C]
@@ -44,7 +44,7 @@
 # name 14 = sbeox1Mm/Kg: Oxygen, SBE 43, 2 [umol/Kg]
 # name 15 = flSP: Fluorescence, Seapoint
 # name 16 = sal11: Salinity, Practical, 2 [PSU]
-# name 17 = sigma-é11: Density, 2 [sigma-theta, Kg/m^3]
+# name 17 = sigma-ï¿½11: Density, 2 [sigma-theta, Kg/m^3]
 # name 18 = potemp168C: Potential Temperature, 2 [ITS-68, deg C]
 # name 19 = par: PAR/Irradiance, Biospherical/Licor
 # name 20 = nbin: number of scans per bin
@@ -337,14 +337,14 @@
 # wfilter_action flECO-AFL = gaussian, 21, 1, 0
 # wfilter_action CStarAt0 = gaussian, 5, 1, 0
 # wfilter_action sal00 = gaussian, 5, 1, 0
-# wfilter_action sigma-é00 = gaussian, 5, 1, 0
+# wfilter_action sigma-ï¿½00 = gaussian, 5, 1, 0
 # wfilter_action potemp090C = median, 21
 # wfilter_action t168C = median, 21
 # wfilter_action c1S/m = median, 21
 # wfilter_action sbeox1Mm/Kg = gaussian, 5, 1, 0
 # wfilter_action flSP = gaussian, 21, 1, 0
 # wfilter_action sal11 = gaussian, 5, 1, 0
-# wfilter_action sigma-é11 = gaussian, 5, 1, 0
+# wfilter_action sigma-ï¿½11 = gaussian, 5, 1, 0
 # wfilter_action potemp168C = median, 21
 # wfilter_action par = gaussian, 21, 1, 0
 # wildedit_date = Jul 12 2013 11:46:23, 7.22.4
@@ -353,7 +353,7 @@
 # wildedit_pass2_nstd = 20.0
 # wildedit_pass2_mindelta = 0.000e+000
 # wildedit_npoint = 100
-# wildedit_vars = prDM t068C c0S/m sbeox0Mm/Kg flECO-AFL CStarAt0 sal00 sigma-é00 potemp090C t168C c1S/m sbeox1Mm/Kg flSP sal11 sigma-é11 potemp168C par
+# wildedit_vars = prDM t068C c0S/m sbeox0Mm/Kg flECO-AFL CStarAt0 sal00 sigma-ï¿½00 potemp090C t168C c1S/m sbeox1Mm/Kg flSP sal11 sigma-ï¿½11 potemp168C par
 # wildedit_excl_bad_scans = yes
 # loopedit_date = Jul 12 2013 11:46:27, 7.22.4
 # loopedit_in = C:\Users\zij\Desktop\2013-POWOW3-HNL2SanDiego\data\CTD\km1312_s18_c03_ctd22.cnv

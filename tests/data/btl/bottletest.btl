@@ -260,7 +260,7 @@
 # datcnv_scans_per_bottle = 49
 # bottlesum_date = Jul 02 2013 09:45:52, 7.22.5
 # bottlesum_in = C:\Projects\DYEatom\CTD\Krause 01.ros C:\Projects\DYEatom\CTD\Krause 01.XMLCON C:\Projects\DYEatom\CTD\Krause 01.BL
-    Bottle        Date      DepSM       PrDM      T090C      T190C      C0S/m      C1S/m      Sal00      Sal11  Sigma-é00  Sigma-é11  FlECO-AFL   CStarTr0   CStarAt0Sbeox0Mm/Kg        Par       Spar       Cpar       Scan
+    Bottle        Date      DepSM       PrDM      T090C      T190C      C0S/m      C1S/m      Sal00      Sal11  Sigma-ï¿½00  Sigma-ï¿½11  FlECO-AFL   CStarTr0   CStarAt0Sbeox0Mm/Kg        Par       Spar       Cpar       Scan
   Position        Time                                                                                                                                                                                                      
       1    Jun 27 2013     31.638     31.875     9.1594     9.1600   3.627258   3.626589    33.9171    33.9096    26.2453    26.2393     0.1277    11.6390     8.6035    118.458 4.4155e-01 1.8608e+03 2.3731e-02      18147 (avg)
               21:23:18      0.206      0.208     0.0253     0.0265   0.002050   0.002150     0.0027     0.0031     0.0061     0.0066     0.0224     0.1272     0.0437      1.770 2.3672e-03 1.6188e+01 2.6630e-04         14 (sdev)

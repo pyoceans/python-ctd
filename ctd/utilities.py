@@ -14,7 +14,7 @@ try:
 except ImportError as e:
     from pathlib2 import Path
 
-path_type = (Path, )
+path_type = (Path,)
 
 
 def header(xml):
@@ -62,8 +62,9 @@ def extrap1d(interpolator):
         if x < xs[0]:
             return ys[0] + (x - xs[0]) * (ys[1] - ys[0]) / (xs[1] - xs[0])
         elif x > xs[-1]:
-            return (ys[-1] + (x - xs[-1]) * (ys[-1] - ys[-2]) /
-                    (xs[-1] - xs[-2]))
+            return ys[-1] + (x - xs[-1]) * (ys[-1] - ys[-2]) / (
+                xs[-1] - xs[-2]
+            )
         else:
             return interpolator(x)
 
@@ -75,17 +76,17 @@ def extrap1d(interpolator):
 
 def normalize_names(name):
     name = name.strip()
-    name = name.strip('*')
+    name = name.strip("*")
     return name
 
 
 def _open_compressed(fname):
     extension = fname.suffix.lower()
-    if extension in ['.gzip', '.gz']:
+    if extension in [".gzip", ".gz"]:
         cfile = gzip.open(str(fname))
-    elif extension == '.bz2':
+    elif extension == ".bz2":
         cfile = bz2.BZ2File(str(fname))
-    elif extension == '.zip':
+    elif extension == ".zip":
         # NOTE: Zip format may contain more than one file in the archive
         # (similar to tar), here we assume that there is just one file per
         # zipfile!  Also, we ask for the name because it can be different from
@@ -95,8 +96,10 @@ def _open_compressed(fname):
         cfile = zfile.open(name)
     else:
         raise ValueError(
-            'Unrecognized file extension. Expected .gzip, .bz2, or .zip, got {}'.format(extension)
+            "Unrecognized file extension. Expected .gzip, .bz2, or .zip, got {}".format(
+                extension
             )
+        )
     contents = cfile.read()
     cfile.close()
     return contents
@@ -107,21 +110,23 @@ def read_file(fname):
         fname = Path(fname).resolve()
 
     extension = fname.suffix.lower()
-    if extension in ['.gzip', '.gz', '.bz2', '.zip']:
+    if extension in [".gzip", ".gz", ".bz2", ".zip"]:
         contents = _open_compressed(fname)
-    elif extension in ['.cnv', '.edf', '.txt', '.ros', '.btl']:
+    elif extension in [".cnv", ".edf", ".txt", ".ros", ".btl"]:
         contents = fname.read_bytes()
     else:
         raise ValueError(
-            'Unrecognized file extension. Expected .cnv, .edf, .txt, .ros, or .btl got {}'.format(extension)
+            "Unrecognized file extension. Expected .cnv, .edf, .txt, .ros, or .btl got {}".format(
+                extension
             )
+        )
     # Read as bytes but we need toreturn strings for the parsers.
-    text = contents.decode(encoding='utf-8', errors='replace')
+    text = contents.decode(encoding="utf-8", errors="replace")
     return StringIO(text)
 
 
 def alphanum_key(s):
     """Order files in a 'human' expected fashion."""
-    key = re.split(r'(\d+)', s)
+    key = re.split(r"(\d+)", s)
     key[1::2] = list(map(int, key[1::2]))
     return key

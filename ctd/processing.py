@@ -2,12 +2,11 @@ from __future__ import absolute_import, division, print_function
 
 import numpy as np
 import numpy.ma as ma
-
 from pandas import Index, Series
 
 from .utilities import Path, rolling_window
 
-data_path = Path(__file__).parents[1].joinpath('tests', 'data')
+data_path = Path(__file__).parents[1].joinpath("tests", "data")
 
 
 def despike(self, n1=2, n2=20, block=100, keep=0):
@@ -25,8 +24,9 @@ def despike(self, n1=2, n2=20, block=100, keep=0):
     # Use the last value to fill-up.
     std = np.r_[std, np.tile(std[-1], block - 1)]
     mean = np.r_[mean, np.tile(mean[-1], block - 1)]
-    mask = (np.abs(data - mean.filled(fill_value=np.NaN)) >
-            std.filled(fill_value=np.NaN))
+    mask = np.abs(data - mean.filled(fill_value=np.NaN)) > std.filled(
+        fill_value=np.NaN
+    )
     data[mask] = np.NaN
 
     # Pass two recompute the mean and std without the flagged values from pass
@@ -39,8 +39,9 @@ def despike(self, n1=2, n2=20, block=100, keep=0):
     std = np.r_[std, np.tile(std[-1], block - 1)]
     mean = np.r_[mean, np.tile(mean[-1], block - 1)]
     values = self.values.astype(float)
-    mask = (np.abs(values - mean.filled(fill_value=np.NaN)) >
-            std.filled(fill_value=np.NaN))
+    mask = np.abs(values - mean.filled(fill_value=np.NaN)) > std.filled(
+        fill_value=np.NaN
+    )
 
     clean = self.astype(float).copy()
     clean[mask] = np.NaN
@@ -80,8 +81,8 @@ def lp_filter(data, sample_rate=24.0, time_constant=0.15):
     from scipy import signal
 
     if True:  # Butter is closer to what SBE is doing with their cosine filter.
-        Wn = (1. / time_constant) / (sample_rate * 2.)
-        b, a = signal.butter(2, Wn, 'low')
+        Wn = (1.0 / time_constant) / (sample_rate * 2.0)
+        b, a = signal.butter(2, Wn, "low")
         data = signal.filtfilt(b, a, data)
 
     return data
@@ -96,9 +97,9 @@ def cell_thermal_mass(temperature, conductivity):
     """
 
     alpha = 0.03  # Thermal anomaly amplitude.
-    beta = 1. / 7  # Thermal anomaly time constant (1/beta).
+    beta = 1.0 / 7  # Thermal anomaly time constant (1/beta).
 
-    sample_interval = 1 / 15.
+    sample_interval = 1 / 15.0
     a = 2 * alpha / (sample_interval * beta + 2)
     b = 1 - (2 * a / alpha)
     dCodT = 0.1 * (1 + 0.006 * [temperature - 20])
@@ -107,13 +108,13 @@ def cell_thermal_mass(temperature, conductivity):
     return ctm
 
 
-def press_check(self, column='index'):
+def press_check(self, column="index"):
     """
     Remove pressure reversals.
 
     """
     data = self.copy()
-    if column != 'index':
+    if column != "index":
         press = data[column]
     else:
         press = data.index.values.astype(float)
@@ -124,13 +125,13 @@ def press_check(self, column='index'):
     for k, p in enumerate(inversions):
         if p:
             ref = press[k]
-            cut = press[k + 1:] < ref
-            mask[k + 1:][cut] = True
+            cut = press[k + 1 :] < ref
+            mask[k + 1 :][cut] = True
     data[mask] = np.NaN
     return data
 
 
-def bindata(self, delta=1., method='averaging'):
+def bindata(self, delta=1.0, method="averaging"):
     """
     Bin average the index (usually pressure) to a given interval (default
     delta = 1).
@@ -139,10 +140,10 @@ def bindata(self, delta=1., method='averaging'):
     check the quality of the binned data.
 
     """
-    if method == 'averaging':
+    if method == "averaging":
         start = np.floor(self.index[0])
         end = np.ceil(self.index[-1])
-        shift = delta / 2.  # To get centered bins.
+        shift = delta / 2.0  # To get centered bins.
         new_index = np.arange(start, end, delta) - shift
         new_index = Index(new_index)
         newdf = self.groupby(new_index.asof).mean()
@@ -155,25 +156,25 @@ def bindata(self, delta=1., method='averaging'):
 
 def split(self):
     """Returns a tuple with down/up-cast."""
-    down = self.iloc[:self.index.argmax()]
-    up = self.iloc[self.index.argmax():][::-1]  # Reverse up index.
+    down = self.iloc[: self.index.argmax()]
+    up = self.iloc[self.index.argmax() :][::-1]  # Reverse up index.
     return down, up
 
 
 def movingaverage(series, window_size=48):
     window = np.ones(int(window_size)) / float(window_size)
-    return Series(np.convolve(series, window, 'same'), index=series.index)
+    return Series(np.convolve(series, window, "same"), index=series.index)
 
 
-def smooth(self, window_len=11, window='hanning'):
+def smooth(self, window_len=11, window="hanning"):
     """Smooth the data using a window with requested size."""
 
     windows = {
-        'flat': np.ones,
-        'hanning': np.hanning,
-        'hamming': np.hamming,
-        'bartlett': np.bartlett,
-        'blackman': np.blackman
+        "flat": np.ones,
+        "hanning": np.hanning,
+        "hamming": np.hamming,
+        "bartlett": np.bartlett,
+        "blackman": np.blackman,
     }
     data = self.values.copy()
 
@@ -181,25 +182,30 @@ def smooth(self, window_len=11, window='hanning'):
         return Series(data, index=self.index, name=self.name)
 
     if window not in list(windows.keys()):
-        raise ValueError("""window must be one of 'flat', 'hanning',
-                         'hamming', 'bartlett', 'blackman'""")
+        raise ValueError(
+            """window must be one of 'flat', 'hanning',
+                         'hamming', 'bartlett', 'blackman'"""
+        )
 
-    s = np.r_[2 * data[0] - data[window_len:1:-1], data, 2 *
-              data[-1] - data[-1:-window_len:-1]]
+    s = np.r_[
+        2 * data[0] - data[window_len:1:-1],
+        data,
+        2 * data[-1] - data[-1:-window_len:-1],
+    ]
 
     w = windows[window](window_len)
 
-    data = np.convolve(w / w.sum(), s, mode='same')
-    data = data[window_len - 1:-window_len + 1]
+    data = np.convolve(w / w.sum(), s, mode="same")
+    data = data[window_len - 1 : -window_len + 1]
     return Series(data, index=self.index, name=self.name)
 
 
-def mixed_layer_depth(CT, method='half degree'):
-    if method == 'half degree':
+def mixed_layer_depth(CT, method="half degree"):
+    if method == "half degree":
         mask = CT[0] - CT < 0.5
     else:
         mask = np.zeros_like(CT)
-    return Series(mask, index=CT.index, name='MLD')
+    return Series(mask, index=CT.index, name="MLD")
 
 
 def barrier_layer_thickness(SA, CT):
@@ -211,6 +217,7 @@ def barrier_layer_thickness(SA, CT):
 
     """
     import gsw
+
     sigma_theta = gsw.sigma0(SA, CT)
     mask = mixed_layer_depth(CT)
     mld = np.where(mask)[0][-1]
@@ -219,24 +226,27 @@ def barrier_layer_thickness(SA, CT):
     d_sig_t = sig_surface - sig_bottom_mld
     d_sig = sigma_theta - sig_bottom_mld
     mask = d_sig < d_sig_t  # Barrier layer.
-    return Series(mask, index=SA.index, name='BLT')
+    return Series(mask, index=SA.index, name="BLT")
 
 
 def derive_cnv(self):
     """Compute SP, SA, CT, z, and GP from a cnv pre-processed cast."""
     import gsw
+
     cast = self.copy()
     p = cast.index.values.astype(float)
-    cast['SP'] = gsw.SP_from_C(cast['c0S/m'].values * 10.,
-                               cast['t090C'].values, p)
-    cast['SA'] = gsw.SA_from_SP(cast['SP'].values, p, self.lon, self.lat)
-    cast['SR'] = gsw.SR_from_SP(cast['SP'].values)
-    cast['CT'] = gsw.CT_from_t(cast['SA'].values, cast['t090C'].values, p)
-    cast['z'] = -gsw.z_from_p(p, self.lat)
-    cast['sigma0_CT'] = gsw.sigma0(cast['SA'].values, cast['CT'].values)
+    cast["SP"] = gsw.SP_from_C(
+        cast["c0S/m"].values * 10.0, cast["t090C"].values, p
+    )
+    cast["SA"] = gsw.SA_from_SP(cast["SP"].values, p, self.lon, self.lat)
+    cast["SR"] = gsw.SR_from_SP(cast["SP"].values)
+    cast["CT"] = gsw.CT_from_t(cast["SA"].values, cast["t090C"].values, p)
+    cast["z"] = -gsw.z_from_p(p, self.lat)
+    cast["sigma0_CT"] = gsw.sigma0(cast["SA"].values, cast["CT"].values)
     return cast
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import doctest
+
     doctest.testmod()

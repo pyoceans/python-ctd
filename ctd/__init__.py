@@ -9,7 +9,7 @@ from .ctd import (
     from_cnv,
     from_edf,
     from_fsi,
-    rosette_summary
+    rosette_summary,
 )
 from .plotting import (
     extrap_sec,
@@ -35,7 +35,8 @@ from .processing import (
 
 
 from ._version import get_versions  # noqa
-__version__ = get_versions()['version']
+
+__version__ = get_versions()["version"]
 del get_versions
 
 

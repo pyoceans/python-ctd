@@ -3,13 +3,10 @@
 from __future__ import absolute_import, division, print_function
 
 import matplotlib.pyplot as plt
-
 import mpl_toolkits.axisartist as AA
-from mpl_toolkits.axes_grid1 import host_subplot
-
 import numpy as np
 import numpy.ma as ma
-
+from mpl_toolkits.axes_grid1 import host_subplot
 from pandas import Series
 
 from .utilities import extrap1d
@@ -20,7 +17,7 @@ def get_maxdepth(self):
     return np.float_(self.index.values * valid_last_depth).max(axis=1)
 
 
-def extrap_sec(data, dist, depth, w1=1., w2=0):
+def extrap_sec(data, dist, depth, w1=1.0, w2=0):
     """
     Extrapolates `data` to zones where the shallow stations are shadowed by
     the deep stations.  The shadow region usually cannot be extrapolates via
@@ -79,7 +76,7 @@ def extrap_sec(data, dist, depth, w1=1., w2=0):
     return new_data
 
 
-def gen_topomask(h, lon, lat, dx=1., kind='linear', plot=False):
+def gen_topomask(h, lon, lat, dx=1.0, kind="linear", plot=False):
     """
     Generates a topography mask from an oceanographic transect taking the
     deepest CTD scan as the depth of each station.
@@ -130,7 +127,7 @@ def plot(self, **kw):
     """
     Plot a CTD variable against the index (pressure or depth).
     """
-    figsize = kw.pop('figsize', (5.5, 6))
+    figsize = kw.pop("figsize", (5.5, 6))
     fig, ax = plt.subplots(figsize=figsize)
 
     ax.plot(self.values, self.index, **kw)
@@ -153,25 +150,24 @@ def plot_vars(self, variables=None, **kwds):
 
     # Axis location.
     host_new_axis = ax0.get_grid_helper().new_fixed_axis
-    ax0.axis['bottom'] = host_new_axis(loc='top', axes=ax0, offset=(0, 0))
+    ax0.axis["bottom"] = host_new_axis(loc="top", axes=ax0, offset=(0, 0))
     par_new_axis = ax1.get_grid_helper().new_fixed_axis
-    ax1.axis['top'] = par_new_axis(loc='bottom', axes=ax1, offset=(0, 0))
+    ax1.axis["top"] = par_new_axis(loc="bottom", axes=ax1, offset=(0, 0))
 
-    ax0.plot(self[variables[0]], self.index, 'r.', label='Temperature')
-    ax1.plot(self[variables[1]], self.index, 'b.', label='Salinity')
+    ax0.plot(self[variables[0]], self.index, "r.", label="Temperature")
+    ax1.plot(self[variables[1]], self.index, "b.", label="Salinity")
 
-    ax0.set_ylabel('Pressure [dbar]')
-    ax0.set_xlabel('Temperature [\u00b0C]')
-    ax1.set_xlabel('Salinity [kg g$^{-1}$]')
+    ax0.set_ylabel("Pressure [dbar]")
+    ax0.set_xlabel("Temperature [\u00b0C]")
+    ax1.set_xlabel("Salinity [kg g$^{-1}$]")
     ax1.invert_yaxis()
 
     try:
-        fig.suptitle(r'Station %s profile' % self.name)
+        fig.suptitle(r"Station %s profile" % self.name)
     except AttributeError:
         pass
 
-    ax0.legend(shadow=True, fancybox=True,
-               numpoints=1, loc='lower right')
+    ax0.legend(shadow=True, fancybox=True, numpoints=1, loc="lower right")
 
     offset = 0.01
     x1, x2 = ax0.get_xlim()[0] - offset, ax0.get_xlim()[1] + offset
@@ -187,8 +183,9 @@ def plot_vars(self, variables=None, **kwds):
 def plot_section(self, reverse=False, filled=False, **kw):
     import gsw
 
-    lon, lat, data = list(map(np.asanyarray,
-                              (self.lon, self.lat, self.values)))
+    lon, lat, data = list(
+        map(np.asanyarray, (self.lon, self.lat, self.values))
+    )
     data = ma.masked_invalid(data)
     h = self.get_maxdepth()
     if reverse:
@@ -205,62 +202,85 @@ def plot_section(self, reverse=False, filled=False, **kw):
         data = extrap_sec(data, x, z, w1=0.97, w2=0.03)
 
     # Contour key words.
-    extend = kw.pop('extend', 'both')
-    fontsize = kw.pop('fontsize', 12)
-    labelsize = kw.pop('labelsize', 11)
-    cmap = kw.pop('cmap', plt.cm.rainbow)
-    levels = kw.pop('levels', np.arange(np.floor(data.min()),
-                    np.ceil(data.max()) + 0.5, 0.5))
+    extend = kw.pop("extend", "both")
+    fontsize = kw.pop("fontsize", 12)
+    labelsize = kw.pop("labelsize", 11)
+    cmap = kw.pop("cmap", plt.cm.rainbow)
+    levels = kw.pop(
+        "levels",
+        np.arange(np.floor(data.min()), np.ceil(data.max()) + 0.5, 0.5),
+    )
 
     # Colorbar key words.
-    pad = kw.pop('pad', 0.04)
-    aspect = kw.pop('aspect', 40)
-    shrink = kw.pop('shrink', 0.9)
-    fraction = kw.pop('fraction', 0.05)
+    pad = kw.pop("pad", 0.04)
+    aspect = kw.pop("aspect", 40)
+    shrink = kw.pop("shrink", 0.9)
+    fraction = kw.pop("fraction", 0.05)
 
     # Topography mask key words.
-    dx = kw.pop('dx', 1.)
-    kind = kw.pop('kind', 'linear')
-    linewidth = kw.pop('linewidth', 1.5)
+    dx = kw.pop("dx", 1.0)
+    kind = kw.pop("kind", "linear")
+    linewidth = kw.pop("linewidth", 1.5)
 
     # Station symbols key words.
-    station_marker = kw.pop('station_marker', None)
-    color = kw.pop('color', 'k')
-    offset = kw.pop('offset', -5)
-    alpha = kw.pop('alpha', 0.5)
+    station_marker = kw.pop("station_marker", None)
+    color = kw.pop("color", "k")
+    offset = kw.pop("offset", -5)
+    alpha = kw.pop("alpha", 0.5)
 
     # Figure.
-    figsize = kw.pop('figsize', (12, 6))
+    figsize = kw.pop("figsize", (12, 6))
     fig, ax = plt.subplots(figsize=figsize)
     xm, hm = gen_topomask(h, lon, lat, dx=dx, kind=kind)
-    ax.plot(xm, hm, color='black', linewidth=linewidth, zorder=3)
-    ax.fill_between(xm, hm, y2=hm.max(), color='0.9', zorder=3)
+    ax.plot(xm, hm, color="black", linewidth=linewidth, zorder=3)
+    ax.fill_between(xm, hm, y2=hm.max(), color="0.9", zorder=3)
 
     if station_marker:
-        ax.plot(x, [offset] * len(h), color=color, marker=station_marker,
-                alpha=alpha, zorder=5)
-    ax.set_xlabel('Cross-shore distance [km]', fontsize=fontsize)
-    ax.set_ylabel('Depth [m]', fontsize=fontsize)
+        ax.plot(
+            x,
+            [offset] * len(h),
+            color=color,
+            marker=station_marker,
+            alpha=alpha,
+            zorder=5,
+        )
+    ax.set_xlabel("Cross-shore distance [km]", fontsize=fontsize)
+    ax.set_ylabel("Depth [m]", fontsize=fontsize)
     ax.set_ylim(offset, hm.max())
     ax.invert_yaxis()
 
-    ax.xaxis.set_ticks_position('top')
-    ax.xaxis.set_label_position('top')
-    ax.yaxis.set_ticks_position('left')
-    ax.yaxis.set_label_position('left')
-    ax.xaxis.set_tick_params(tickdir='out', labelsize=labelsize, pad=1)
-    ax.yaxis.set_tick_params(tickdir='out', labelsize=labelsize, pad=1)
+    ax.xaxis.set_ticks_position("top")
+    ax.xaxis.set_label_position("top")
+    ax.yaxis.set_ticks_position("left")
+    ax.yaxis.set_label_position("left")
+    ax.xaxis.set_tick_params(tickdir="out", labelsize=labelsize, pad=1)
+    ax.yaxis.set_tick_params(tickdir="out", labelsize=labelsize, pad=1)
 
     # Color version.
-    cs = ax.contourf(x, z, data, cmap=cmap, levels=levels, alpha=1.,
-                     extend=extend, zorder=2)  # manual=True
+    cs = ax.contourf(
+        x,
+        z,
+        data,
+        cmap=cmap,
+        levels=levels,
+        alpha=1.0,
+        extend=extend,
+        zorder=2,
+    )  # manual=True
     # Colorbar.
-    cb = fig.colorbar(mappable=cs, ax=ax, orientation='vertical',
-                      aspect=aspect, shrink=shrink, fraction=fraction,
-                      pad=pad)
+    cb = fig.colorbar(
+        mappable=cs,
+        ax=ax,
+        orientation="vertical",
+        aspect=aspect,
+        shrink=shrink,
+        fraction=fraction,
+        pad=pad,
+    )
     return fig, ax, cb
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import doctest
+
     doctest.testmod()

@@ -1,28 +1,23 @@
 from __future__ import absolute_import, division, print_function
 
+import linecache
 import re
 import warnings
 from datetime import datetime
-import linecache
 
 import numpy as np
-
 import pandas as pd
+
+from .utilities import Path, basename, normalize_names, read_file
+
 if "time_of_reset" not in pd.DataFrame._metadata:
     pd.DataFrame._metadata.append("time_of_reset")
 
 
-from .utilities import (
-    Path,
-    basename,
-    normalize_names,
-    read_file,
-)
-
-data_path = Path(__file__).parents[1].joinpath('tests', 'data')
+data_path = Path(__file__).parents[1].joinpath("tests", "data")
 
 
-def _parse_seabird(lines, ftype='cnv'):
+def _parse_seabird(lines, ftype="cnv"):
     # Initialize variables.
     lon = lat = time = None
     skiprows = 0
@@ -33,75 +28,75 @@ def _parse_seabird(lines, ftype='cnv'):
         line = line.strip()
 
         # Only cnv has columns names, for bottle files we will use the variable row.
-        if ftype == 'cnv':
-            if '# name' in line:
-                name, unit = line.split('=')[1].split(':')
+        if ftype == "cnv":
+            if "# name" in line:
+                name, unit = line.split("=")[1].split(":")
                 name, unit = list(map(normalize_names, (name, unit)))
                 names.append(name)
 
         # Seabird headers starts with *.
-        if line.startswith('*'):
+        if line.startswith("*"):
             header.append(line)
 
         # Seabird configuration starts with #.
-        if line.startswith('#'):
+        if line.startswith("#"):
             config.append(line)
 
         # NMEA position and time.
-        if 'NMEA Latitude' in line:
+        if "NMEA Latitude" in line:
             hemisphere = line[-1]
-            lat = line.strip(hemisphere).split('=')[1].strip()
+            lat = line.strip(hemisphere).split("=")[1].strip()
             lat = np.float_(lat.split())
-            if hemisphere == 'S':
-                lat = -(lat[0] + lat[1] / 60.)
-            elif hemisphere == 'N':
-                lat = lat[0] + lat[1] / 60.
+            if hemisphere == "S":
+                lat = -(lat[0] + lat[1] / 60.0)
+            elif hemisphere == "N":
+                lat = lat[0] + lat[1] / 60.0
             else:
-                raise ValueError('Latitude not recognized.')
-        if 'NMEA Longitude' in line:
+                raise ValueError("Latitude not recognized.")
+        if "NMEA Longitude" in line:
             hemisphere = line[-1]
-            lon = line.strip(hemisphere).split('=')[1].strip()
+            lon = line.strip(hemisphere).split("=")[1].strip()
             lon = np.float_(lon.split())
-            if hemisphere == 'W':
-                lon = -(lon[0] + lon[1] / 60.)
-            elif hemisphere == 'E':
-                lon = lon[0] + lon[1] / 60.
+            if hemisphere == "W":
+                lon = -(lon[0] + lon[1] / 60.0)
+            elif hemisphere == "E":
+                lon = lon[0] + lon[1] / 60.0
             else:
-                raise ValueError('Latitude not recognized.')
-        if 'NMEA UTC (Time)' in line:
-            time = line.split('=')[-1].strip()
+                raise ValueError("Latitude not recognized.")
+        if "NMEA UTC (Time)" in line:
+            time = line.split("=")[-1].strip()
             # Should use some fuzzy datetime parser to make this more robust.
-            time = datetime.strptime(time, '%b %d %Y %H:%M:%S')
+            time = datetime.strptime(time, "%b %d %Y %H:%M:%S")
 
         # cnv file header ends with *END* while
-        if ftype == 'cnv':
-            if line == '*END*':
+        if ftype == "cnv":
+            if line == "*END*":
                 skiprows = k + 1
                 break
         else:  # btl.
             # There is no *END* like in a .cnv file, skip two after header info.
-            if not (line.startswith('*') | line.startswith('#')):
+            if not (line.startswith("*") | line.startswith("#")):
                 # Fix commonly occurring problem when Sbeox.* exists in the file
                 # the name is concatenated to previous parameter
                 # example:
                 #   CStarAt0Sbeox0Mm/Kg to CStarAt0 Sbeox0Mm/Kg (really two different params)
-                line = re.sub(r'(\S)Sbeox', '\\1 Sbeox', line)
+                line = re.sub(r"(\S)Sbeox", "\\1 Sbeox", line)
 
                 names = line.split()
                 skiprows = k + 2
                 break
-    if ftype == 'btl':
+    if ftype == "btl":
         # Capture stat names column.
-        names.append('Statistic')
+        names.append("Statistic")
     metadata.update(
         {
-            'header': header,
-            'config': config,
-            'names': names,
-            'skiprows': skiprows,
-            'time': time,
-            'lon': lon,
-            'lat': lat,
+            "header": header,
+            "config": config,
+            "names": names,
+            "skiprows": skiprows,
+            "time": time,
+            "lon": lon,
+            "lat": lat,
         }
     )
     return metadata
@@ -110,7 +105,7 @@ def _parse_seabird(lines, ftype='cnv'):
 def asof(self, label):
     """pandas index workaround."""
     if label not in self:
-        loc = self.searchsorted(label, side='left')
+        loc = self.searchsorted(label, side="left")
         if loc > 0:
             return self[loc - 1]
         else:
@@ -132,14 +127,10 @@ class CTD(pd.DataFrame):
         serial=None,
         config=None,
         dtype=None,
-        copy=False
+        copy=False,
     ):
         super(CTD, self).__init__(
-            data=data,
-            index=index,
-            columns=columns,
-            dtype=dtype,
-            copy=copy
+            data=data, index=index, columns=columns, dtype=dtype, copy=copy
         )
         self.time = time
         self.longitude = longitude
@@ -150,22 +141,27 @@ class CTD(pd.DataFrame):
         self.name = name
 
     def __reduce__(self):
-        return self.__class__, (
-            pd.DataFrame(self),  # NOTE Using that type(data)==DataFrame and the
-                                 # the rest of the arguments of DataFrame.__init__
-                                 # to defaults, the constructors acts as a
-                                 # copy constructor.
-            None,
-            None,
-            self.time,
-            self.longitude,
-            self.latitude,
-            self.header,
-            self.serial,
-            self.config,
-            self.name,
-            None,
-            False,
+        return (
+            self.__class__,
+            (
+                pd.DataFrame(
+                    self
+                ),  # NOTE Using that type(data)==DataFrame and the
+                # the rest of the arguments of DataFrame.__init__
+                # to defaults, the constructors acts as a
+                # copy constructor.
+                None,
+                None,
+                self.time,
+                self.longitude,
+                self.latitude,
+                self.header,
+                self.serial,
+                self.config,
+                self.name,
+                None,
+                False,
+            ),
         )
 
 
@@ -190,42 +186,42 @@ def from_edf(fname, below_water=False, lon=None, lat=None):
     header, names = [], []
     for k, line in enumerate(f.readlines()):
         line = line.strip()
-        if line.startswith('Serial Number'):
-            serial = line.strip().split(':')[1].strip()
-        elif line.startswith('Latitude'):
+        if line.startswith("Serial Number"):
+            serial = line.strip().split(":")[1].strip()
+        elif line.startswith("Latitude"):
             if not lat:
                 try:
                     hemisphere = line[-1]
-                    lat = line.strip(hemisphere).split(':')[1].strip()
+                    lat = line.strip(hemisphere).split(":")[1].strip()
                     lat = np.float_(lat.split())
-                    if hemisphere == 'S':
-                        lat = -(lat[0] + lat[1] / 60.)
-                    elif hemisphere == 'N':
-                        lat = lat[0] + lat[1] / 60.
+                    if hemisphere == "S":
+                        lat = -(lat[0] + lat[1] / 60.0)
+                    elif hemisphere == "N":
+                        lat = lat[0] + lat[1] / 60.0
                 except (IndexError, ValueError) as e:
-                    msg = 'Ill formed or not present latitude in the header. '
-                    msg += 'Try specifying one with the keyword `lat=`.'
-                    raise ValueError('%s\n%s' % (msg, e))
-        elif line.startswith('Longitude'):
+                    msg = "Ill formed or not present latitude in the header. "
+                    msg += "Try specifying one with the keyword `lat=`."
+                    raise ValueError("%s\n%s" % (msg, e))
+        elif line.startswith("Longitude"):
             if not lon:
                 try:
                     hemisphere = line[-1]
-                    lon = line.strip(hemisphere).split(':')[1].strip()
+                    lon = line.strip(hemisphere).split(":")[1].strip()
                     lon = np.float_(lon.split())
-                    if hemisphere == 'W':
-                        lon = -(lon[0] + lon[1] / 60.)
-                    elif hemisphere == 'E':
-                        lon = lon[0] + lon[1] / 60.
+                    if hemisphere == "W":
+                        lon = -(lon[0] + lon[1] / 60.0)
+                    elif hemisphere == "E":
+                        lon = lon[0] + lon[1] / 60.0
                 except (IndexError, ValueError) as e:
-                    msg = 'Ill formed or not present Longitude in the header.'
-                    msg += 'Try specifying one with the keyword `lon=`.'
-                    raise ValueError('%s\n%s' % (msg, e))
+                    msg = "Ill formed or not present Longitude in the header."
+                    msg += "Try specifying one with the keyword `lon=`."
+                    raise ValueError("%s\n%s" % (msg, e))
         else:
             header.append(line)
-            if line.startswith('Field'):
-                col, unit = [l.strip().lower() for l in line.split(':')]
+            if line.startswith("Field"):
+                col, unit = [l.strip().lower() for l in line.split(":")]
                 names.append(unit.split()[0])
-        if line == '// Data':
+        if line == "// Data":
             skiprows = k + 1
             break
 
@@ -236,17 +232,23 @@ def from_edf(fname, below_water=False, lon=None, lat=None):
         index_col=None,
         names=names,
         skiprows=skiprows,
-        delim_whitespace=True
+        delim_whitespace=True,
     )
     f.close()
 
-    cast.set_index('depth', drop=True, inplace=True)
-    cast.index.name = 'Depth [m]'
+    cast.set_index("depth", drop=True, inplace=True)
+    cast.index.name = "Depth [m]"
     name = basename(fname)[1]
     if below_water:
         cast = remove_above_water(cast)
-    return CTD(cast, longitude=float(lon), latitude=float(lat),
-               serial=serial, name=name, header=header)
+    return CTD(
+        cast,
+        longitude=float(lon),
+        latitude=float(lat),
+        serial=serial,
+        name=name,
+        header=header,
+    )
 
 
 def from_cnv(fname, below_water=False, time=None, lon=None, lat=None):
@@ -264,22 +266,22 @@ def from_cnv(fname, below_water=False, time=None, lon=None, lat=None):
     """
 
     f = read_file(fname)
-    metadata = _parse_seabird(f.readlines(), ftype='cnv')
+    metadata = _parse_seabird(f.readlines(), ftype="cnv")
 
     f.seek(0)
     cast = pd.read_fwf(
         f,
         header=None,
         index_col=None,
-        names=metadata['names'],
-        skiprows=metadata['skiprows'],
+        names=metadata["names"],
+        skiprows=metadata["skiprows"],
         delim_whitespace=True,
-        widths=[11, ] * len(metadata['names'])
+        widths=[11] * len(metadata["names"]),
     )
     f.close()
 
     key_set = False
-    prkeys = ['prDM', 'prdM', 'pr']
+    prkeys = ["prDM", "prdM", "pr"]
     for prkey in prkeys:
         try:
             cast.set_index(prkey, drop=True, inplace=True)
@@ -287,17 +289,13 @@ def from_cnv(fname, below_water=False, time=None, lon=None, lat=None):
         except KeyError:
             continue
     if not key_set:
-        msg = 'Could not find pressure field (supported names are {}).'
+        msg = "Could not find pressure field (supported names are {})."
         raise KeyError(msg.format(prkeys))
-    cast.index.name = 'Pressure [dbar]'
+    cast.index.name = "Pressure [dbar]"
 
     name = basename(fname)[0]
 
-    dtypes = {
-        'bpos': int,
-        'pumps': bool,
-        'flag': bool,
-    }
+    dtypes = {"bpos": int, "pumps": bool, "flag": bool}
     for column in cast.columns:
         if column in dtypes:
             cast[column] = cast[column].astype(dtypes[column])
@@ -305,18 +303,18 @@ def from_cnv(fname, below_water=False, time=None, lon=None, lat=None):
             try:
                 cast[column] = cast[column].astype(float)
             except ValueError:
-                warnings.warn('Could not convert %s to float.' % column)
+                warnings.warn("Could not convert %s to float." % column)
     if below_water:
         cast = remove_above_water(cast)
     return CTD(
         cast,
-        time=metadata['time'],
-        longitude=metadata['lon'],
-        latitude=metadata['lat'],
+        time=metadata["time"],
+        longitude=metadata["lon"],
+        latitude=metadata["lat"],
         name=name,
-        header=metadata['header'],
-        config=metadata['config'],
-        )
+        header=metadata["header"],
+        config=metadata["config"],
+    )
 
 
 def from_bl(filename):
@@ -332,10 +330,16 @@ def from_bl(filename):
     datetime.datetime(2018, 6, 25, 20, 8, 55)
 
     """
-    df = pd.read_csv(filename, skiprows=2, parse_dates=[1], index_col=0,
-                     names=["bottle_number", "time", "startscan", "endscan"])
+    df = pd.read_csv(
+        filename,
+        skiprows=2,
+        parse_dates=[1],
+        index_col=0,
+        names=["bottle_number", "time", "startscan", "endscan"],
+    )
     df.time_of_reset = pd.to_datetime(
-        linecache.getline(filename, 2)[6:-1]).to_pydatetime()
+        linecache.getline(filename, 2)[6:-1]
+    ).to_pydatetime()
     return df
 
 
@@ -351,7 +355,7 @@ def from_btl(fname, lon=None, lat=None):
     """
 
     f = read_file(fname)
-    metadata = _parse_seabird(f.readlines(), ftype='btl')
+    metadata = _parse_seabird(f.readlines(), ftype="btl")
 
     f.seek(0)
 
@@ -359,9 +363,9 @@ def from_btl(fname, lon=None, lat=None):
         f,
         header=None,
         index_col=False,
-        names=metadata['names'],
+        names=metadata["names"],
         parse_dates=False,
-        skiprows=metadata['skiprows'],
+        skiprows=metadata["skiprows"],
     )
     f.close()
 
@@ -372,30 +376,32 @@ def from_btl(fname, lon=None, lat=None):
     # Get row types, see what you have: avg, std, min, max or just avg, std.
     rowtypes = cast[cast.columns[-1]].unique()
     # Get times and dates which occur on second line of each bottle.
-    dates = cast.iloc[::len(rowtypes), 1].reset_index(drop=True)
-    times = cast.iloc[1::len(rowtypes), 1].reset_index(drop=True)
-    datetimes = dates + ' ' + times
+    dates = cast.iloc[:: len(rowtypes), 1].reset_index(drop=True)
+    times = cast.iloc[1 :: len(rowtypes), 1].reset_index(drop=True)
+    datetimes = dates + " " + times
 
     # Fill the Date column with datetimes.
-    cast.loc[::len(rowtypes), 'Date'] = datetimes.values
-    cast.loc[1::len(rowtypes), 'Date'] = datetimes.values
+    cast.loc[:: len(rowtypes), "Date"] = datetimes.values
+    cast.loc[1 :: len(rowtypes), "Date"] = datetimes.values
 
     # Fill missing rows.
-    cast['Bottle'] = cast['Bottle'].fillna(method='ffill')
-    cast['Date'] = cast['Date'].fillna(method='ffill')
+    cast["Bottle"] = cast["Bottle"].fillna(method="ffill")
+    cast["Date"] = cast["Date"].fillna(method="ffill")
 
-    cast['Statistic'] = cast['Statistic'].str.replace(r'\(|\)', '')  # (avg) to avg
+    cast["Statistic"] = cast["Statistic"].str.replace(
+        r"\(|\)", ""
+    )  # (avg) to avg
 
     name = basename(fname)[0]
 
     dtypes = {
-        'bpos': int,
-        'pumps': bool,
-        'flag': bool,
-        'Bottle': int,
-        'Scan': int,
-        'Statistic': str,
-        'Date': str,
+        "bpos": int,
+        "pumps": bool,
+        "flag": bool,
+        "Bottle": int,
+        "Scan": int,
+        "Statistic": str,
+        "Date": str,
     }
     for column in cast.columns:
         if column in dtypes:
@@ -404,17 +410,17 @@ def from_btl(fname, lon=None, lat=None):
             try:
                 cast[column] = cast[column].astype(float)
             except ValueError:
-                warnings.warn('Could not convert %s to float.' % column)
+                warnings.warn("Could not convert %s to float." % column)
 
-    cast['Date'] = pd.to_datetime(cast['Date'])
+    cast["Date"] = pd.to_datetime(cast["Date"])
 
     return CTD(
         cast,
-        longitude=metadata['lon'],
-        latitude=metadata['lat'],
+        longitude=metadata["lon"],
+        latitude=metadata["lat"],
         name=name,
-        header=metadata['header'],
-        config=metadata['config']
+        header=metadata["header"],
+        config=metadata["config"],
     )
 
 
@@ -435,16 +441,16 @@ def from_fsi(fname, skiprows=9, below_water=False, lon=None, lat=None):
     f = read_file(fname)
     cast = pd.read_table(
         f,
-        header='infer',
+        header="infer",
         index_col=None,
         skiprows=skiprows,
         dtype=float,
-        delim_whitespace=True
+        delim_whitespace=True,
     )
     f.close()
 
-    cast.set_index('PRES', drop=True, inplace=True)
-    cast.index.name = 'Pressure [dbar]'
+    cast.set_index("PRES", drop=True, inplace=True)
+    cast.index.name = "Pressure [dbar]"
     cast.name = basename(fname)[0]
     if below_water:
         cast = remove_above_water(cast)
@@ -470,12 +476,13 @@ def rosette_summary(fname):
 
     """
     ros = from_cnv(fname)
-    ros['pressure'] = ros.index.values.astype(float)
-    ros['nbf'] = ros['nbf'].astype(int)
-    ros.set_index('nbf', drop=True, inplace=True, verify_integrity=False)
+    ros["pressure"] = ros.index.values.astype(float)
+    ros["nbf"] = ros["nbf"].astype(int)
+    ros.set_index("nbf", drop=True, inplace=True, verify_integrity=False)
     return ros
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import doctest
+
     doctest.testmod()

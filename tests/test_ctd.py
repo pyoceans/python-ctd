@@ -207,11 +207,10 @@ def section():
 
     # Section.
     section = Panel.fromDict(section)
-    return {"section": section, "lon": lon, "lat": lat}
+    yield {"section": section, "lon": lon, "lat": lat}
 
 
-def test_section():
-    data = section()
-    CT = data["section"].minor_xs("CT")
-    CT.lon, CT.lat = data["lon"], data["lat"]
+def test_section(section):
+    CT = section["section"].minor_xs("CT")
+    CT.lon, CT.lat = section["lon"], section["lat"]
     fig, ax, cb = plot_section(CT, reverse=True)

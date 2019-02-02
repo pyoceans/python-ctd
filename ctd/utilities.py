@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function
-
 import bz2
 import gzip
 import re
@@ -22,16 +20,7 @@ def header(xml):
 
 
 def basename(fname):
-    """
-    Return file name without path.
-
-    Examples
-    --------
-    >>> fname = '../test/data/FSI.txt.zip'
-    >>> print('{}, {}, {}'.format(*basename(fname)))
-    ../test/data, FSI.txt, .zip
-
-    """
+    """Return file name without path."""
     if not isinstance(fname, path_type):
         fname = Path(fname)
     path, name, ext = fname.parent, fname.stem, fname.suffix

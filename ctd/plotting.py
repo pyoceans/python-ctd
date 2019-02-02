@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import absolute_import, division, print_function
-
 import matplotlib.pyplot as plt
 import mpl_toolkits.axisartist as AA
 import numpy as np

@@ -2,13 +2,7 @@ environment:
   CONDA_INSTALL_LOCN: C:\\Miniconda36-x64
   matrix:
     - TARGET_ARCH: x64
-      CONDA_PY: 27
-
-    - TARGET_ARCH: x64
-      CONDA_PY: 35
-
-    - TARGET_ARCH: x64
-      CONDA_PY: 36
+      PY: 3.7
 
 platform:
     - x64
@@ -26,19 +20,21 @@ install:
 
     # Add path, activate `conda` and update conda.
     - cmd: call %CONDA_INSTALL_LOCN%\Scripts\activate.bat
-    - cmd: conda.exe config --set always_yes yes --set changeps1 no --set show_channel_urls true
-    - cmd: conda.exe update conda
-    - cmd: conda.exe config --add channels conda-forge --force
+    - cmd: conda config --set always_yes yes --set changeps1 no --set show_channel_urls true
+    # - cmd: conda update conda --quiet
+    - cmd: conda install conda<4.6
+    - cmd: conda config --add channels conda-forge --force
 
     - cmd: set PYTHONUNBUFFERED=1
 
-    - cmd: conda.exe install conda-build vs2008_express_vc_python_patch
-    - cmd: call setup_x64
-    - cmd: conda.exe info --all
-    - cmd: conda.exe list
+    - cmd: conda create --name TEST python=%PY% --file requirements.txt --file requirements-dev.txt
+    - cmd: conda activate TEST
+    - cmd: conda info --all
+    - cmd: conda list
 
 # Skip .NET project specific build phase.
 build: off
 
 test_script:
-    - "conda build conda.recipe"
+    - pytest -n 2 -rxs --cov=ctd tests
+    - pytest -s -rxs --doctest-modules -vv ctd

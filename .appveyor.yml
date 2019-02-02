@@ -21,7 +21,8 @@ install:
     # Add path, activate `conda` and update conda.
     - cmd: call %CONDA_INSTALL_LOCN%\Scripts\activate.bat
     - cmd: conda config --set always_yes yes --set changeps1 no --set show_channel_urls true
-    - cmd: conda update conda --quiet
+    # - cmd: conda update conda --quiet
+    - cmd: conda install conda<4.6
     - cmd: conda config --add channels conda-forge --force
 
     - cmd: set PYTHONUNBUFFERED=1

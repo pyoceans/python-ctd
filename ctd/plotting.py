@@ -276,9 +276,3 @@ def plot_section(self, reverse=False, filled=False, **kw):
         pad=pad,
     )
     return fig, ax, cb
-
-
-if __name__ == "__main__":
-    import doctest
-
-    doctest.testmod()

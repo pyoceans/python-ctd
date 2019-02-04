@@ -2,9 +2,7 @@ import numpy as np
 import numpy.ma as ma
 from pandas import Index, Series
 
-from .utilities import Path, rolling_window
-
-data_path = Path(__file__).parents[1].joinpath("tests", "data")
+from .utilities import rolling_window
 
 
 def despike(self, n1=2, n2=20, block=100, keep=0):
@@ -54,8 +52,10 @@ def lp_filter(data, sample_rate=24.0, time_constant=0.15):
 
     Examples
     --------
+    >>> from .utilities import Path
     >>> import matplotlib.pyplot as plt
     >>> from ctd import DataFrame, lp_filter
+    >>> data_path = Path(__file__).parents[1].joinpath("tests", "data")
     >>> raw = DataFrame.from_cnv(data_path.joinpath('CTD-spiked-unfiltered.cnv.bz2'))
     >>> prc = DataFrame.from_cnv(data_path.joinpath('CTD-spiked-filtered.cnv.bz2'))
     >>> kw = dict(sample_rate=24.0, time_constant=0.15)

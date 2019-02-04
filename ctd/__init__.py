@@ -39,7 +39,6 @@ del get_versions
 
 
 __all__ = [
-    asof,
     barrier_layer_thickness,
     bindata,
     cell_thermal_mass,

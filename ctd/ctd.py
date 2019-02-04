@@ -6,13 +6,10 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 
-from .utilities import Path, basename, normalize_names, read_file
+from .utilities import basename, normalize_names, read_file
 
 if "time_of_reset" not in pd.DataFrame._metadata:
     pd.DataFrame._metadata.append("time_of_reset")
-
-
-data_path = Path(__file__).parents[1].joinpath("tests", "data")
 
 
 def _parse_seabird(lines, ftype="cnv"):
@@ -173,7 +170,9 @@ def from_edf(fname, below_water=False, lon=None, lat=None):
 
     Examples
     --------
+    >>> from .utilities import Path
     >>> from ctd import DataFrame
+    >>> data_path = Path(__file__).parents[1].joinpath("tests", "data")
     >>> cast = DataFrame.from_edf(data_path.joinpath('XBT.EDF.gz'))
     >>> fig, ax = cast['temperature'].plot()
     >>> _ = ax.axis([20, 24, 19, 0])
@@ -255,7 +254,9 @@ def from_cnv(fname, below_water=False, time=None, lon=None, lat=None):
 
     Examples
     --------
+    >>> from .utilities import Path
     >>> from ctd import DataFrame
+    >>> data_path = Path(__file__).parents[1].joinpath("tests", "data")
     >>> cast = DataFrame.from_cnv(data_path.joinpath('CTD_big.cnv.bz2'))
     >>> downcast, upcast = cast.split()
     >>> fig, ax = downcast['t090C'].plot()
@@ -322,7 +323,9 @@ def from_bl(filename):
 
     Example
     -------
+    >>> from .utilities import Path
     >>> from ctd import DataFrame
+    >>> data_path = Path(__file__).parents[1].joinpath("tests", "data")
     >>> df = DataFrame.from_bl(str(data_path.joinpath('bl', 'bottletest.bl')))
     >>> df.time_of_reset
     datetime.datetime(2018, 6, 25, 20, 8, 55)
@@ -347,7 +350,9 @@ def from_btl(fname, lon=None, lat=None):
 
     Examples
     --------
+    >>> from .utilities import Path
     >>> from ctd import DataFrame
+    >>> data_path = Path(__file__).parents[1].joinpath("tests", "data")
     >>> bottles = DataFrame.from_btl(data_path.joinpath('btl', 'bottletest.btl'))
 
     """
@@ -429,7 +434,9 @@ def from_fsi(fname, skiprows=9, below_water=False, lon=None, lat=None):
 
     Examples
     --------
+    >>> from .utilities import Path
     >>> from ctd import DataFrame
+    >>> data_path = Path(__file__).parents[1].joinpath("tests", "data")
     >>> cast = DataFrame.from_fsi(data_path.joinpath('FSI.txt.gz'))
     >>> downcast, upcast = cast.split()
     >>> fig, ax = downcast['TEMP'].plot()
@@ -466,6 +473,8 @@ def rosette_summary(fname):
 
     Examples
     --------
+    >>> from .utilities import Path
+    >>> data_path = Path(__file__).parents[1].joinpath("tests", "data")
     >>> fname = data_path.joinpath('CTD/g01l01s01.ros')
     >>> ros = rosette_summary(fname)
     >>> ros = ros.groupby(ros.index).mean()

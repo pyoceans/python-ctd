@@ -223,7 +223,7 @@ def from_edf(fname, below_water=False, lon=None, lat=None):
             break
 
     f.seek(0)
-    cast = pd.read_table(
+    cast = pd.read_csv(
         f,
         header=None,
         index_col=None,
@@ -444,7 +444,7 @@ def from_fsi(fname, skiprows=9, below_water=False, lon=None, lat=None):
 
     """
     f = read_file(fname)
-    cast = pd.read_table(
+    cast = pd.read_csv(
         f,
         header="infer",
         index_col=None,

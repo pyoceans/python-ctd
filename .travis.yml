@@ -27,11 +27,12 @@ before_install:
 
 # Test source distribution.
 install:
-  - python setup.py sdist && version=$(python setup.py --version) && pushd dist  && pip install ctd-${version}.tar.gz && popd
+  - python setup.py sdist && version=$(python setup.py --version) && pushd dist  && pip install --no-deps --force-reinstall ctd-${version}.tar.gz && popd
 
 script:
   - if [[ $TRAVIS_JOB_NAME == "default" ]]; then
-      pytest -n 2 -rxs --cov=ctd tests ;
+      cp -r tests/ /tmp ;
+      pushd /tmp && pytest -n 2 -rxs --cov=ctd tests && popd ;
     fi
 
   - if [[ $TRAVIS_JOB_NAME == "doctest" ]]; then

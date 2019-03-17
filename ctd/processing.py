@@ -1,19 +1,36 @@
 import numpy as np
 import numpy.ma as ma
-from pandas import Index, Series
+import pandas as pd
+from pandas_flavor import register_dataframe_method, register_series_method
 
-from .utilities import rolling_window
+
+def _rolling_window(data, block):
+    """
+    http://stackoverflow.com/questions/4936620/
+    Using strides for an efficient moving average filter.
+
+    """
+    shape = data.shape[:-1] + (data.shape[-1] - block + 1, block)
+    strides = data.strides + (data.strides[-1],)
+    return np.lib.stride_tricks.as_strided(data, shape=shape, strides=strides)
 
 
-def despike(self, n1=2, n2=20, block=100, keep=0):
+@register_series_method
+@register_dataframe_method
+def remove_above_water(df):
+    return df[df.index >= 0]
+
+
+@register_series_method
+def despike(series, n1=2, n2=20, block=100, keep=0):
     """
     Wild Edit Seabird-like function.  Passes with Standard deviation
     `n1` and `n2` with window size `block`.
 
     """
 
-    data = self.values.astype(float).copy()
-    roll = rolling_window(data, block)
+    data = series.values.astype(float).copy()
+    roll = _rolling_window(data, block)
     roll = ma.masked_invalid(roll)
     std = n1 * roll.std(axis=1)
     mean = roll.mean(axis=1)
@@ -27,24 +44,26 @@ def despike(self, n1=2, n2=20, block=100, keep=0):
 
     # Pass two recompute the mean and std without the flagged values from pass
     # one and removed the flagged data.
-    roll = rolling_window(data, block)
+    roll = _rolling_window(data, block)
     roll = ma.masked_invalid(roll)
     std = n2 * roll.std(axis=1)
     mean = roll.mean(axis=1)
     # Use the last value to fill-up.
     std = np.r_[std, np.tile(std[-1], block - 1)]
     mean = np.r_[mean, np.tile(mean[-1], block - 1)]
-    values = self.values.astype(float)
+    values = series.values.astype(float)
     mask = np.abs(values - mean.filled(fill_value=np.NaN)) > std.filled(
         fill_value=np.NaN
     )
 
-    clean = self.astype(float).copy()
+    clean = series.astype(float).copy()
     clean[mask] = np.NaN
     return clean
 
 
-def lp_filter(data, sample_rate=24.0, time_constant=0.15):
+@register_series_method
+@register_dataframe_method
+def lp_filter(df, sample_rate=24.0, time_constant=0.15):
     """
     Filter a series with `time_constant` (use 0.15 s for pressure), and for
     a signal of `sample_rate` in Hertz (24 Hz for 911+).
@@ -52,70 +71,45 @@ def lp_filter(data, sample_rate=24.0, time_constant=0.15):
 
     Examples
     --------
-    >>> from .utilities import Path
+    >>> from pathlib import Path
     >>> import matplotlib.pyplot as plt
-    >>> from ctd import DataFrame, lp_filter
+    >>> import ctd
     >>> data_path = Path(__file__).parents[1].joinpath("tests", "data")
-    >>> raw = DataFrame.from_cnv(data_path.joinpath('CTD-spiked-unfiltered.cnv.bz2'))
-    >>> prc = DataFrame.from_cnv(data_path.joinpath('CTD-spiked-filtered.cnv.bz2'))
-    >>> kw = dict(sample_rate=24.0, time_constant=0.15)
+    >>> raw = ctd.from_cnv(data_path.joinpath('CTD-spiked-unfiltered.cnv.bz2'))
+    >>> prc = ctd.from_cnv(data_path.joinpath('CTD-spiked-filtered.cnv.bz2'))
+    >>> kw = {"sample_rate": 24.0, "time_constant": 0.15}
     >>> original = prc.index.values
     >>> unfiltered = raw.index.values
-    >>> filtered = lp_filter(unfiltered, **kw)
+    >>> filtered = raw.lp_filter(**kw).index.values
     >>> fig, ax = plt.subplots()
     >>> l1, = ax.plot(original, 'k', label='original')
     >>> l2, = ax.plot(unfiltered, 'r', label='unfiltered')
     >>> l3, = ax.plot(filtered, 'g', label='filtered')
     >>> leg = ax.legend()
-    >>> _ = ax.axis([33564, 33648, 1034, 1035])
 
     Notes
     -----
     http://wiki.scipy.org/Cookbook/FIRFilter
 
-
     """
 
     from scipy import signal
 
-    if True:  # Butter is closer to what SBE is doing with their cosine filter.
-        Wn = (1.0 / time_constant) / (sample_rate * 2.0)
-        b, a = signal.butter(2, Wn, "low")
-        data = signal.filtfilt(b, a, data)
+    # Butter is closer to what SBE is doing with their cosine filter.
+    Wn = (1.0 / time_constant) / (sample_rate * 2.0)
+    b, a = signal.butter(2, Wn, "low")
+    df.index = signal.filtfilt(b, a, df.index.values)
+    return df
 
-    return data
 
-
-def cell_thermal_mass(temperature, conductivity):
+@register_series_method
+@register_dataframe_method
+def press_check(df):
     """
-    Sample interval is measured in seconds.
-    Temperature in degrees.
-    CTM is calculated in S/m.
-
-    """
-
-    alpha = 0.03  # Thermal anomaly amplitude.
-    beta = 1.0 / 7  # Thermal anomaly time constant (1/beta).
-
-    sample_interval = 1 / 15.0
-    a = 2 * alpha / (sample_interval * beta + 2)
-    b = 1 - (2 * a / alpha)
-    dCodT = 0.1 * (1 + 0.006 * [temperature - 20])
-    dT = np.diff(temperature)
-    ctm = -1.0 * b * conductivity + a * (dCodT) * dT  # [S/m]
-    return ctm
-
-
-def press_check(self, column="index"):
-    """
-    Remove pressure reversals.
+    Remove pressure reversals from the index.
 
     """
-    data = self.copy()
-    if column != "index":
-        press = data[column]
-    else:
-        press = data.index.values.astype(float)
+    press = df.copy().index.values.astype(float)
 
     ref = press[0]
     inversions = np.diff(np.r_[press, press[-1]]) < 0
@@ -125,46 +119,53 @@ def press_check(self, column="index"):
             ref = press[k]
             cut = press[k + 1 :] < ref
             mask[k + 1 :][cut] = True
-    data[mask] = np.NaN
-    return data
+    df[mask] = np.NaN
+    return df
 
 
-def bindata(self, delta=1.0, method="averaging"):
+@register_series_method
+@register_dataframe_method
+def bindata(df, delta=1.0, method="average"):
     """
     Bin average the index (usually pressure) to a given interval (default
     delta = 1).
 
-    Note that this method does not drop NA automatically.  Therefore, one can
-    check the quality of the binned data.
-
     """
-    if method == "averaging":
-        start = np.floor(self.index[0])
-        end = np.ceil(self.index[-1])
-        shift = delta / 2.0  # To get centered bins.
-        new_index = np.arange(start, end, delta) - shift
-        new_index = Index(new_index)
-        newdf = self.groupby(new_index.asof).mean()
-        newdf.index += shift  # Not shifted.
+    start = np.floor(df.index[0])
+    stop = np.ceil(df.index[-1])
+    new_index = np.arange(start, stop, delta)
+    binned = pd.cut(df.index, bins=new_index)
+    if method == "average":
+        newdf = df.groupby(binned).mean()
+        newdf.index = new_index[:-1]
+    elif method == "interpolate":
+        raise NotImplementedError(
+            "Bin-average via interpolation method is not Implemented yet."
+        )
     else:
-        newdf = self.copy()
-
+        raise ValueError(
+            f"Expected method `average` or `interpolate`, but got {method}."
+        )
     return newdf
 
 
-def split(self):
+@register_series_method
+@register_dataframe_method
+def split(df):
     """Returns a tuple with down/up-cast."""
-    down = self.iloc[: self.index.argmax()]
-    up = self.iloc[self.index.argmax() :][::-1]  # Reverse up index.
+    down = df.iloc[: df.index.argmax()]
+    up = df.iloc[df.index.argmax() :][::-1]  # Reverse up index.
     return down, up
 
 
+@register_series_method
 def movingaverage(series, window_size=48):
     window = np.ones(int(window_size)) / float(window_size)
-    return Series(np.convolve(series, window, "same"), index=series.index)
+    return pd.Series(np.convolve(series, window, "same"), index=series.index)
 
 
-def smooth(self, window_len=11, window="hanning"):
+@register_series_method
+def smooth(series, window_len=11, window="hanning"):
     """Smooth the data using a window with requested size."""
 
     windows = {
@@ -174,10 +175,10 @@ def smooth(self, window_len=11, window="hanning"):
         "bartlett": np.bartlett,
         "blackman": np.blackman,
     }
-    data = self.values.copy()
+    data = series.values.copy()
 
     if window_len < 3:
-        return Series(data, index=self.index, name=self.name)
+        return pd.Series(data, index=series.index, name=series.name)
 
     if window not in list(windows.keys()):
         raise ValueError(
@@ -195,56 +196,4 @@ def smooth(self, window_len=11, window="hanning"):
 
     data = np.convolve(w / w.sum(), s, mode="same")
     data = data[window_len - 1 : -window_len + 1]
-    return Series(data, index=self.index, name=self.name)
-
-
-def mixed_layer_depth(CT, method="half degree"):
-    if method == "half degree":
-        mask = CT[0] - CT < 0.5
-    else:
-        mask = np.zeros_like(CT)
-    return Series(mask, index=CT.index, name="MLD")
-
-
-def barrier_layer_thickness(SA, CT):
-    """
-    Compute the thickness of water separating the mixed surface layer from the
-    thermocline.  A more precise definition would be the difference between
-    mixed layer depth (MLD) calculated from temperature minus the mixed layer
-    depth calculated using density.
-
-    """
-    import gsw
-
-    sigma_theta = gsw.sigma0(SA, CT)
-    mask = mixed_layer_depth(CT)
-    mld = np.where(mask)[0][-1]
-    sig_surface = sigma_theta[0]
-    sig_bottom_mld = gsw.sigma0(SA[0], CT[mld])
-    d_sig_t = sig_surface - sig_bottom_mld
-    d_sig = sigma_theta - sig_bottom_mld
-    mask = d_sig < d_sig_t  # Barrier layer.
-    return Series(mask, index=SA.index, name="BLT")
-
-
-def derive_cnv(self):
-    """Compute SP, SA, CT, z, and GP from a cnv pre-processed cast."""
-    import gsw
-
-    cast = self.copy()
-    p = cast.index.values.astype(float)
-    cast["SP"] = gsw.SP_from_C(
-        cast["c0S/m"].values * 10.0, cast["t090C"].values, p
-    )
-    cast["SA"] = gsw.SA_from_SP(cast["SP"].values, p, self.lon, self.lat)
-    cast["SR"] = gsw.SR_from_SP(cast["SP"].values)
-    cast["CT"] = gsw.CT_from_t(cast["SA"].values, cast["t090C"].values, p)
-    cast["z"] = -gsw.z_from_p(p, self.lat)
-    cast["sigma0_CT"] = gsw.sigma0(cast["SA"].values, cast["CT"].values)
-    return cast
-
-
-if __name__ == "__main__":
-    import doctest
-
-    doctest.testmod()
+    return pd.Series(data, index=series.index, name=series.name)

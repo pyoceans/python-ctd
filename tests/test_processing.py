@@ -1,22 +1,21 @@
+from pathlib import Path
+
 import numpy as np
 import pytest
 
-from ctd import DataFrame, derive_cnv, lp_filter
-from ctd.utilities import Path
+import ctd
 
 data_path = Path(__file__).parent.joinpath("data")
 
 
 @pytest.fixture
 def spiked_ctd():
-    yield DataFrame.from_cnv(
-        data_path.joinpath("CTD-spiked-unfiltered.cnv.bz2")
-    )
+    yield ctd.from_cnv(data_path.joinpath("CTD-spiked-unfiltered.cnv.bz2"))
 
 
 @pytest.fixture
 def filtered_ctd():
-    yield DataFrame.from_cnv(data_path.joinpath("CTD-spiked-filtered.cnv.bz2"))
+    yield ctd.from_cnv(data_path.joinpath("CTD-spiked-filtered.cnv.bz2"))
 
 
 # Split.
@@ -44,8 +43,7 @@ def test_despike(filtered_ctd):
 def test_lp_filter(spiked_ctd, filtered_ctd):
     kw = {"sample_rate": 24.0, "time_constant": 0.15}
     expected = filtered_ctd.index.values
-    unfiltered = spiked_ctd.index.values
-    filtered = lp_filter(unfiltered, **kw)
+    filtered = spiked_ctd.lp_filter(**kw).index
     # Caveat: Not really a good test...
     np.testing.assert_almost_equal(filtered, expected, decimal=1)
 
@@ -64,11 +62,3 @@ def test_bindata(filtered_ctd):
     down = filtered_ctd["t090C"].split()[0]
     down = down.bindata(delta=delta)
     assert np.unique(np.diff(down.index.values)) == delta
-
-
-def test_derive_cnv(spiked_ctd):
-    spiked_ctd.lat = spiked_ctd["latitude"].mean()
-    spiked_ctd.lon = spiked_ctd["longitude"].mean()
-    derived = derive_cnv(spiked_ctd)
-    new_cols = set(derived).symmetric_difference(spiked_ctd.columns)
-    assert ["CT", "SA", "SP", "SR", "sigma0_CT", "z"] == sorted(new_cols)

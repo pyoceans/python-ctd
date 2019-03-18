@@ -5,10 +5,9 @@
 Tools to load hydrographic data as pandas DataFrame with some handy methods for
 data pre-processing and analysis
 
-This module can load `SeaBird CTD
-(CNV) <http://www.seabird.com/software/SBEDataProcforWindows.htm>`_,
-`Sippican XBT (EDF) <http://www.sippican.com/>`_, and `Falmouth CTD
-(ASCII) <http://www.falmouth.com/>`_ formats.
+This module can load [SeaBird CTD (CNV)](http://www.seabird.com/software/SBEDataProcforWindows.htm),
+[Sippican XBT (EDF)](http://www.sippican.com/),
+and [Falmouth CTD (ASCII)](http://www.falmouth.com/) formats.
 
 ## Quick intro
 

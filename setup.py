@@ -1,52 +1,46 @@
-import os
+from pathlib import Path
 
-from setuptools import setup
+from setuptools import find_packages, setup
 
 import versioneer
 
-rootpath = os.path.abspath(os.path.dirname(__file__))
+rootpath = Path(__file__).parent.absolute()
 
 
 def read(*parts):
-    return open(os.path.join(rootpath, *parts), "r").read()
-
-
-long_description = "{}\n{}".format(read("README.rst"), read("CHANGES.txt"))
-LICENSE = read("LICENSE.txt")
+    return open(rootpath.joinpath(*parts), "r").read()
 
 
 with open("requirements.txt") as f:
-    require = f.readlines()
-install_requires = [r.strip() for r in require]
+    requires = f.readlines()
+install_requires = [req.strip() for req in requires]
 
 setup(
     name="ctd",
+    python_requires=">=3.6",
     version=versioneer.get_version(),
-    license=LICENSE,
-    long_description=long_description,
-    classifiers=[
-        "Development Status :: 5 - Production/Stable",
-        "Environment :: Console",
-        "Intended Audience :: Science/Research",
-        "Intended Audience :: Developers",
-        "Intended Audience :: Education",
-        "License :: OSI Approved :: BSD License",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python",
-        "Topic :: Scientific/Engineering",
-        "Topic :: Education",
-    ],
     description="Tools to load hydrographic data as DataFrames",
+    license="BSD-3-Clause",
+    long_description=f'{read("README.md")}',
+    long_description_content_type="text/markdown",
     author="Filipe Fernandes",
     author_email="ocefpaf@gmail.com",
-    maintainer="Filipe Fernandes",
-    maintainer_email="ocefpaf@gmail.com",
     url="https://github.com/pyoceans/python-ctd",
     download_url="http://pypi.python.org/pypi/ctd",
+    keywords=["oceanography", "CTD", "pandas"],
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "License :: OSI Approved :: BSD License",
+        "Environment :: Console",
+        "Intended Audience :: Science/Research",
+        "Operating System :: OS Independent",
+        "Topic :: Scientific/Engineering",
+    ],
     platforms="any",
-    keywords=["oceanography", "data analysis", "DataFrame"],
+    packages=find_packages(),
+    extras_require={"testing": ["pytest"]},
     install_requires=install_requires,
-    tests_require=["pytest"],
-    packages=["ctd"],
     cmdclass=versioneer.get_cmdclass(),
 )

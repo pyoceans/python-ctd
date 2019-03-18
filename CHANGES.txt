@@ -1,21 +1,25 @@
 Changelog
 ---------
 
+Version 1.0.0
+
+* Major re-fator to use `pandas_flavor` instead of Monkey Patching.
+
 Version 0.4.0
 
-* Read searbird `bl` files
-* Fixed some warnings for the latest pandas
-* Fixed hardcoded number of stats in `from_btl`
-* Added a seabird ASCII bottle reader
-* Unified bottle and cnv parsers
+* Read searbird `bl` files.
+* Fixed some warnings for the latest pandas.
+* Fixed hardcoded number of stats in `from_btl`.
+* Added a seabird ASCII bottle reader.
+* Unified bottle and cnv parsers.
 
 Version 0.3.0
 
-* Changed license from `MIT` to BSD 3-Clause
-* Fixed `gsw 3.1.1` compatibility issues
-* Fixed reading pressure column from Sea Bird MicroCat SBE 37SM
-* Fixed Python 2/3 encoding issues
-* Improved CI test framework
+* Changed license from `MIT` to BSD 3-Clause.
+* Fixed `gsw 3.1.1` compatibility issues.
+* Fixed reading pressure column from Sea Bird MicroCat SBE 37SM.
+* Fixed Python 2/3 encoding issues.
+* Improved CI test framework.
 
 This will be the past version using `pandas` b/c the `Panel` class is deprecated.
 The next version will probably use `xarray` to store and serialized the CTD data.
@@ -25,7 +29,7 @@ Version 0.2.2
 * Support for different searbird `cnv` pressure spellings ('prDM' and 'prdM')
   thanks @j08lue.
 * Lazy import for optinal dependencies (`gsw` and `scipy`).
-* Several small bug fixes
+* Several small bug fixes.
 
 Version 0.2.1
 

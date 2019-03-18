@@ -34,8 +34,7 @@ fig, ax = downcast['t090C'].plot_cast()
 
 ![Bad Processing](https://raw.githubusercontent.com/ocefpaf/python-ctd/master/docs/readme_01.png)
 
-We can do
-`better <http://www.go-ship.org/Manual/McTaggart_et_al_CTD.pdf>`_:
+We can do [better](http://www.go-ship.org/Manual/McTaggart_et_al_CTD.pdf):
 
 ```python
 downcast, upcast = cast.split()

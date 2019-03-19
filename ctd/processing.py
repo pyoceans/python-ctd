@@ -22,6 +22,17 @@ def remove_above_water(df):
 
 
 @register_series_method
+@register_dataframe_method
+def split(df):
+    """Returns a tuple with down/up-cast."""
+    idx = df.index.argmax() + 1
+    down = df.iloc[:idx]
+    # Reverse index to orient it as a CTD cast.
+    up = df.iloc[idx:][::-1]
+    return down, up
+
+
+@register_series_method
 def despike(series, n1=2, n2=20, block=100, keep=0):
     """
     Wild Edit Seabird-like function.  Passes with Standard deviation
@@ -150,21 +161,6 @@ def bindata(df, delta=1.0, method="average"):
 
 
 @register_series_method
-@register_dataframe_method
-def split(df):
-    """Returns a tuple with down/up-cast."""
-    down = df.iloc[: df.index.argmax()]
-    up = df.iloc[df.index.argmax() :][::-1]  # Reverse up index.
-    return down, up
-
-
-@register_series_method
-def movingaverage(series, window_size=48):
-    window = np.ones(int(window_size)) / float(window_size)
-    return pd.Series(np.convolve(series, window, "same"), index=series.index)
-
-
-@register_series_method
 def smooth(series, window_len=11, window="hanning"):
     """Smooth the data using a window with requested size."""
 
@@ -197,3 +193,9 @@ def smooth(series, window_len=11, window="hanning"):
     data = np.convolve(w / w.sum(), s, mode="same")
     data = data[window_len - 1 : -window_len + 1]
     return pd.Series(data, index=series.index, name=series.name)
+
+
+@register_series_method
+def movingaverage(series, window_size=48):
+    window = np.ones(int(window_size)) / float(window_size)
+    return pd.Series(np.convolve(series, window, "same"), index=series.index)

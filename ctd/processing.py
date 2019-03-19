@@ -22,43 +22,14 @@ def remove_above_water(df):
 
 
 @register_series_method
-def despike(series, n1=2, n2=20, block=100, keep=0):
-    """
-    Wild Edit Seabird-like function.  Passes with Standard deviation
-    `n1` and `n2` with window size `block`.
-
-    """
-
-    data = series.values.astype(float).copy()
-    roll = _rolling_window(data, block)
-    roll = ma.masked_invalid(roll)
-    std = n1 * roll.std(axis=1)
-    mean = roll.mean(axis=1)
-    # Use the last value to fill-up.
-    std = np.r_[std, np.tile(std[-1], block - 1)]
-    mean = np.r_[mean, np.tile(mean[-1], block - 1)]
-    mask = np.abs(data - mean.filled(fill_value=np.NaN)) > std.filled(
-        fill_value=np.NaN
-    )
-    data[mask] = np.NaN
-
-    # Pass two recompute the mean and std without the flagged values from pass
-    # one and removed the flagged data.
-    roll = _rolling_window(data, block)
-    roll = ma.masked_invalid(roll)
-    std = n2 * roll.std(axis=1)
-    mean = roll.mean(axis=1)
-    # Use the last value to fill-up.
-    std = np.r_[std, np.tile(std[-1], block - 1)]
-    mean = np.r_[mean, np.tile(mean[-1], block - 1)]
-    values = series.values.astype(float)
-    mask = np.abs(values - mean.filled(fill_value=np.NaN)) > std.filled(
-        fill_value=np.NaN
-    )
-
-    clean = series.astype(float).copy()
-    clean[mask] = np.NaN
-    return clean
+@register_dataframe_method
+def split(df):
+    """Returns a tuple with down/up-cast."""
+    idx = df.index.argmax() + 1
+    down = df.iloc[:idx]
+    # Reverse index to orient it as a CTD cast.
+    up = df.iloc[idx:][::-1]
+    return down, up
 
 
 @register_series_method
@@ -150,18 +121,43 @@ def bindata(df, delta=1.0, method="average"):
 
 
 @register_series_method
-@register_dataframe_method
-def split(df):
-    """Returns a tuple with down/up-cast."""
-    down = df.iloc[: df.index.argmax()]
-    up = df.iloc[df.index.argmax() :][::-1]  # Reverse up index.
-    return down, up
+def despike(series, n1=2, n2=20, block=100, keep=0):
+    """
+    Wild Edit Seabird-like function.  Passes with Standard deviation
+    `n1` and `n2` with window size `block`.
 
+    """
 
-@register_series_method
-def movingaverage(series, window_size=48):
-    window = np.ones(int(window_size)) / float(window_size)
-    return pd.Series(np.convolve(series, window, "same"), index=series.index)
+    data = series.values.astype(float).copy()
+    roll = _rolling_window(data, block)
+    roll = ma.masked_invalid(roll)
+    std = n1 * roll.std(axis=1)
+    mean = roll.mean(axis=1)
+    # Use the last value to fill-up.
+    std = np.r_[std, np.tile(std[-1], block - 1)]
+    mean = np.r_[mean, np.tile(mean[-1], block - 1)]
+    mask = np.abs(data - mean.filled(fill_value=np.NaN)) > std.filled(
+        fill_value=np.NaN
+    )
+    data[mask] = np.NaN
+
+    # Pass two recompute the mean and std without the flagged values from pass
+    # one and removed the flagged data.
+    roll = _rolling_window(data, block)
+    roll = ma.masked_invalid(roll)
+    std = n2 * roll.std(axis=1)
+    mean = roll.mean(axis=1)
+    # Use the last value to fill-up.
+    std = np.r_[std, np.tile(std[-1], block - 1)]
+    mean = np.r_[mean, np.tile(mean[-1], block - 1)]
+    values = series.values.astype(float)
+    mask = np.abs(values - mean.filled(fill_value=np.NaN)) > std.filled(
+        fill_value=np.NaN
+    )
+
+    clean = series.astype(float).copy()
+    clean[mask] = np.NaN
+    return clean
 
 
 @register_series_method
@@ -197,3 +193,9 @@ def smooth(series, window_len=11, window="hanning"):
     data = np.convolve(w / w.sum(), s, mode="same")
     data = data[window_len - 1 : -window_len + 1]
     return pd.Series(data, index=series.index, name=series.name)
+
+
+@register_series_method
+def movingaverage(series, window_size=48):
+    window = np.ones(int(window_size)) / float(window_size)
+    return pd.Series(np.convolve(series, window, "same"), index=series.index)

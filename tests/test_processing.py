@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 import pytest
 
 import ctd
@@ -9,56 +10,67 @@ data_path = Path(__file__).parent.joinpath("data")
 
 
 @pytest.fixture
-def spiked_ctd():
-    yield ctd.from_cnv(data_path.joinpath("CTD-spiked-unfiltered.cnv.bz2"))
+def series():
+    index = np.r_[np.linspace(-5, 10, 20), np.linspace(10, -5, 20)]
+    yield pd.Series(data=np.arange(len(index)), index=index)
 
 
 @pytest.fixture
-def filtered_ctd():
-    yield ctd.from_cnv(data_path.joinpath("CTD-spiked-filtered.cnv.bz2"))
+def df():
+    index = np.r_[np.linspace(-5, 10, 20), np.linspace(10, -5, 20)]
+    yield pd.DataFrame(data=np.arange(len(index)), index=index)
 
 
-# Split.
-def test_split_return_tuple(spiked_ctd):
-    raw = spiked_ctd.split()
-    assert isinstance(raw, tuple)
+def test_remove_above_water_series(series):
+    assert any(series.index < 0)
+    assert not any(series.remove_above_water().index < 0)
 
 
-def test_split_cnv(spiked_ctd):
-    downcast, upcast = spiked_ctd.split()
-    assert downcast.index.size + upcast.index.size == spiked_ctd.index.size
+def test_remove_above_water_df(df):
+    assert any(df.index < 0)
+    assert not any(df.remove_above_water().index < 0)
 
 
-# Despike.
-def test_despike(filtered_ctd):
-    # Looking at downcast only.
-    dirty = filtered_ctd["c0S/m"].split()[0]
-    clean = dirty.despike(n1=2, n2=20, block=500)
-    spikes = clean.isnull()
-    equal = (dirty[~spikes] == clean[~spikes]).all()
-    assert spikes.any() and equal
+def test_split_series(series):
+    splitted = series.split()
+    down, up = splitted
+    assert isinstance(splitted, tuple)
+    assert series.equals(pd.concat([down, up[::-1]]))
 
 
-# Filter.
-def test_lp_filter(spiked_ctd, filtered_ctd):
-    kw = {"sample_rate": 24.0, "time_constant": 0.15}
-    expected = filtered_ctd.index.values
-    filtered = spiked_ctd.lp_filter(**kw).index
-    # Caveat: Not really a good test...
-    np.testing.assert_almost_equal(filtered, expected, decimal=1)
+def test_split_df(df):
+    splitted = df.split()
+    down, up = splitted
+    assert isinstance(splitted, tuple)
+    assert df.equals(pd.concat([down, up[::-1]]))
 
 
-# Pressure check.
-def test_press_check(spiked_ctd):
-    unchecked = spiked_ctd["t090C"]
-    press_checked = unchecked.press_check()
-    reversals = press_checked.isnull()
-    equal = (unchecked[~reversals] == press_checked[~reversals]).all()
-    assert reversals.any() and equal
+def test_press_check_series(series):
+    # reverse 7th and 9th and confirm they are removed after the `press_check`.
+    index = [0, 1, 2, 3, 4, 5, 7, 6, 9, 8, 10]
+    series = pd.Series(data=np.random.randn(len(index)), index=index)
+    series = series.press_check()
+    assert np.isnan(series.iloc[7])
+    assert np.isnan(series.iloc[9])
 
 
-def test_bindata(filtered_ctd):
+def test_press_check_df(df):
+    # reverse 7th and 9th and confirm they are removed after the `press_check`.
+    index = [0, 1, 2, 3, 4, 5, 7, 6, 9, 8, 10]
+    arr = np.random.randn(len(index))
+    df = pd.DataFrame(data=np.c_[arr, arr], index=index)
+    df = df.press_check()
+    assert np.isnan(df.iloc[7]).all()
+    assert np.isnan(df.iloc[9]).all()
+
+
+def test_bindata(series):
     delta = 1.0
-    down = filtered_ctd["t090C"].split()[0]
-    down = down.bindata(delta=delta)
-    assert np.unique(np.diff(down.index.values)) == delta
+    index = series.remove_above_water().split()[0].bindata(delta=delta).index
+    assert all(index.values == np.arange(0, 9, delta))
+    assert np.unique(np.diff(index.values)) == delta
+
+    delta = 2
+    index = series.remove_above_water().split()[0].bindata(delta=delta).index
+    assert all(index.values == np.arange(0, 9 - delta, delta))
+    assert np.unique(np.diff(index.values)) == delta

@@ -9,7 +9,7 @@ addons:
 
 env:
   global:
-    - secure: "HmQVTgIORmOdQCInEJ5b62zsFXOYUfeNChkdmxbsL8N6eUj+QEXRLkZvedUHinzCjRRG38kkXPtp6EpUgv19bEO+0A3WCNqCP7Eqy0WwasjTGxC8QRX5ZBjpojPNlT7COCdFpTCBf/w/kTLM5xT9SH01uUF8ETpfBtF057VkP+0="lfkVl2pv95UMOXmtlBxYOr9H/QCwWEezWH4lfmvKR8f4="
+    - secure: "Tlgd7sOn9XoITQ69wWen9XLLzVqz8IXKtA4B+KXaRP6vTliP6XPrEDldOrOkNYwQFE7P5p57H3irp2fMLIsvxd2JEuN17i+6flB5JrBX+YmVV6tQ/DdDHUUc55CmO1bJefNpWK3kc/Z3TXdKA1k881sTGe/0BHTHV73CYj9ARrs="
 
 before_script:
   - "export DISPLAY=:99.0"

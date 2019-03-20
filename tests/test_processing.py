@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-import ctd
+import ctd  # noqa
 
 data_path = Path(__file__).parent.joinpath("data")
 

@@ -1,8 +1,6 @@
 import matplotlib.pyplot as plt
-import mpl_toolkits.axisartist as AA
 import numpy as np
 import numpy.ma as ma
-from mpl_toolkits.axes_grid1 import host_subplot
 from pandas import Series
 
 
@@ -140,46 +138,6 @@ def gen_topomask(h, lon, lat, dx=1.0, kind="linear", plot=False):
     hm = Ih(xm)
 
     return xm, hm
-
-
-def plot_vars(self, variables=None, **kwds):
-    """
-    Plot CTD temperature and salinity.
-    """
-    fig = plt.figure(figsize=(8, 10))
-    ax0 = host_subplot(111, axes_class=AA.Axes)
-    ax1 = ax0.twiny()
-
-    # Axis location.
-    host_new_axis = ax0.get_grid_helper().new_fixed_axis
-    ax0.axis["bottom"] = host_new_axis(loc="top", axes=ax0, offset=(0, 0))
-    par_new_axis = ax1.get_grid_helper().new_fixed_axis
-    ax1.axis["top"] = par_new_axis(loc="bottom", axes=ax1, offset=(0, 0))
-
-    ax0.plot(self[variables[0]], self.index, "r.", label="Temperature")
-    ax1.plot(self[variables[1]], self.index, "b.", label="Salinity")
-
-    ax0.set_ylabel("Pressure [dbar]")
-    ax0.set_xlabel("Temperature [\u00b0C]")
-    ax1.set_xlabel("Salinity [kg g$^{-1}$]")
-    ax1.invert_yaxis()
-
-    try:
-        fig.suptitle(r"Station %s profile" % self.name)
-    except AttributeError:
-        pass
-
-    ax0.legend(shadow=True, fancybox=True, numpoints=1, loc="lower right")
-
-    offset = 0.01
-    x1, x2 = ax0.get_xlim()[0] - offset, ax0.get_xlim()[1] + offset
-    ax0.set_xlim(x1, x2)
-
-    offset = 0.01
-    x1, x2 = ax1.get_xlim()[0] - offset, ax1.get_xlim()[1] + offset
-    ax1.set_xlim(x1, x2)
-
-    return fig, (ax0, ax1)
 
 
 def plot_section(self, reverse=False, filled=False, **kw):
@@ -329,22 +287,3 @@ def barrier_layer_thickness(SA, CT):
     d_sig = sigma_theta - sig_bottom_mld
     mask = d_sig < d_sig_t  # Barrier layer.
     return Series(mask, index=SA.index, name="BLT")
-
-
-def derive_cnv(df):
-    """Compute SP, SA, CT, z, and GP from a cnv pre-processed cast."""
-    import gsw
-
-    cast = df.copy()
-    p = cast.index.values.astype(float)
-    cast["SP"] = gsw.SP_from_C(
-        cast["c0S/m"].values * 10.0, cast["t090C"].values, p
-    )
-    cast["SA"] = gsw.SA_from_SP(
-        cast["SP"].values, p, df._metadata["lon"], df._metadata["lat"]
-    )
-    cast["SR"] = gsw.SR_from_SP(cast["SP"].values)
-    cast["CT"] = gsw.CT_from_t(cast["SA"].values, cast["t090C"].values, p)
-    cast["z"] = -gsw.z_from_p(p, df._metadata["lat"])
-    cast["sigma0_CT"] = gsw.sigma0(cast["SA"].values, cast["CT"].values)
-    return cast

@@ -20,17 +20,19 @@ install:
 
     # Add path, activate `conda` and update conda.
     - cmd: call %CONDA_INSTALL_LOCN%\Scripts\activate.bat
+
     - cmd: conda config --set always_yes yes --set changeps1 no --set show_channel_urls true
-    # - cmd: conda update conda --quiet
-    - cmd: conda install conda<4.6
+    - cmd: conda update conda --quiet
+    - cmd: conda install pycryptosat --quiet
     - cmd: conda config --add channels conda-forge --force
+    - cmd: conda config --set sat_solver pycryptosat
+    - cmd: conda config --set channel_priority strict
+    - cmd: conda config --set safety_checks disabled
 
     - cmd: set PYTHONUNBUFFERED=1
 
     - cmd: conda create --name TEST python=%PY% --file requirements.txt --file requirements-dev.txt
     - cmd: conda activate TEST
-    - cmd: conda info --all
-    - cmd: conda list
 
 # Skip .NET project specific build phase.
 build: off

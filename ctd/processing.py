@@ -18,7 +18,8 @@ def _rolling_window(data, block):
 @register_series_method
 @register_dataframe_method
 def remove_above_water(df):
-    return df[df.index >= 0]
+    new_df = df.copy()
+    return new_df[new_df.index >= 0]
 
 
 @register_series_method
@@ -69,8 +70,9 @@ def lp_filter(df, sample_rate=24.0, time_constant=0.15):
     # Butter is closer to what SBE is doing with their cosine filter.
     Wn = (1.0 / time_constant) / (sample_rate * 2.0)
     b, a = signal.butter(2, Wn, "low")
-    df.index = signal.filtfilt(b, a, df.index.values)
-    return df
+    new_df = df.copy()
+    new_df.index = signal.filtfilt(b, a, df.index.values)
+    return new_df
 
 
 @register_series_method
@@ -80,7 +82,8 @@ def press_check(df):
     Remove pressure reversals from the index.
 
     """
-    press = df.copy().index.values.astype(float)
+    new_df = df.copy()
+    press = new_df.copy().index.values
 
     ref = press[0]
     inversions = np.diff(np.r_[press, press[-1]]) < 0
@@ -90,8 +93,8 @@ def press_check(df):
             ref = press[k]
             cut = press[k + 1 :] < ref
             mask[k + 1 :][cut] = True
-    df[mask] = np.NaN
-    return df
+    new_df[mask] = np.NaN
+    return new_df
 
 
 @register_series_method
@@ -107,8 +110,8 @@ def bindata(df, delta=1.0, method="average"):
     new_index = np.arange(start, stop, delta)
     binned = pd.cut(df.index, bins=new_index)
     if method == "average":
-        newdf = df.groupby(binned).mean()
-        newdf.index = new_index[:-1]
+        new_df = df.groupby(binned).mean()
+        new_df.index = new_index[:-1]
     elif method == "interpolate":
         raise NotImplementedError(
             "Bin-average via interpolation method is not Implemented yet."
@@ -117,11 +120,10 @@ def bindata(df, delta=1.0, method="average"):
         raise ValueError(
             f"Expected method `average` or `interpolate`, but got {method}."
         )
-    return newdf
+    return new_df
 
 
-@register_series_method
-def despike(series, n1=2, n2=20, block=100, keep=0):
+def _despike(series, n1, n2, block, keep):
     """
     Wild Edit Seabird-like function.  Passes with Standard deviation
     `n1` and `n2` with window size `block`.
@@ -161,7 +163,21 @@ def despike(series, n1=2, n2=20, block=100, keep=0):
 
 
 @register_series_method
-def smooth(series, window_len=11, window="hanning"):
+@register_dataframe_method
+def despike(df, n1=2, n2=20, block=100, keep=0):
+    """
+    Wild Edit Seabird-like function.  Passes with Standard deviation
+    `n1` and `n2` with window size `block`.
+
+    """
+    if isinstance(df, pd.Series):
+        new_df = _despike(df, n1=n1, n2=n2, block=block, keep=keep)
+    else:
+        new_df = df.apply(_despike, n1=n1, n2=n2, block=block, keep=keep)
+    return new_df
+
+
+def _smooth(series, window_len, window):
     """Smooth the data using a window with requested size."""
 
     windows = {
@@ -196,6 +212,26 @@ def smooth(series, window_len=11, window="hanning"):
 
 
 @register_series_method
-def movingaverage(series, window_size=48):
+@register_dataframe_method
+def smooth(df, window_len=11, window="hanning"):
+    """Smooth the data using a window with requested size."""
+    if isinstance(df, pd.Series):
+        new_df = _smooth(df, window_len=window_len, window=window)
+    else:
+        new_df = df.apply(_smooth, window_len=window_len, window=window)
+    return new_df
+
+
+def _movingaverage(series, window_size=48):
     window = np.ones(int(window_size)) / float(window_size)
     return pd.Series(np.convolve(series, window, "same"), index=series.index)
+
+
+@register_series_method
+@register_dataframe_method
+def movingaverage(df, window_size=48):
+    if isinstance(df, pd.Series):
+        new_df = _movingaverage(df, window_size=window_size)
+    else:
+        new_df = df.apply(_movingaverage, window_size=window_size)
+    return new_df

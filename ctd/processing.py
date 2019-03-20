@@ -61,7 +61,7 @@ def lp_filter(df, sample_rate=24.0, time_constant=0.15):
 
     Notes
     -----
-    http://wiki.scipy.org/Cookbook/FIRFilter
+    https://scipy-cookbook.readthedocs.io/items/FIRFilter.html
 
     """
 

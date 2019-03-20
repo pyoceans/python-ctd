@@ -1,9 +1,20 @@
+language: python
+
+sudo: false
+
+addons:
+  apt:
+    packages:
+      - xvfb
+
+env:
+  global:
+    - secure: "Z3aC0JHckMn+NzP/718YkV/CPbvChc7cGuNS0z9WdpU6wVNnM9is1noomDbn/FKJz4DCEsPNEyHvRsn6KueXoh1+P+cJgWkue/1bqY7VdxmUDNGJzbTezarHwbMl+GsYd1/HCUZvnftNClvQKWT+EMO7zxMY/H770mVAqwKMfOk="
+
 before_script:
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
   - sleep 5 # give xvfb some time to start
-
-language: python
 
 matrix:
   fast_finish: true
@@ -14,16 +25,24 @@ matrix:
       env: PY=3.7
     - name: "coding_standards"
       env: PY=3.7
+    - name: "docs"
+      env: PY=3.7
 
 before_install:
-  - wget http://bit.ly/miniconda -O miniconda.sh
-  - bash miniconda.sh -b -p $HOME/miniconda
-  - export PATH="$HOME/miniconda/bin:$PATH"
-  - conda config --set always_yes yes --set changeps1 no --set show_channel_urls true
-  - conda update conda --quiet
-  - conda config --add channels conda-forge --force
-  - conda create --name TEST python=$PY --file requirements.txt --file requirements-dev.txt
-  - source activate TEST
+  # Install miniconda and create TEST env.
+  - |
+    wget http://bit.ly/miniconda -O miniconda.sh
+    bash miniconda.sh -b -p $HOME/miniconda
+    export PATH="$HOME/miniconda/bin:$PATH"
+    conda config --set always_yes yes --set changeps1 no --set show_channel_urls true
+    conda update conda --quiet
+    conda install pycryptosat --quiet
+    conda config --add channels conda-forge --force
+    conda config --set sat_solver pycryptosat
+    conda config --set channel_priority strict
+    conda config --set safety_checks disabled
+    conda create --name TEST python=$PY --file requirements.txt --file requirements-dev.txt
+    source activate TEST
 
 # Test source distribution.
 install:
@@ -39,6 +58,33 @@ script:
       pytest -s -rxs --doctest-modules -vv ctd ;
     fi
 
-  - if [[ $TEST_TARGET == 'coding_standards' ]]; then
+  - if [[ $TRAVIS_JOB_NAME == 'coding_standards' ]]; then
       pytest --flake8 -m flake8 ;
     fi
+
+  - if [[ $TRAVIS_JOB_NAME == 'docs' ]]; then
+      set -e ;
+      cp notebooks/quick_intro.ipynb docs/source/ ;
+      pushd docs ;
+      make clean html linkcheck ;
+      popd ;
+      python -m doctr deploy --built-docs docs/build/html . ;
+    fi
+
+doctr:
+  require-master: true
+  sync: false
+
+deploy:
+  skip_cleanup: true
+  provider: pypi
+  user: ocefpaf
+  password:
+    secure: "PQK/Hsl7DrIG4ZE6cpGJ4C8xOiI3bDw12Ont5RIgdMgPbqj+QZAMN88mUdv7EZvGRI8QQSWMF+y4Ehji1KZotRMGHTfBK2oP8zqAP4LXF83u2d8fBizyuyO8ni51mMPXDKNrtjmzr6Ei0ov9anPc4CastdZEkiJ+85sTcD8Lp2o="
+  distributions: sdist bdist_wheel
+  upload_docs: no
+  on:
+    repo: pyoceans/python-ctd
+    tags: true
+    all_branches: master
+    condition: '$TRAVIS_JOB_NAME == "default"'

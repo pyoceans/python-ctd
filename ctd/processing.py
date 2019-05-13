@@ -97,6 +97,24 @@ def press_check(df):
     return new_df
 
 
+def _bindata(series, delta, method):
+    start = np.ceil(series.index[0])
+    stop = np.floor(series.index[-1])
+    new_index = np.arange(start, stop, delta)
+    binned = pd.cut(series.index, bins=new_index)
+    if method == "average":
+        new_series = series.groupby(binned).mean()
+        new_series.index = new_index[:-1] + delta / 2
+    elif method == "interpolate":
+        data = np.interp(new_index, series.index, series)
+        return pd.Series(data, index=new_index, name=series.name)
+    else:
+        raise ValueError(
+            f"Expected method `average` or `interpolate`, but got {method}."
+        )
+    return new_series
+
+
 @register_series_method
 @register_dataframe_method
 def bindata(df, delta=1.0, method="average"):
@@ -105,21 +123,10 @@ def bindata(df, delta=1.0, method="average"):
     delta = 1).
 
     """
-    start = np.floor(df.index[0])
-    stop = np.ceil(df.index[-1])
-    new_index = np.arange(start, stop, delta)
-    binned = pd.cut(df.index, bins=new_index)
-    if method == "average":
-        new_df = df.groupby(binned).mean()
-        new_df.index = new_index[:-1]
-    elif method == "interpolate":
-        raise NotImplementedError(
-            "Bin-average via interpolation method is not Implemented yet."
-        )
+    if isinstance(df, pd.Series):
+        new_df = _bindata(df, delta=delta, method=method)
     else:
-        raise ValueError(
-            f"Expected method `average` or `interpolate`, but got {method}."
-        )
+        new_df = df.apply(_bindata, delta=delta, method=method)
     return new_df
 
 

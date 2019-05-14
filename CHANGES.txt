@@ -4,6 +4,7 @@ Changelog
 Version 1.0.0
 
 * Major re-factor to use `pandas_flavor` instead of Monkey Patching.
+* Added bindata via interpolation.
 
 Version 0.4.0
 
@@ -28,7 +29,7 @@ Version 0.2.2
 
 * Support for different searbird `cnv` pressure spellings ('prDM' and 'prdM')
   thanks @j08lue.
-* Lazy import for optinal dependencies (`gsw` and `scipy`).
+* Lazy import for optional dependencies (`gsw` and `scipy`).
 * Several small bug fixes.
 
 Version 0.2.1

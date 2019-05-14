@@ -1,12 +1,8 @@
-from pathlib import Path
-
 import numpy as np
 import pandas as pd
 import pytest
 
 import ctd  # noqa
-
-data_path = Path(__file__).parent.joinpath("data")
 
 
 @pytest.fixture
@@ -64,13 +60,13 @@ def test_press_check_df(df):
     assert np.isnan(df.iloc[9]).all()
 
 
-def test_bindata(series):
+def test_bindata_average(series):
     delta = 1.0
     index = series.remove_above_water().split()[0].bindata(delta=delta).index
-    assert all(index.values == np.arange(0, 9, delta))
+    assert all(index.values == np.arange(1, 9, delta) + delta / 2)
     assert np.unique(np.diff(index.values)) == delta
 
     delta = 2
     index = series.remove_above_water().split()[0].bindata(delta=delta).index
-    assert all(index.values == np.arange(0, 9 - delta, delta))
+    assert all(index.values == np.arange(1, 9, delta) + delta / 2)
     assert np.unique(np.diff(index.values)) == delta

@@ -1,4 +1,5 @@
 import bz2
+import collections
 import gzip
 import linecache
 import re
@@ -67,6 +68,24 @@ def _read_file(fname):
     # Read as bytes but we need to return strings for the parsers.
     text = contents.decode(encoding="utf-8", errors="replace")
     return StringIO(text)
+
+
+def _remane_duplicate_columns(names):
+    items = collections.Counter(names).items()
+    dup = []
+    for item, count in items:
+        if count > 2:
+            raise ValueError(
+                f"Cannot handle more than two duplicated columns. Found {count} for {item}."
+            )
+        if count > 1:
+            dup.append(item)
+
+    second_occurrences = [names[::-1].index(item) for item in dup]
+    for idx in second_occurrences:
+        idx += 1
+        names[idx] = f"{names[idx]}_"
+    return names
 
 
 def _parse_seabird(lines, ftype="cnv"):
@@ -144,7 +163,7 @@ def _parse_seabird(lines, ftype="cnv"):
         {
             "header": "\n".join(header),
             "config": "\n".join(config),
-            "names": names,
+            "names": _remane_duplicate_columns(names),
             "skiprows": skiprows,
             "time": time,
             "lon": lon,

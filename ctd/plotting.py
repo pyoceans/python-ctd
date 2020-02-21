@@ -5,23 +5,22 @@ from pandas_flavor import register_dataframe_method, register_series_method
 
 @register_series_method
 @register_dataframe_method
-def plot_cast(df, secondary_y=False, label=None, *args, **kwargs):
+def plot_cast(df, secondary_y=False, label=None, ax=None, *args, **kwargs):
     """
     Plot a CTD variable with the index in the y-axis instead of x-axis.
 
     """
 
-    ax = kwargs.pop("ax", None)
     fignums = plt.get_fignums()
     if ax is None and not fignums:
         ax = plt.axes()
         fig = ax.get_figure()
-        fig.set_size_inches((5.25, 6.75))
     else:
         ax = plt.gca()
         fig = plt.gcf()
 
-    figsize = kwargs.pop("figsize", fig.get_size_inches())
+    kwargs.setdefault("figsize", (5.25, 6.75))
+    figsize = kwargs.pop("figsize")
     fig.set_size_inches(figsize)
 
     y_inverted = False

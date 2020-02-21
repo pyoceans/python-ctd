@@ -28,7 +28,7 @@ def _normalize_names(name):
 
 
 def _open_compressed(fname):
-    extension = fname.suffix.lower()
+    extension = fname.suffix.casefold()
     if extension in [".gzip", ".gz"]:
         cfile = gzip.open(str(fname))
     elif extension == ".bz2":
@@ -56,7 +56,7 @@ def _read_file(fname):
     if not isinstance(fname, Path):
         fname = Path(fname).resolve()
 
-    extension = fname.suffix.lower()
+    extension = fname.suffix.casefold()
     if extension in [".gzip", ".gz", ".bz2", ".zip"]:
         contents = _open_compressed(fname)
     elif extension in [".cnv", ".edf", ".txt", ".ros", ".btl"]:
@@ -319,7 +319,7 @@ def from_edf(fname):
         else:
             header.append(line)
             if line.startswith("Field"):
-                col, unit = [l.strip().lower() for l in line.split(":")]
+                col, unit = [l.strip().casefold() for l in line.split(":")]
                 names.append(unit.split()[0])
         if line == "// Data":
             skiprows = k + 1

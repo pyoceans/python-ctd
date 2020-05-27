@@ -1,5 +1,4 @@
-include README.rst
 include *.txt
+include README.md
 recursive-include ctd *.py
-include versioneer.py
-include ctd/_version.py
+prune tests

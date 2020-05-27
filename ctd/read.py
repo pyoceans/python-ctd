@@ -351,7 +351,7 @@ def from_edf(fname):
     return df
 
 
-def from_cnv(fname):
+def from_cnv(fname, prname=None):
     """
     DataFrame constructor to open Seabird CTD CNV-ASCII format.
 
@@ -380,8 +380,11 @@ def from_cnv(fname):
     )
     f.close()
 
+
     key_set = False
-    prkeys = ["prDM", "prdM", "pr"]
+    prkeys = [
+      "prM ", "prE", "prDM", "pr50M", "pr50M1", "prSM", "prdM", "pr"
+    ]
     for prkey in prkeys:
         try:
             df.set_index(prkey, drop=True, inplace=True)
@@ -390,7 +393,7 @@ def from_cnv(fname):
             continue
     if not key_set:
         raise KeyError(
-            f"Could not find pressure field (supported names are {prkeys})."
+            f"Could not find pressure field (supported names are:{prkeys})."
         )
     df.index.name = "Pressure [dbar]"
 

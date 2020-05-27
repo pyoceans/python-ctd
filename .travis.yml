@@ -14,14 +14,18 @@ env:
 matrix:
   fast_finish: true
   include:
-    - name: "default"
+    - name: "python-3.6"
+      env: PY=3.6
+    - name: "python-3.7"
       env: PY=3.7
-    - name: "doctest"
-      env: PY=3.7
-    - name: "coding_standards"
-      env: PY=3.7
+    - name: "python-3.8"
+      env: PY=3.8
+    - name: "tarball"
+      env: PY=3
     - name: "docs"
-      env: PY=3.7
+      env: PY=3
+    - name: "doctest"
+      env: PY=3
 
 before_install:
   # Install miniconda and create TEST env.
@@ -39,22 +43,26 @@ before_install:
     conda create --name TEST python=$PY --file requirements.txt --file requirements-dev.txt
     source activate TEST
 
-# Test source distribution.
 install:
-  - python setup.py sdist && version=$(python setup.py --version) && pushd dist  && pip install --no-deps --force-reinstall ctd-${version}.tar.gz && popd
+  - pip install -e . --no-deps --force-reinstall
 
 script:
-  - if [[ $TRAVIS_JOB_NAME == "default" ]]; then
-      cp -r tests/ /tmp ;
-      pushd /tmp && pytest -n 2 -rxs --cov=ctd tests && popd ;
+  - |
+    if [[ $TRAVIS_JOB_NAME == python-* ]]; then
+      cp -r tests/ /tmp
+      pushd /tmp && pytest -n 2 -rxs --cov=ctd tests && popd
     fi
 
   - if [[ $TRAVIS_JOB_NAME == "doctest" ]]; then
       pytest -s -rxs --doctest-modules -vv ctd ;
     fi
 
-  - if [[ $TRAVIS_JOB_NAME == 'coding_standards' ]]; then
-      pytest --flake8 -m flake8 ;
+
+  - if [[ $TRAVIS_JOB_NAME == 'tarball' ]]; then
+      python setup.py --version ;
+      pip wheel . -w dist --no-deps ;
+      check-manifest --verbose ;
+      twine check dist/* ;
     fi
   
   - |
@@ -84,4 +92,4 @@ deploy:
     repo: pyoceans/python-ctd
     tags: true
     all_branches: master
-    condition: '$TRAVIS_JOB_NAME == "default"'
+    condition: '$TRAVIS_JOB_NAME == "tarball"'

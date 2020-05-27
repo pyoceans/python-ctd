@@ -366,7 +366,7 @@ def from_cnv(fname, prname=None):
 
     """
     f = _read_file(fname)
-    metadata = _parse_seabird(f.readlines(), ftype="cnv")
+    metadata = _parse_seabird(f.readlines())
 
     f.seek(0)
     df = pd.read_fwf(
@@ -393,7 +393,7 @@ def from_cnv(fname, prname=None):
             continue
     if not key_set:
         raise KeyError(
-            f"Could not find pressure field (supported names are:{prkeys})."
+            f"Could not find pressure field (supported names are {prkeys})."
         )
     df.index.name = "Pressure [dbar]"
 

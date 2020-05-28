@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.ma as ma
+
 from pandas import Series
 
 
@@ -17,9 +18,7 @@ def _extrap1d(interpolator):
         if x < xs[0]:
             return ys[0] + (x - xs[0]) * (ys[1] - ys[0]) / (xs[1] - xs[0])
         elif x > xs[-1]:
-            return ys[-1] + (x - xs[-1]) * (ys[-1] - ys[-2]) / (
-                xs[-1] - xs[-2]
-            )
+            return ys[-1] + (x - xs[-1]) * (ys[-1] - ys[-2]) / (xs[-1] - xs[-2])
         else:
             return interpolator(x)
 
@@ -143,9 +142,7 @@ def gen_topomask(h, lon, lat, dx=1.0, kind="linear", plot=False):
 def plot_section(self, reverse=False, filled=False, **kw):
     import gsw
 
-    lon, lat, data = list(
-        map(np.asanyarray, (self.lon, self.lat, self.values))
-    )
+    lon, lat, data = list(map(np.asanyarray, (self.lon, self.lat, self.values)))
     data = ma.masked_invalid(data)
     h = self.get_maxdepth()
     if reverse:
@@ -167,8 +164,7 @@ def plot_section(self, reverse=False, filled=False, **kw):
     labelsize = kw.pop("labelsize", 11)
     cmap = kw.pop("cmap", plt.cm.rainbow)
     levels = kw.pop(
-        "levels",
-        np.arange(np.floor(data.min()), np.ceil(data.max()) + 0.5, 0.5),
+        "levels", np.arange(np.floor(data.min()), np.ceil(data.max()) + 0.5, 0.5),
     )
 
     # Colorbar key words.
@@ -218,14 +214,7 @@ def plot_section(self, reverse=False, filled=False, **kw):
 
     # Color version.
     cs = ax.contourf(
-        x,
-        z,
-        data,
-        cmap=cmap,
-        levels=levels,
-        alpha=1.0,
-        extend=extend,
-        zorder=2,
+        x, z, data, cmap=cmap, levels=levels, alpha=1.0, extend=extend, zorder=2,
     )  # manual=True
     # Colorbar.
     cb = fig.colorbar(

@@ -61,6 +61,7 @@ author = "Filipe Fernandes"
 #
 from ctd import __version__ as VERSION
 
+
 version = VERSION
 # The full version, including alpha/beta/rc tags.
 release = VERSION

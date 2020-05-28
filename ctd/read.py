@@ -89,7 +89,7 @@ def _remane_duplicate_columns(names):
     return names
 
 
-def _parse_seabird(lines, ftype="cnv"):
+def _parse_seabird(lines, ftype):
     # Initialize variables.
     lon = lat = time = None, None, None
     skiprows = 0
@@ -367,7 +367,7 @@ def from_cnv(fname):
 
     """
     f = _read_file(fname)
-    metadata = _parse_seabird(f.readlines())
+    metadata = _parse_seabird(f.readlines(), ftype="cnv")
 
     f.seek(0)
     df = pd.read_fwf(

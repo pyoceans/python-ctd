@@ -1,4 +1,3 @@
-from ._version import get_versions  # noqa
 from .core import CTD as _CTD  # noqa
 from .plotting import plot_cast
 from .processing import (
@@ -11,17 +10,13 @@ from .processing import (
     smooth,
     split,
 )
-from .read import (
-    from_bl,
-    from_btl,
-    from_cnv,
-    from_edf,
-    from_fsi,
-    rosette_summary,
-)
+from .read import from_bl, from_btl, from_cnv, from_edf, from_fsi, rosette_summary
 
-__version__ = get_versions()["version"]
-del get_versions
+
+try:
+    from ._version import __version__
+except ImportError:
+    __version__ = "unknown"
 
 
 __all__ = [

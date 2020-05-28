@@ -1,6 +1,7 @@
 import numpy as np
 import numpy.ma as ma
 import pandas as pd
+
 from pandas_flavor import register_dataframe_method, register_series_method
 
 
@@ -145,9 +146,7 @@ def _despike(series, n1, n2, block, keep):
     # Use the last value to fill-up.
     std = np.r_[std, np.tile(std[-1], block - 1)]
     mean = np.r_[mean, np.tile(mean[-1], block - 1)]
-    mask = np.abs(data - mean.filled(fill_value=np.NaN)) > std.filled(
-        fill_value=np.NaN
-    )
+    mask = np.abs(data - mean.filled(fill_value=np.NaN)) > std.filled(fill_value=np.NaN)
     data[mask] = np.NaN
 
     # Pass two recompute the mean and std without the flagged values from pass

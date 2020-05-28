@@ -6,7 +6,9 @@ import pandas as pd
 import pytest
 
 import ctd
+
 from ctd.read import _read_file
+
 
 data_path = Path(__file__).parent.joinpath("data")
 

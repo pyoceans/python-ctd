@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+
 from pandas_flavor import register_dataframe_method, register_series_method
 
 

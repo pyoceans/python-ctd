@@ -5,6 +5,7 @@ import linecache
 import re
 import warnings
 import zipfile
+
 from datetime import datetime
 from io import StringIO
 from pathlib import Path
@@ -319,7 +320,7 @@ def from_edf(fname):
         else:
             header.append(line)
             if line.startswith("Field"):
-                col, unit = [l.strip().casefold() for l in line.split(":")]
+                col, unit = [ln.strip().casefold() for ln in line.split(":")]
                 names.append(unit.split()[0])
         if line == "// Data":
             skiprows = k + 1
@@ -351,7 +352,7 @@ def from_edf(fname):
     return df
 
 
-def from_cnv(fname, prname=None):
+def from_cnv(fname):
     """
     DataFrame constructor to open Seabird CTD CNV-ASCII format.
 
@@ -380,11 +381,8 @@ def from_cnv(fname, prname=None):
     )
     f.close()
 
-
     key_set = False
-    prkeys = [
-      "prM ", "prE", "prDM", "pr50M", "pr50M1", "prSM", "prdM", "pr"
-    ]
+    prkeys = ["prM ", "prE", "prDM", "pr50M", "pr50M1", "prSM", "prdM", "pr"]
     for prkey in prkeys:
         try:
             df.set_index(prkey, drop=True, inplace=True)
@@ -392,9 +390,7 @@ def from_cnv(fname, prname=None):
         except KeyError:
             continue
     if not key_set:
-        raise KeyError(
-            f"Could not find pressure field (supported names are {prkeys})."
-        )
+        raise KeyError(f"Could not find pressure field (supported names are {prkeys}).")
     df.index.name = "Pressure [dbar]"
 
     name = _basename(fname)[1]

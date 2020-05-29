@@ -381,16 +381,11 @@ def from_cnv(fname):
     )
     f.close()
 
-    key_set = False
     prkeys = ["prM ", "prE", "prDM", "pr50M", "pr50M1", "prSM", "prdM", "pr"]
-    for prkey in prkeys:
-        try:
-            df.set_index(prkey, drop=True, inplace=True)
-            key_set = True
-        except KeyError:
-            continue
-    if not key_set:
-        raise KeyError(f"Could not find pressure field (supported names are {prkeys}).")
+    prkey = [key for key in prkeys if key in df.columns]
+    if len(prkey) != 1:
+        raise ValueError(f"Expectd one pressure column, got {prkey}.")
+    df.set_index(prkey, drop=True, inplace=True)
     df.index.name = "Pressure [dbar]"
 
     name = _basename(fname)[1]

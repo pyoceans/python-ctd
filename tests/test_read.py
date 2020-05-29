@@ -107,5 +107,5 @@ def test_pressure_field_labels():
     for fname in sorted(data_path.glob("issue3prlabworks*.cnv")):
         ctd.from_cnv(fname)
     for fname in sorted(data_path.glob("issue3prlabfails*.cnv")):
-        with pytest.raises(KeyError):
+        with pytest.raises(ValueError):
             ctd.from_cnv(fname)

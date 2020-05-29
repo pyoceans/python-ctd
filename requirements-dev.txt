@@ -8,6 +8,7 @@ flake8-mutable
 flake8-print
 ipykernel
 isort
+jupyter
 jupyter_client
 mypy
 nbconvert

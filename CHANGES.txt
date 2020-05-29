@@ -1,6 +1,14 @@
 Changelog
 ---------
 
+Version 1.1.0
+
+* Added more SBE valid pressure names
+* Wrap matplotlib plots
+* Use case fold to avoid to standardize names
+* Support pandas >=1.0
+
+
 Version 1.0.0
 
 * Major re-factor to use `pandas_flavor` instead of Monkey Patching.

@@ -1,6 +1,6 @@
 # python-ctd
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11396.svg)](https://doi.org/10.5281/zenodo.11396) [![Build Status](https://travis-ci.org/pyoceans/python-ctd.svg?branch=master)](https://travis-ci.org/pyoceans/python-ctd) [![PyPI](https://img.shields.io/pypi/v/ctd.svg?style=plastic)](https://pypi.python.org/pypi/ctd) [![Build status](https://ci.appveyor.com/api/projects/status/m1wxtsb8gpm96i53?svg=true)](https://ci.appveyor.com/project/ocefpaf/python-ctd) [![License](http://img.shields.io/badge/license-BSD-blue.svg?style=flat)](https://github.com/pyoceans/python-ctd/blob/master/LICENSE.txt)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11396.svg)](https://doi.org/10.5281/zenodo.11396) [![Build Status](https://travis-ci.org/pyoceans/python-ctd.svg?branch=master)](https://travis-ci.org/pyoceans/python-ctd) [![PyPI](https://img.shields.io/pypi/v/ctd.svg?style=plastic)](https://pypi.python.org/pypi/ctd) [![Build status](https://ci.appveyor.com/api/projects/status/m1wxtsb8gpm96i53?svg=true)](https://ci.appveyor.com/project/ocefpaf/python-ctd) [![License](http://img.shields.io/badge/license-BSD--3--Clause-blue.svg?style=flat)](https://github.com/pyoceans/python-ctd/blob/master/LICENSE.txt)
 
 Tools to load hydrographic data as pandas DataFrame with some handy methods for
 data pre-processing and analysis

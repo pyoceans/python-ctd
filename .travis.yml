@@ -37,7 +37,6 @@ before_install:
     conda update conda --quiet
     conda install pycryptosat --quiet
     conda config --add channels conda-forge --force
-    conda config --set sat_solver pycryptosat
     conda config --set channel_priority strict
     conda config --set safety_checks disabled
     conda create --name TEST python=$PY --file requirements.txt --file requirements-dev.txt
@@ -50,7 +49,9 @@ script:
   - |
     if [[ $TRAVIS_JOB_NAME == python-* ]]; then
       cp -r tests/ /tmp
-      pushd /tmp && pytest -n 2 -rxs --cov=ctd tests && popd
+      pushd /tmp
+      pytest -n 2 -rxs --cov=ctd tests
+      popd
     fi
 
   - if [[ $TRAVIS_JOB_NAME == "doctest" ]]; then
@@ -80,14 +81,18 @@ script:
       fi
     fi
 
+doctr:
+  require-master: true
+  sync: false
+
 deploy:
   skip_cleanup: true
   provider: pypi
-  user: ocefpaf
+  user: "__token__"
   password:
-    secure: "PQK/Hsl7DrIG4ZE6cpGJ4C8xOiI3bDw12Ont5RIgdMgPbqj+QZAMN88mUdv7EZvGRI8QQSWMF+y4Ehji1KZotRMGHTfBK2oP8zqAP4LXF83u2d8fBizyuyO8ni51mMPXDKNrtjmzr6Ei0ov9anPc4CastdZEkiJ+85sTcD8Lp2o="
+    secure: "gX6IaIX82qVMA3tkcoDKaRPrWqDvqg2co53aIYFBIuSsMJuhFk/mKaL+9e0RzYIs00dQOd/4AfbiRgTq5jfmrePD6jmrm/toxzrtHbWPIa+psfhAx60fFH4BocuyjY/qdCF8FmEWdZa+ODzgkBXyidATkLt3W6XmsyLQ14l0wmY="
   distributions: sdist bdist_wheel
-  upload_docs: no
+  upload_docs: false
   on:
     repo: pyoceans/python-ctd
     tags: true

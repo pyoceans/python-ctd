@@ -90,7 +90,7 @@ deploy:
   provider: pypi
   user: "__token__"
   password:
-    secure: "gX6IaIX82qVMA3tkcoDKaRPrWqDvqg2co53aIYFBIuSsMJuhFk/mKaL+9e0RzYIs00dQOd/4AfbiRgTq5jfmrePD6jmrm/toxzrtHbWPIa+psfhAx60fFH4BocuyjY/qdCF8FmEWdZa+ODzgkBXyidATkLt3W6XmsyLQ14l0wmY="
+    secure: "MdQV2uZYrHZ8NAC3jSsEU9BVaYd5OCEvu5+NhglkBDUSLcrmr+dJni0c0BoMCh1D026ynNt1joVxk2euo1Rpbqa1jiMr5ADAvh1VdLjiqdAnr9TVy9dFVk85/qscnP3LWZ1DCiWorujFbSyObsU+grNwjxjvV+7NW0rXrpHNI+8="
   distributions: sdist bdist_wheel
   upload_docs: false
   on:

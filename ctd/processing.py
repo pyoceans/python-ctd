@@ -1,3 +1,7 @@
+"""
+Processing module
+"""
+
 import numpy as np
 import numpy.ma as ma
 import pandas as pd
@@ -19,6 +23,7 @@ def _rolling_window(data, block):
 @register_series_method
 @register_dataframe_method
 def remove_above_water(df):
+    """Remove all data above the water line."""
     return remove_up_to(df, idx=0)
 
 
@@ -27,6 +32,7 @@ def remove_above_water(df):
 def remove_up_to(df, idx):
     """
     Remove all the data above a certain index value where index can be pressure or depth.
+
     """
     new_df = df.copy()
     return new_df[new_df.index >= idx]
@@ -108,6 +114,7 @@ def press_check(df):
 
 
 def _bindata(series, delta, method):
+    """Average the data into bins of the size `delta`."""
     start = np.ceil(series.index[0])
     stop = np.floor(series.index[-1])
     new_index = np.arange(start, stop, delta)
@@ -238,6 +245,7 @@ def smooth(df, window_len=11, window="hanning"):
 
 
 def _movingaverage(series, window_size=48):
+    """Moving average function on a pandas series."""
     window = np.ones(int(window_size)) / float(window_size)
     return pd.Series(np.convolve(series, window, "same"), index=series.index)
 
@@ -245,6 +253,16 @@ def _movingaverage(series, window_size=48):
 @register_series_method
 @register_dataframe_method
 def movingaverage(df, window_size=48):
+    """
+    Moving average on a data frame or series.
+
+    Inputs
+    ------
+    windows_size : integer
+        Size of the window.
+
+    """
+
     if isinstance(df, pd.Series):
         new_df = _movingaverage(df, window_size=window_size)
     else:

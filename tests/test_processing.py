@@ -27,6 +27,18 @@ def test_remove_above_water_df(df):
     assert not any(df.remove_above_water().index < 0)
 
 
+def test_remove_up_to_series(series):
+    idx = 10
+    assert any(series.index < idx)
+    assert not any(series.remove_up_to(idx=idx).index < idx)
+
+
+def test_remove_up_to_df(df):
+    idx = 10
+    assert any(df.index < idx)
+    assert not any(df.remove_up_to(idx=idx).index < idx)
+
+
 def test_split_series(series):
     splitted = series.split()
     down, up = splitted

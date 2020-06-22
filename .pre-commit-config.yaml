@@ -13,6 +13,13 @@ repos:
     - id: file-contents-sorter
       files: requirements-dev.txt
 
+- repo: https://github.com/econchick/interrogate
+  rev: 1.2.0
+  hooks:
+    - id: interrogate
+      exclude: ^(docs|setup.py|tests)
+      args: [--config=pyproject.toml]
+
 - repo: https://gitlab.com/pycqa/flake8
   rev: 3.7.9
   hooks:
@@ -44,3 +51,10 @@ repos:
   - id: mypy
     exclude: docs/source/conf.py
     args: [--ignore-missing-imports]
+
+- repo: https://github.com/codespell-project/codespell
+  rev: v1.16.0
+  hooks:
+    - id: codespell
+      args:
+        - --ignore-words-list=pres,nd,te,afe,ue,wil,tey,te,ot,fo

@@ -1,3 +1,7 @@
+"""
+Extra functionality for plotting and post-processing.
+"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.ma as ma
@@ -7,14 +11,19 @@ from pandas import Series
 
 def _extrap1d(interpolator):
     """
-    http://stackoverflow.com/questions/2745329/
     How to make scipy.interpolate return an extrapolated result beyond the
     input range.
+
+    This is usually bad interpolation! But sometimes useful for pretty pictures,
+    use it with caution!
+
+    http://stackoverflow.com/questions/2745329/
 
     """
     xs, ys = interpolator.x, interpolator.y
 
     def pointwise(x):
+        """Pointwise interpolation."""
         if x < xs[0]:
             return ys[0] + (x - xs[0]) * (ys[1] - ys[0]) / (xs[1] - xs[0])
         elif x > xs[-1]:
@@ -23,12 +32,14 @@ def _extrap1d(interpolator):
             return interpolator(x)
 
     def ufunclike(xs):
+        """Return an interpolation ufunc."""
         return np.array(list(map(pointwise, np.array(xs))))
 
     return ufunclike
 
 
 def get_maxdepth(self):
+    """Return the maximum depth/pressure of a cast."""
     valid_last_depth = self.apply(Series.notnull).values.T
     return np.float_(self.index.values * valid_last_depth).max(axis=1)
 
@@ -140,6 +151,7 @@ def gen_topomask(h, lon, lat, dx=1.0, kind="linear", plot=False):
 
 
 def plot_section(self, reverse=False, filled=False, **kw):
+    """Plot a sequence of CTD casts as a section."""
     import gsw
 
     lon, lat, data = list(map(np.asanyarray, (self.lon, self.lat, self.values)))
@@ -250,6 +262,7 @@ def cell_thermal_mass(temperature, conductivity):
 
 
 def mixed_layer_depth(CT, method="half degree"):
+    """Return the mixed layer depth based on the "half degree" criteria."""
     if method == "half degree":
         mask = CT[0] - CT < 0.5
     else:

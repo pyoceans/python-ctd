@@ -40,16 +40,16 @@ def test_remove_up_to_df(df):
 
 
 def test_split_series(series):
-    splitted = series.split()
-    down, up = splitted
-    assert isinstance(splitted, tuple)
+    split = series.split()
+    down, up = split
+    assert isinstance(split, tuple)
     assert series.equals(pd.concat([down, up[::-1]]))
 
 
 def test_split_df(df):
-    splitted = df.split()
-    down, up = splitted
-    assert isinstance(splitted, tuple)
+    split = df.split()
+    down, up = split
+    assert isinstance(split, tuple)
     assert df.equals(pd.concat([down, up[::-1]]))
 
 

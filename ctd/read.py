@@ -1,3 +1,7 @@
+"""
+Read module
+"""
+
 import bz2
 import collections
 import gzip
@@ -23,12 +27,14 @@ def _basename(fname):
 
 
 def _normalize_names(name):
+    """Normalize column names."""
     name = name.strip()
     name = name.strip("*")
     return name
 
 
 def _open_compressed(fname):
+    """Open compressed gzip, gz, zip or bz2 files."""
     extension = fname.suffix.casefold()
     if extension in [".gzip", ".gz"]:
         cfile = gzip.open(str(fname))
@@ -54,6 +60,7 @@ def _open_compressed(fname):
 
 
 def _read_file(fname):
+    """Read file contents."""
     if not isinstance(fname, Path):
         fname = Path(fname).resolve()
 
@@ -72,6 +79,7 @@ def _read_file(fname):
 
 
 def _remane_duplicate_columns(names):
+    """Rename a column when it is duplicated."""
     items = collections.Counter(names).items()
     dup = []
     for item, count in items:
@@ -90,6 +98,7 @@ def _remane_duplicate_columns(names):
 
 
 def _parse_seabird(lines, ftype):
+    """Parse searbird formats."""
     # Initialize variables.
     lon = lat = time = None, None, None
     skiprows = 0
@@ -384,7 +393,7 @@ def from_cnv(fname):
     prkeys = ["prM ", "prE", "prDM", "pr50M", "pr50M1", "prSM", "prdM", "pr"]
     prkey = [key for key in prkeys if key in df.columns]
     if len(prkey) != 1:
-        raise ValueError(f"Expectd one pressure column, got {prkey}.")
+        raise ValueError(f"Expected one pressure column, got {prkey}.")
     df.set_index(prkey, drop=True, inplace=True)
     df.index.name = "Pressure [dbar]"
 

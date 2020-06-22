@@ -19,8 +19,17 @@ def _rolling_window(data, block):
 @register_series_method
 @register_dataframe_method
 def remove_above_water(df):
+    return remove_up_to(df, idx=0)
+
+
+@register_series_method
+@register_dataframe_method
+def remove_up_to(df, idx):
+    """
+    Remove all the data above a certain index value where index can be pressure or depth.
+    """
     new_df = df.copy()
-    return new_df[new_df.index >= 0]
+    return new_df[new_df.index >= idx]
 
 
 @register_series_method

@@ -35,10 +35,8 @@ before_install:
     export PATH="$HOME/miniconda/bin:$PATH"
     conda config --set always_yes yes --set changeps1 no --set show_channel_urls true
     conda update conda --quiet
-    conda install pycryptosat --quiet
     conda config --add channels conda-forge --force
     conda config --set channel_priority strict
-    conda config --set safety_checks disabled
     conda create --name TEST python=$PY --file requirements.txt --file requirements-dev.txt
     source activate TEST
 

@@ -14,6 +14,7 @@ from datetime import datetime
 from io import StringIO
 from pathlib import Path
 
+import gsw
 import numpy as np
 import pandas as pd
 
@@ -399,7 +400,7 @@ def from_cnv(fname):
     if prkey == "depSM":
         lat = metadata.get("lat", None)
         if lat is not None:
-            df.index = p_from_z(
+            df.index = gsw.p_from_z(
                 df.index, lat, geo_strf_dyn_height=0, sea_surface_geopotential=0
             )
         else:

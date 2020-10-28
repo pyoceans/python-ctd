@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+Version 1.2.0
+* Added `remove_up_to()` method to remove bad data at the beginning of a cast
+* Allow for data without pressure to be loaded and, if possible, create the pressure index
+
 Version 1.1.0
 
 * Added more SBE valid pressure names

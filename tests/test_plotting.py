@@ -8,7 +8,7 @@ import pytest
 import ctd
 
 
-matplotlib.use("Agg", warn=True)
+matplotlib.use("Agg")
 
 data_path = Path(__file__).parent.joinpath("data")
 

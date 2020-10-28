@@ -137,6 +137,7 @@ def gen_topomask(h, lon, lat, dx=1.0, kind="linear", plot=False):
     """
 
     import gsw
+
     from scipy.interpolate import interp1d
 
     h, lon, lat = list(map(np.asanyarray, (h, lon, lat)))
@@ -176,7 +177,8 @@ def plot_section(self, reverse=False, filled=False, **kw):
     labelsize = kw.pop("labelsize", 11)
     cmap = kw.pop("cmap", plt.cm.rainbow)
     levels = kw.pop(
-        "levels", np.arange(np.floor(data.min()), np.ceil(data.max()) + 0.5, 0.5),
+        "levels",
+        np.arange(np.floor(data.min()), np.ceil(data.max()) + 0.5, 0.5),
     )
 
     # Colorbar key words.
@@ -226,7 +228,14 @@ def plot_section(self, reverse=False, filled=False, **kw):
 
     # Color version.
     cs = ax.contourf(
-        x, z, data, cmap=cmap, levels=levels, alpha=1.0, extend=extend, zorder=2,
+        x,
+        z,
+        data,
+        cmap=cmap,
+        levels=levels,
+        alpha=1.0,
+        extend=extend,
+        zorder=2,
     )  # manual=True
     # Colorbar.
     cb = fig.colorbar(

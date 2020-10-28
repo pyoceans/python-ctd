@@ -14,6 +14,7 @@ from datetime import datetime
 from io import StringIO
 from pathlib import Path
 
+import gsw
 import numpy as np
 import pandas as pd
 
@@ -390,12 +391,24 @@ def from_cnv(fname):
     )
     f.close()
 
-    prkeys = ["prM ", "prE", "prDM", "pr50M", "pr50M1", "prSM", "prdM", "pr"]
+    prkeys = ["prM ", "prE", "prDM", "pr50M", "pr50M1", "prSM", "prdM", "pr", "depSM"]
     prkey = [key for key in prkeys if key in df.columns]
     if len(prkey) != 1:
-        raise ValueError(f"Expected one pressure column, got {prkey}.")
+        raise ValueError(f"Expected one pressure/depth column, got {prkey}.")
     df.set_index(prkey, drop=True, inplace=True)
     df.index.name = "Pressure [dbar]"
+    if prkey == "depSM":
+        lat = metadata.get("lat", None)
+        if lat is not None:
+            df.index = gsw.p_from_z(
+                df.index, lat, geo_strf_dyn_height=0, sea_surface_geopotential=0
+            )
+        else:
+            warnings.war(
+                f"Missing latitude information. Cannot compute pressure! Your index is {prkey}, "
+                "please compute pressure manually with `gsw.p_from_z` and overwrite your index."
+            )
+            df.index.name = prkey
 
     name = _basename(fname)[1]
 

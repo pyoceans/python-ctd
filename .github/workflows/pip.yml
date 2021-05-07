@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.7", "3.8", "3.9"]
-        os: [ubuntu-latest]
+        os: [windows-latest, ubuntu-latest, macos-latest]
 
     steps:
     - uses: actions/checkout@v2
@@ -19,15 +19,12 @@ jobs:
     - name: Setup python
       uses: actions/setup-python@v2
 
-    - name: Install proj
-      run: sudo apt-get install libgeos-dev libproj-dev
-
     - name: Python ${{ matrix.python-version }}
       run: |
-        pip install numpy cython
         pip install -r requirements.txt -r requirements-dev.txt
         pip install -e . --no-deps --force-reinstall
+
     - name: pip-tests
       run: |
-        pytest -rxs --cov=ctd tests
+        pytest -rxs Pip
         

@@ -35,4 +35,4 @@ jobs:
       shell: bash -l {0}
       run: |
         source activate TEST
-        pytest -rxs --cov=ctd tests
+        pytest -rxs tests

@@ -26,5 +26,4 @@ jobs:
 
     - name: pip-tests
       run: |
-        pytest -rxs --cov=ctd tests
-        
+        pytest -rxs tests

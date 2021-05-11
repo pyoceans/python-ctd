@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # ctd documentation build configuration file, created by
 # sphinx-quickstart on Mon Oct  9 21:28:42 2017.
@@ -60,7 +59,6 @@ author = "Filipe Fernandes"
 # built documents.
 #
 from ctd import __version__ as VERSION
-
 
 version = VERSION
 # The full version, including alpha/beta/rc tags.
@@ -124,7 +122,7 @@ html_sidebars = {
         "relations.html",  # needs 'show_related': True theme option to display
         "searchbox.html",
         "donate.html",
-    ]
+    ],
 }
 
 
@@ -161,7 +159,7 @@ latex_documents = [
         "ctd Documentation",
         "Filipe Fernandes",
         "manual",
-    )
+    ),
 ]
 
 
@@ -186,5 +184,5 @@ texinfo_documents = [
         "ctd",
         "One line description of project.",
         "Miscellaneous",
-    )
+    ),
 ]

@@ -7,7 +7,6 @@ import pytest
 
 import ctd
 
-
 matplotlib.use("Agg")
 
 data_path = Path(__file__).parent.joinpath("data")
@@ -19,13 +18,13 @@ def _assert_is_valid_plot_return_object(objs):
             assert isinstance(el, plt.Axes), (
                 "one of 'objs' is not a "
                 "matplotlib Axes instance, "
-                "type encountered {0!r}"
+                "type encountered {!r}"
                 "".format(el.__class__.__name__)
             )
     else:
         assert isinstance(objs, (plt.Artist, tuple, dict)), (
             "objs is neither an ndarray of Artist instances nor a "
-            'single Artist instance, tuple, or dict, "objs" is a {0!r} '
+            'single Artist instance, tuple, or dict, "objs" is a {!r} '
             "".format(objs.__class__.__name__)
         )
 

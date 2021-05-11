@@ -9,7 +9,6 @@ import linecache
 import re
 import warnings
 import zipfile
-
 from datetime import datetime
 from io import StringIO
 from pathlib import Path
@@ -52,8 +51,8 @@ def _open_compressed(fname):
     else:
         raise ValueError(
             "Unrecognized file extension. Expected .gzip, .bz2, or .zip, got {}".format(
-                extension
-            )
+                extension,
+            ),
         )
     contents = cfile.read()
     cfile.close()
@@ -72,7 +71,7 @@ def _read_file(fname):
         contents = fname.read_bytes()
     else:
         raise ValueError(
-            f"Unrecognized file extension. Expected .cnv, .edf, .txt, .ros, or .btl got {extension}"
+            f"Unrecognized file extension. Expected .cnv, .edf, .txt, .ros, or .btl got {extension}",
         )
     # Read as bytes but we need to return strings for the parsers.
     text = contents.decode(encoding="utf-8", errors="replace")
@@ -86,7 +85,7 @@ def _remane_duplicate_columns(names):
     for item, count in items:
         if count > 2:
             raise ValueError(
-                f"Cannot handle more than two duplicated columns. Found {count} for {item}."
+                f"Cannot handle more than two duplicated columns. Found {count} for {item}.",
             )
         if count > 1:
             dup.append(item)
@@ -179,7 +178,7 @@ def _parse_seabird(lines, ftype):
             "time": time,
             "lon": lon,
             "lat": lat,
-        }
+        },
     )
     return metadata
 
@@ -206,8 +205,8 @@ def from_bl(fname):
     )
     df._metadata = {
         "time_of_reset": pd.to_datetime(
-            linecache.getline(str(fname), 2)[6:-1]
-        ).to_pydatetime()
+            linecache.getline(str(fname), 2)[6:-1],
+        ).to_pydatetime(),
     }
     return df
 
@@ -401,12 +400,15 @@ def from_cnv(fname):
         lat = metadata.get("lat", None)
         if lat is not None:
             df.index = gsw.p_from_z(
-                df.index, lat, geo_strf_dyn_height=0, sea_surface_geopotential=0
+                df.index,
+                lat,
+                geo_strf_dyn_height=0,
+                sea_surface_geopotential=0,
             )
         else:
             warnings.war(
                 f"Missing latitude information. Cannot compute pressure! Your index is {prkey}, "
-                "please compute pressure manually with `gsw.p_from_z` and overwrite your index."
+                "please compute pressure manually with `gsw.p_from_z` and overwrite your index.",
             )
             df.index.name = prkey
 

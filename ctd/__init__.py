@@ -17,7 +17,6 @@ from .processing import (
 )
 from .read import from_bl, from_btl, from_cnv, from_edf, from_fsi, rosette_summary
 
-
 try:
     from ._version import __version__
 except ImportError:

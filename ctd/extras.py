@@ -5,7 +5,6 @@ Extra functionality for plotting and post-processing.
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.ma as ma
-
 from pandas import Series
 
 
@@ -137,7 +136,6 @@ def gen_topomask(h, lon, lat, dx=1.0, kind="linear", plot=False):
     """
 
     import gsw
-
     from scipy.interpolate import interp1d
 
     h, lon, lat = list(map(np.asanyarray, (h, lon, lat)))

@@ -5,7 +5,6 @@ import pytest
 
 import ctd
 
-
 data_path = Path(__file__).parent.joinpath("data")
 
 

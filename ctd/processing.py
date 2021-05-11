@@ -5,7 +5,6 @@ Processing module
 import numpy as np
 import numpy.ma as ma
 import pandas as pd
-
 from pandas_flavor import register_dataframe_method, register_series_method
 
 
@@ -127,7 +126,7 @@ def _bindata(series, delta, method):
         return pd.Series(data, index=new_index, name=series.name)
     else:
         raise ValueError(
-            f"Expected method `average` or `interpolate`, but got {method}."
+            f"Expected method `average` or `interpolate`, but got {method}.",
         )
     return new_series
 
@@ -176,7 +175,7 @@ def _despike(series, n1, n2, block, keep):
     mean = np.r_[mean, np.tile(mean[-1], block - 1)]
     values = series.values.astype(float)
     mask = np.abs(values - mean.filled(fill_value=np.NaN)) > std.filled(
-        fill_value=np.NaN
+        fill_value=np.NaN,
     )
 
     clean = series.astype(float).copy()
@@ -217,7 +216,7 @@ def _smooth(series, window_len, window):
     if window not in list(windows.keys()):
         raise ValueError(
             """window must be one of 'flat', 'hanning',
-                         'hamming', 'bartlett', 'blackman'"""
+                         'hamming', 'bartlett', 'blackman'""",
         )
 
     s = np.r_[

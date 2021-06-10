@@ -329,7 +329,7 @@ def from_edf(fname):
         else:
             header.append(line)
             if line.startswith("Field"):
-                col, unit = [ln.strip().casefold() for ln in line.split(":")]
+                col, unit = (ln.strip().casefold() for ln in line.split(":"))
                 names.append(unit.split()[0])
         if line == "// Data":
             skiprows = k + 1

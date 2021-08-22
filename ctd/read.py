@@ -529,8 +529,8 @@ def from_castaway_csv(fname):
     # Add metadata
     meta = [s.replace("%", "").strip().split(",") for s in meta]
     metadata = {}
-    for l in meta:
-        metadata[l[0]] = l[1]
+    for line in meta:
+        metadata[line[0]] = line[1]
     metadata["units"] = units
     setattr(df, "_metadata", metadata)
 

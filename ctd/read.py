@@ -489,6 +489,7 @@ def rosette_summary(fname):
     ros.set_index("nbf", drop=True, inplace=True, verify_integrity=False)
     return ros
 
+
 def from_castaway_csv(fname):
     """
     DataFrame constructor to open CastAway CSV format.
@@ -505,30 +506,32 @@ def from_castaway_csv(fname):
     """
     with open(fname) as file:
         f = file.readlines()
-    
+
     # Strip newline characters
     f = [s.strip() for s in f]
 
     # separte meta data and CTD profile
-    meta = [s for s in f if s[0] == '%'][0:-1]
-    data = [s.split(',') for s in f if s[0] != '%']
+    meta = [s for s in f if s[0] == "%"][0:-1]
+    data = [s.split(",") for s in f if s[0] != "%"]
     df = pd.DataFrame(data[1:-1], columns=data[0])
 
     # convert to numeric
     for col in df.columns:
         df[col] = pd.to_numeric(df[col])
-    
+
     # normlise column names and extract units
-    units = [s[s.find("(")+1:s.find(")")] for s in df.columns]
-    df.columns = [_normalize_names(s.split('(')[0]).lower().replace(' ','_') for s in df.columns]
+    units = [s[s.find("(") + 1 : s.find(")")] for s in df.columns]
+    df.columns = [
+        _normalize_names(s.split("(")[0]).lower().replace(" ", "_") for s in df.columns
+    ]
     df.set_index("pressure", drop=True, inplace=True, verify_integrity=False)
 
     # Add metadata
-    meta = [s.replace('%','').strip().split(',') for s in meta]
+    meta = [s.replace("%", "").strip().split(",") for s in meta]
     metadata = {}
     for l in meta:
         metadata[l[0]] = l[1]
-    metadata['units'] = units
+    metadata["units"] = units
     setattr(df, "_metadata", metadata)
 
     return df

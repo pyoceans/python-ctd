@@ -498,7 +498,7 @@ def from_castaway_csv(fname):
     --------
     >>> import ctd
     >>> cast = ctd.from_castaway_csv('tests/data/castaway_data.csv')
-    >>> downcast, upcast = cast.split() # upcast often prefiltered
+    >>> downcast, upcast = cast.split() # Upcast often prefiltered
     >>> fig, ax = plt.subplots()
     >>> ax = downcast['temperature'].plot_cast()
     >>> fig.show()
@@ -510,16 +510,16 @@ def from_castaway_csv(fname):
     # Strip newline characters
     f = [s.strip() for s in f]
 
-    # separte meta data and CTD profile
+    # Separate meta data and CTD profile
     meta = [s for s in f if s[0] == "%"][0:-1]
     data = [s.split(",") for s in f if s[0] != "%"]
     df = pd.DataFrame(data[1:-1], columns=data[0])
 
-    # convert to numeric
+    # Convert to numeric
     for col in df.columns:
         df[col] = pd.to_numeric(df[col])
 
-    # normlise column names and extract units
+    # Normalise column names and extract units
     units = [s[s.find("(") + 1 : s.find(")")] for s in df.columns]
     df.columns = [
         _normalize_names(s.split("(")[0]).lower().replace(" ", "_") for s in df.columns

@@ -55,7 +55,7 @@ repos:
         - --ignore-words-list=pres,nd,te,afe,ue,wil,tey,te,ot,fo
 
 - repo: https://github.com/asottile/pyupgrade
-  rev: v2.23.3
+  rev: v2.24.0
   hooks:
     - id: pyupgrade
       args:

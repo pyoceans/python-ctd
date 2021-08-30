@@ -35,7 +35,7 @@ repos:
       args: ["--profile", "black", "--filter-files"]
 
 - repo: https://github.com/psf/black
-  rev: 21.7b0
+  rev: 21.8b0
   hooks:
   - id: black
     language_version: python3
@@ -55,7 +55,7 @@ repos:
         - --ignore-words-list=pres,nd,te,afe,ue,wil,tey,te,ot,fo
 
 - repo: https://github.com/asottile/pyupgrade
-  rev: v2.24.0
+  rev: v2.25.0
   hooks:
     - id: pyupgrade
       args:

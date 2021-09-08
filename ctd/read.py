@@ -488,3 +488,50 @@ def rosette_summary(fname):
     ros["nbf"] = ros["nbf"].astype(int)
     ros.set_index("nbf", drop=True, inplace=True, verify_integrity=False)
     return ros
+
+
+def from_castaway_csv(fname):
+    """
+    DataFrame constructor to open CastAway CSV format.
+
+    Example
+    --------
+    >>> import ctd
+    >>> cast = ctd.from_castaway_csv('tests/data/castaway_data.csv')
+    >>> downcast, upcast = cast.split() # Upcast often prefiltered
+    >>> fig, ax = plt.subplots()
+    >>> ax = downcast['temperature'].plot_cast()
+    >>> fig.show()
+
+    """
+    with open(fname) as file:
+        f = file.readlines()
+
+    # Strip newline characters
+    f = [s.strip() for s in f]
+
+    # Separate meta data and CTD profile
+    meta = [s for s in f if s[0] == "%"][0:-1]
+    data = [s.split(",") for s in f if s[0] != "%"]
+    df = pd.DataFrame(data[1:-1], columns=data[0])
+
+    # Convert to numeric
+    for col in df.columns:
+        df[col] = pd.to_numeric(df[col])
+
+    # Normalise column names and extract units
+    units = [s[s.find("(") + 1 : s.find(")")] for s in df.columns]
+    df.columns = [
+        _normalize_names(s.split("(")[0]).lower().replace(" ", "_") for s in df.columns
+    ]
+    df.set_index("pressure", drop=True, inplace=True, verify_integrity=False)
+
+    # Add metadata
+    meta = [s.replace("%", "").strip().split(",") for s in meta]
+    metadata = {}
+    for line in meta:
+        metadata[line[0]] = line[1]
+    metadata["units"] = units
+    setattr(df, "_metadata", metadata)
+
+    return df

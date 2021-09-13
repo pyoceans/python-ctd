@@ -14,7 +14,7 @@ repos:
       files: requirements-dev.txt
 
 - repo: https://github.com/econchick/interrogate
-  rev: 1.4.0
+  rev: 1.5.0
   hooks:
     - id: interrogate
       exclude: ^(docs|setup.py|tests)
@@ -55,7 +55,7 @@ repos:
         - --ignore-words-list=pres,nd,te,afe,ue,wil,tey,te,ot,fo
 
 - repo: https://github.com/asottile/pyupgrade
-  rev: v2.25.0
+  rev: v2.26.0
   hooks:
     - id: pyupgrade
       args:

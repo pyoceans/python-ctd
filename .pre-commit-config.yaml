@@ -28,7 +28,7 @@ repos:
       args: [--max-line-length=105, --ignore=E203]
 
 - repo: https://github.com/pycqa/isort
-  rev: 5.10.0
+  rev: 5.10.1
   hooks:
     - id: isort
       additional_dependencies: [toml]

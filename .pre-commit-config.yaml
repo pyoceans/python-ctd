@@ -1,6 +1,6 @@
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.1.0
+  rev: v4.2.0
   hooks:
     - id: trailing-whitespace
       exclude: tests/data
@@ -55,7 +55,7 @@ repos:
         - --ignore-words-list=pres,nd,te,afe,ue,wil,tey,te,ot,fo
 
 - repo: https://github.com/asottile/pyupgrade
-  rev: v2.31.1
+  rev: v2.32.0
   hooks:
     - id: pyupgrade
       args:

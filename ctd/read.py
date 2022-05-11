@@ -246,7 +246,7 @@ def from_btl(fname):
     # Get row types, see what you have: avg, std, min, max or just avg, std.
     rowtypes = df[df.columns[-1]].unique()
     # Get times and dates which occur on second line of each bottle.
-    date_idx = metadata['names'].index('Date')
+    date_idx = metadata["names"].index("Date")
     dates = df.iloc[:: len(rowtypes), date_idx].reset_index(drop=True)
     times = df.iloc[1 :: len(rowtypes), date_idx].reset_index(drop=True)
     datetimes = dates + " " + times

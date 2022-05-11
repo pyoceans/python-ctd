@@ -54,6 +54,11 @@ def btl():
 
 
 @pytest.fixture
+def btl():
+    yield ctd.from_btl(data_path.joinpath("btl", "alt_bottletest.btl"))
+
+
+@pytest.fixture
 def ros():
     yield ctd.rosette_summary(data_path.joinpath("CTD", "g01l03s01m-m2.ros"))
 

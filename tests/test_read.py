@@ -54,7 +54,7 @@ def btl():
 
 
 @pytest.fixture
-def btl():
+def btl_duplicate_header_name():
     yield ctd.from_btl(data_path.joinpath("btl", "alt_bottletest.BTL"))
 
 

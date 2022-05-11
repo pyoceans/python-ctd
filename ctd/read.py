@@ -91,7 +91,7 @@ def _remane_duplicate_columns(names):
             dup.append(item)
 
     # since we can assume there are only two instances of a word in the list, how about we find the last
-    # index of an instance, which will be the second occurence of the item
+    # index of an instance, which will be the second occurrence of the item
     second_occurrences = [len(names) - names[::-1].index(item) - 1 for item in dup]
     for idx in second_occurrences:
         names[idx] = f"{names[idx]}_"

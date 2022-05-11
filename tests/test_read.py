@@ -55,7 +55,7 @@ def btl():
 
 @pytest.fixture
 def btl():
-    yield ctd.from_btl(data_path.joinpath("btl", "alt_bottletest.btl"))
+    yield ctd.from_btl(data_path.joinpath("btl", "alt_bottletest.BTL"))
 
 
 @pytest.fixture

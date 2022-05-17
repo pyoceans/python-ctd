@@ -91,7 +91,7 @@ def _remane_duplicate_columns(names):
             dup.append(item)
 
     # since we can assume there are only two instances of a word in the list, how about we find the last
-    # index of an instance, which will be the second occurence of the item
+    # index of an instance, which will be the second occurrence of the item
     second_occurrences = [len(names) - names[::-1].index(item) - 1 for item in dup]
     for idx in second_occurrences:
         names[idx] = f"{names[idx]}_"
@@ -246,7 +246,7 @@ def from_btl(fname):
     # Get row types, see what you have: avg, std, min, max or just avg, std.
     rowtypes = df[df.columns[-1]].unique()
     # Get times and dates which occur on second line of each bottle.
-    date_idx = metadata['names'].index('Date')
+    date_idx = metadata["names"].index("Date")
     dates = df.iloc[:: len(rowtypes), date_idx].reset_index(drop=True)
     times = df.iloc[1 :: len(rowtypes), date_idx].reset_index(drop=True)
     datetimes = dates + " " + times

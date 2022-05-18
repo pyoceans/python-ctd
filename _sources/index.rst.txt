@@ -7,7 +7,7 @@ Load and pre-process CTD/XBT casts as pandas DataFrames.
 .. toctree::
    :maxdepth: 3
 
-   quick_intro.ipynb
+   quick_intro-output.ipynb
    ctd
 
 Indices and tables

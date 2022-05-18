@@ -54,6 +54,11 @@ def btl():
 
 
 @pytest.fixture
+def btl_duplicate_header_name():
+    yield ctd.from_btl(data_path.joinpath("btl", "alt_bottletest.BTL"))
+
+
+@pytest.fixture
 def ros():
     yield ctd.rosette_summary(data_path.joinpath("CTD", "g01l03s01m-m2.ros"))
 
@@ -76,6 +81,12 @@ def test_cnv_is_dataframe(cnv):
 def test_btl_is_dataframe(btl):
     assert isinstance(btl, pd.DataFrame)
     assert not btl.empty
+
+
+def test_btl_with_dup_cols(btl_duplicate_header_name):
+    assert all(
+        col in btl_duplicate_header_name.columns for col in ["Bottle", "Bottle_"]
+    )
 
 
 def test_ros_is_dataframe(ros):

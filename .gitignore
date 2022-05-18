@@ -7,3 +7,5 @@
 build/
 ctd/_version.py
 dist/
+*-output.ipynb
+*.pyc

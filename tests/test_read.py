@@ -83,6 +83,12 @@ def test_btl_is_dataframe(btl):
     assert not btl.empty
 
 
+def test_btl_with_dup_cols(btl_duplicate_header_name):
+    assert all(
+        col in btl_duplicate_header_name.columns for col in ["Bottle", "Bottle_"]
+    )
+
+
 def test_ros_is_dataframe(ros):
     assert isinstance(ros, pd.DataFrame)
     assert not ros.empty

@@ -255,10 +255,8 @@ def movingaverage(df, window_size=48):
     """
     Moving average on a data frame or series.
 
-    Inputs
-    ------
-    windows_size : integer
-        Size of the window.
+    Inputs:
+      windows_size : integer
 
     """
 

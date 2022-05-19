@@ -60,9 +60,11 @@ def _open_compressed(fname):
 
 
 def _read_file(fname):
-    """Read file contents."""
+    """Read file contents, or read from StringIO object."""
     if isinstance(fname, StringIO):
-        return fname
+        fname.seek(0)
+        text = fname.read()
+        return StringIO(text)
 
     if not isinstance(fname, Path):
         fname = Path(fname).resolve()

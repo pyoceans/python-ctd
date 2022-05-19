@@ -61,6 +61,9 @@ def _open_compressed(fname):
 
 def _read_file(fname):
     """Read file contents."""
+    if isinstance(fname, StringIO):
+        return fname
+
     if not isinstance(fname, Path):
         fname = Path(fname).resolve()
 
@@ -212,7 +215,7 @@ def from_bl(fname):
     return df
 
 
-def from_btl(fname):
+def from_btl(fname, name=None):
     """
     DataFrame constructor to open Seabird CTD BTL-ASCII format.
 
@@ -261,7 +264,8 @@ def from_btl(fname):
 
     df["Statistic"] = df["Statistic"].str.replace(r"\(|\)", "")  # (avg) to avg
 
-    name = _basename(fname)[1]
+    if name is None:
+        name = _basename(fname)[1]
 
     dtypes = {
         "bpos": int,

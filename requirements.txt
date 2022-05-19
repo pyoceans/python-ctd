@@ -1,3 +1,4 @@
+chardet
 gsw>=3.3.0
 matplotlib
 numpy

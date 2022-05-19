@@ -13,6 +13,7 @@ from datetime import datetime
 from io import StringIO
 from pathlib import Path
 
+import chardet
 import gsw
 import numpy as np
 import pandas as pd
@@ -50,9 +51,7 @@ def _open_compressed(fname):
         cfile = zfile.open(name)
     else:
         raise ValueError(
-            "Unrecognized file extension. Expected .gzip, .bz2, or .zip, got {}".format(
-                extension,
-            ),
+            f"Unrecognized file extension. Expected .gzip, .bz2, or .zip, got {extension}",
         )
     contents = cfile.read()
     cfile.close()
@@ -74,7 +73,8 @@ def _read_file(fname):
             f"Unrecognized file extension. Expected .cnv, .edf, .txt, .ros, or .btl got {extension}",
         )
     # Read as bytes but we need to return strings for the parsers.
-    text = contents.decode(encoding="utf-8", errors="replace")
+    encoding = chardet.detect(contents)["encoding"]
+    text = contents.decode(encoding=encoding, errors="replace")
     return StringIO(text)
 
 

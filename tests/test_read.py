@@ -61,7 +61,7 @@ def btl_duplicate_header_name():
 @pytest.fixture
 def btl_as_stream():
     file = open(mode="rb", file=data_path.joinpath("btl", "alt_bottletest.BTL"))
-    stream = StringIO(file.read().decode('cp1252'))
+    stream = StringIO(file.read().decode("cp1252"))
     yield ctd.from_btl(stream, "alt_bottletest")
 
 

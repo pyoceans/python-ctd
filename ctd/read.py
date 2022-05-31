@@ -59,7 +59,12 @@ def _open_compressed(fname):
 
 
 def _read_file(fname):
-    """Read file contents."""
+    """Read file contents, or read from StringIO object."""
+    if isinstance(fname, StringIO):
+        fname.seek(0)
+        text = fname.read()
+        return StringIO(text)
+
     if not isinstance(fname, Path):
         fname = Path(fname).resolve()
 
@@ -102,6 +107,7 @@ def _parse_seabird(lines, ftype):
     """Parse searbird formats."""
     # Initialize variables.
     lon = lat = time = None, None, None
+    fname = None
     skiprows = 0
 
     metadata = {}
@@ -119,6 +125,9 @@ def _parse_seabird(lines, ftype):
         # Seabird headers starts with *.
         if line.startswith("*"):
             header.append(line)
+            if "FileName" in line:
+                file_path = line.split("=")[-1].strip()
+                fname = Path(file_path).stem
 
         # Seabird configuration starts with #.
         if line.startswith("#"):
@@ -172,6 +181,7 @@ def _parse_seabird(lines, ftype):
         names.append("Statistic")
     metadata.update(
         {
+            "name": fname if fname else "unknown",
             "header": "\n".join(header),
             "config": "\n".join(config),
             "names": _remane_duplicate_columns(names),
@@ -261,7 +271,9 @@ def from_btl(fname):
 
     df["Statistic"] = df["Statistic"].str.replace(r"\(|\)", "")  # (avg) to avg
 
-    name = _basename(fname)[1]
+    if "name" not in metadata:
+        name = _basename(fname)[1]
+        metadata["name"] = str(name)
 
     dtypes = {
         "bpos": int,
@@ -282,7 +294,6 @@ def from_btl(fname):
                 warnings.warn("Could not convert %s to float." % column)
 
     df["Date"] = pd.to_datetime(df["Date"])
-    metadata["name"] = str(name)
     setattr(df, "_metadata", metadata)
     return df
 

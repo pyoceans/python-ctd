@@ -54,8 +54,10 @@ def btl():
 
 
 @pytest.fixture
-def btl_duplicate_header_name():
-    yield ctd.from_btl(data_path.joinpath("btl", "alt_bottletest.BTL"))
+def btl_as_stream():
+    file = open(mode="rb", file=data_path.joinpath("btl", "alt_bottletest.BTL"))
+    stream = StringIO(file.read().decode("cp1252"))
+    yield ctd.from_btl(stream)
 
 
 @pytest.fixture
@@ -83,10 +85,13 @@ def test_btl_is_dataframe(btl):
     assert not btl.empty
 
 
-def test_btl_with_dup_cols(btl_duplicate_header_name):
-    assert all(
-        col in btl_duplicate_header_name.columns for col in ["Bottle", "Bottle_"]
-    )
+def test_btl_with_dup_cols(btl_as_stream):
+    assert all(col in btl_as_stream.columns for col in ["Bottle", "Bottle_"])
+
+
+def test_btl_as_stringio(btl_as_stream):
+    assert isinstance(btl_as_stream, pd.DataFrame)
+    assert not btl_as_stream.empty
 
 
 def test_ros_is_dataframe(ros):

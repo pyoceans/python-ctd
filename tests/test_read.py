@@ -86,9 +86,7 @@ def test_btl_is_dataframe(btl):
 
 
 def test_btl_with_dup_cols(btl_as_stream):
-    assert all(
-        col in btl_as_stream.columns for col in ["Bottle", "Bottle_"]
-    )
+    assert all(col in btl_as_stream.columns for col in ["Bottle", "Bottle_"])
 
 
 def test_btl_as_stringio(btl_as_stream):

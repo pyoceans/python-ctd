@@ -96,11 +96,6 @@ def test_btl_as_stringio(btl_as_stream):
     assert not btl_as_stream.empty
 
 
-def test_btl_as_stringio_without_name(btl_as_stream):
-    assert isinstance(btl_as_stream, pd.DataFrame)
-    assert not btl_as_stream.empty
-
-
 def test_ros_is_dataframe(ros):
     assert isinstance(ros, pd.DataFrame)
     assert not ros.empty

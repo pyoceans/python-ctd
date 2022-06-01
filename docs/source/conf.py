@@ -100,7 +100,7 @@ html_theme_options = {
     "github_user": "pyoceans",
     "github_repo": "python-ctd",
     "github_banner": True,
-    "travis_button": True,
+    "travis_button": False,
     "fixed_sidebar": True,
 }
 

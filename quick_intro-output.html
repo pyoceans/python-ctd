@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Quick introduction &#8212; ctd 1.4.2.dev18+ge483136 documentation</title>
+    <title>Quick introduction &#8212; ctd 1.4.2.dev21+g879cf1e documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
@@ -637,7 +637,7 @@ pandas.core.frame.DataFrame
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/tmp/ipykernel_3231/2012244476.py:5: MatplotlibDeprecationWarning: The seaborn styles shipped by Matplotlib are deprecated since 3.6, as they no longer correspond to the styles shipped by seaborn. However, they will remain available as &#39;seaborn-v0_8-&lt;style&gt;&#39;. Alternatively, directly use the seaborn API instead.
+/tmp/ipykernel_3250/2012244476.py:5: MatplotlibDeprecationWarning: The seaborn styles shipped by Matplotlib are deprecated since 3.6, as they no longer correspond to the styles shipped by seaborn. However, they will remain available as &#39;seaborn-v0_8-&lt;style&gt;&#39;. Alternatively, directly use the seaborn API instead.
   style.use(&#34;seaborn-whitegrid&#34;)
 </pre></div></div>
 </div>
@@ -915,11 +915,20 @@ dict_keys([&#39;name&#39;, &#39;header&#39;, &#39;config&#39;, &#39;names&#39;, 
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/runner/work/python-ctd/python-ctd/ctd/plotting.py:43: FutureWarning: iteritems is deprecated and will be removed in a future version. Use .items instead.
+  for k, (col, series) in enumerate(df.iteritems()):
+</pre></div></div>
+</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="_images/quick_intro-output_20_0.png" src="_images/quick_intro-output_20_0.png" />
+<img alt="_images/quick_intro-output_20_1.png" src="_images/quick_intro-output_20_1.png" />
 </div>
 </div>
 <p>Last but not least let’s tweak a three line plot with the main variables measured.</p>

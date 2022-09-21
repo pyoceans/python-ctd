@@ -1,0 +1,13 @@
+name: CTD
+channels:
+  - conda-forge
+dependencies:
+  - python=3
+  - chardet
+  - gsw >=3.3.0
+  - matplotlib
+  - numpy
+  - pandas >=0.24.0
+  - pandas-flavor >=0.1.2
+  - scipy
+  - jupyter

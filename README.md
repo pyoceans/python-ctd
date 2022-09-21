@@ -64,3 +64,7 @@ ax.set_xlabel('Temperature (°C)')
 ```
 
 ![Good Processing](https://raw.githubusercontent.com/pyoceans/python-ctd/main/docs/readme_02.png)
+
+## Try it out on mybinder
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/pyoceans/python-ctd/HEAD?labpath=notebooks)

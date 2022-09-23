@@ -403,7 +403,18 @@ def from_cnv(fname):
     )
     f.close()
 
-    prkeys = ["prM ", "prE", "prDM", "pr50M", "pr50M1", "prSM", "prdM", "pr", "depSM"]
+    prkeys = [
+        "prM ",
+        "prE",
+        "prDM",
+        "pr50M",
+        "pr50M1",
+        "prSM",
+        "prdM",
+        "pr",
+        "depSM",
+        "prDE",
+    ]
     prkey = [key for key in prkeys if key in df.columns]
     if len(prkey) != 1:
         raise ValueError(f"Expected one pressure/depth column, got {prkey}.")

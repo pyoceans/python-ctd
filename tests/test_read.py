@@ -114,12 +114,11 @@ def test_header_parse():
 
 def test_pressure_field_labels():
     """
-    Support different pressure field labels encountered in
-    Sea-Bird cnv files (issue #3)
+    Support different pressure field labels encountered in Sea-Bird cnv files.
 
     """
-    for fname in sorted(data_path.glob("issue3prlabworks*.cnv")):
+    for fname in sorted(data_path.glob("press-pass*.cnv")):
         ctd.from_cnv(fname)
-    for fname in sorted(data_path.glob("issue3prlabfails*.cnv")):
+    for fname in sorted(data_path.glob("press-fails*.cnv")):
         with pytest.raises(ValueError):
             ctd.from_cnv(fname)

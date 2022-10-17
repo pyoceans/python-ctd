@@ -42,14 +42,14 @@ repos:
 
 
 - repo: https://github.com/codespell-project/codespell
-  rev: v2.2.1
+  rev: v2.2.2
   hooks:
     - id: codespell
       args:
         - --ignore-words-list=pres,nd,te,afe,ue,wil,tey,te,ot,fo
 
 - repo: https://github.com/asottile/pyupgrade
-  rev: v3.0.0
+  rev: v3.1.0
   hooks:
     - id: pyupgrade
       args:

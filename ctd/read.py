@@ -269,7 +269,7 @@ def from_btl(fname):
     df["Bottle"] = df["Bottle"].fillna(method="ffill")
     df["Date"] = df["Date"].fillna(method="ffill")
 
-    df["Statistic"] = df["Statistic"].str.replace(r"\(|\)", "")  # (avg) to avg
+    df["Statistic"] = df["Statistic"].str.lstrip("(").str.rstrip(")")  # (avg) to avg
 
     if "name" not in metadata:
         name = _basename(fname)[1]

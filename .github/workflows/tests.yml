@@ -34,3 +34,9 @@ jobs:
       run: |
         micromamba activate TEST
         python -m pytest -rxs tests
+
+    - name: Doctests
+      shell: bash -l {0}
+      run: |
+        micromamba activate TEST
+        python -m pytest -s -rxs --doctest-modules -vv ctd

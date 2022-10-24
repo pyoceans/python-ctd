@@ -15,7 +15,15 @@ from .processing import (
     smooth,
     split,
 )
-from .read import from_bl, from_btl, from_cnv, from_edf, from_fsi, rosette_summary
+from .read import (
+    from_bl,
+    from_btl,
+    from_castaway_csv,
+    from_cnv,
+    from_edf,
+    from_fsi,
+    rosette_summary,
+)
 
 try:
     from ._version import __version__
@@ -28,6 +36,7 @@ __all__ = [
     "despike",
     "from_bl",
     "from_btl",
+    "from_castaway_csv",
     "from_cnv",
     "from_edf",
     "from_fsi",

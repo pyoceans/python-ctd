@@ -40,7 +40,7 @@ def plot_cast(df, secondary_y=False, label=None, ax=None, *args, **kwargs):
 
     if isinstance(df, pd.DataFrame):
         labels = label if label else df.columns
-        for k, (col, series) in enumerate(df.iteritems()):
+        for k, (col, series) in enumerate(df.items()):
             ax.plot(series, series.index, label=labels[k])
     elif isinstance(df, pd.Series):
         label = label if label else str(df.name)

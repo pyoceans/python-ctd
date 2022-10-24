@@ -522,10 +522,10 @@ def from_castaway_csv(fname):
     --------
     >>> import ctd
     >>> cast = ctd.from_castaway_csv('tests/data/castaway_data.csv')
-    >>> downcast, upcast = cast.split() # Upcast often prefiltered
-    >>> fig, ax = plt.subplots()
-    >>> ax = downcast['temperature'].plot_cast()
-    >>> fig.show()
+    >>> cast.columns
+    Index(['depth', 'temperature', 'conductivity', 'specific_conductance',
+           'salinity', 'sound_velocity', 'density'],
+          dtype='object')
 
     """
     with open(fname) as file:

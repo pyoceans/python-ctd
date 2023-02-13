@@ -417,11 +417,11 @@ def from_cnv(fname):
         "prDE",
     ]
     prkey = [key for key in prkeys if key in df.columns]
-    if len(prkey) ==0:
+    if len(prkey) == 0:
         raise ValueError(f"Expected one pressure/depth column, didn't receive any")
-    elif len(prkey) >1:
-        #if multiple keys present then keep the first one 
-        prkey=prkey[0]
+    elif len(prkey) > 1:
+        # if multiple keys present then keep the first one
+        prkey = prkey[0]
 
     df.set_index(prkey, drop=True, inplace=True)
     df.index.name = "Pressure [dbar]"

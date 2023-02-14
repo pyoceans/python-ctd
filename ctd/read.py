@@ -404,7 +404,6 @@ def from_cnv(fname):
     f.close()
 
     prkeys = [
-        "prM ",
         "prM",
         "prE",
         "prDM",
@@ -416,9 +415,10 @@ def from_cnv(fname):
         "depSM",
         "prDE",
     ]
+    df.columns = df.columns.str.strip()
     prkey = [key for key in prkeys if key in df.columns]
     if len(prkey) == 0:
-        raise ValueError(f"Expected one pressure/depth column, didn't receive any")
+        raise ValueError("Expected one pressure/depth column, didn't receive any")
     elif len(prkey) > 1:
         # if multiple keys present then keep the first one
         prkey = prkey[0]

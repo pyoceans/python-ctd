@@ -404,7 +404,7 @@ def from_cnv(fname):
     f.close()
 
     prkeys = [
-        "prM ",
+        "prM",
         "prE",
         "prDM",
         "pr50M",
@@ -415,9 +415,14 @@ def from_cnv(fname):
         "depSM",
         "prDE",
     ]
+    df.columns = df.columns.str.strip()
     prkey = [key for key in prkeys if key in df.columns]
-    if len(prkey) != 1:
-        raise ValueError(f"Expected one pressure/depth column, got {prkey}.")
+    if len(prkey) == 0:
+        raise ValueError("Expected one pressure/depth column, didn't receive any")
+    elif len(prkey) > 1:
+        # if multiple keys present then keep the first one
+        prkey = prkey[0]
+
     df.set_index(prkey, drop=True, inplace=True)
     df.index.name = "Pressure [dbar]"
     if prkey == "depSM":

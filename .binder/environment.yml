@@ -11,3 +11,4 @@ dependencies:
   - pandas-flavor >=0.1.2
   - scipy
   - jupyter
+  - ctd

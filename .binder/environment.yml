@@ -14,4 +14,3 @@ dependencies:
   - pip
   - pip:
     - ctd @ git+https://github.com/pyoceans/python-ctd@main
-    

@@ -11,4 +11,7 @@ dependencies:
   - pandas-flavor >=0.1.2
   - scipy
   - jupyter
-  - ctd
+  - pip
+  - pip:
+    - ctd @ git+https://github.com/pyoceans/python-ctd@main
+    

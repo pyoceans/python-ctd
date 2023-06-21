@@ -202,7 +202,7 @@ def from_bl(fname):
     >>> from pathlib import Path
     >>> import ctd
     >>> data_path = Path(__file__).parents[1].joinpath("tests", "data")
-    >>> df = ctd.from_bl(str(data_path.joinpath('bl', 'bottletest.bl')))
+    >>> df = ctd.from_bl(str(data_path.joinpath("bl", "bottletest.bl")))
     >>> df._metadata["time_of_reset"]
     datetime.datetime(2018, 6, 25, 20, 8, 55)
 
@@ -231,7 +231,7 @@ def from_btl(fname):
     >>> from pathlib import Path
     >>> import ctd
     >>> data_path = Path(__file__).parents[1].joinpath("tests", "data")
-    >>> bottles = ctd.from_btl(data_path.joinpath('btl', 'bottletest.btl'))
+    >>> bottles = ctd.from_btl(data_path.joinpath("btl", "bottletest.btl"))
 
     """
     f = _read_file(fname)
@@ -291,10 +291,13 @@ def from_btl(fname):
             try:
                 df[column] = df[column].astype(float)
             except ValueError:
-                warnings.warn("Could not convert %s to float." % column)
+                warnings.warn(
+                    f"Could not convert {column} to float.",
+                    stacklevel=2,
+                )
 
     df["Date"] = pd.to_datetime(df["Date"])
-    setattr(df, "_metadata", metadata)
+    df._metadata = metadata
     return df
 
 
@@ -307,8 +310,8 @@ def from_edf(fname):
     >>> from pathlib import Path
     >>> import ctd
     >>> data_path = Path(__file__).parents[1].joinpath("tests", "data")
-    >>> cast = ctd.from_edf(data_path.joinpath('XBT.EDF.gz'))
-    >>> ax = cast['temperature'].plot_cast()
+    >>> cast = ctd.from_edf(data_path.joinpath("XBT.EDF.gz"))
+    >>> ax = cast["temperature"].plot_cast()
 
     """
     f = _read_file(fname)
@@ -370,7 +373,7 @@ def from_edf(fname):
         "header": "\n".join(header),
         "serial": serial,
     }
-    setattr(df, "_metadata", metadata)
+    df._metadata = metadata
     return df
 
 
@@ -383,9 +386,9 @@ def from_cnv(fname):
     >>> from pathlib import Path
     >>> import ctd
     >>> data_path = Path(__file__).parents[1].joinpath("tests", "data")
-    >>> cast = ctd.from_cnv(data_path.joinpath('CTD_big.cnv.bz2'))
+    >>> cast = ctd.from_cnv(data_path.joinpath("CTD_big.cnv.bz2"))
     >>> downcast, upcast = cast.split()
-    >>> ax = downcast['t090C'].plot_cast()
+    >>> ax = downcast["t090C"].plot_cast()
 
     """
     f = _read_file(fname)
@@ -451,10 +454,13 @@ def from_cnv(fname):
             try:
                 df[column] = df[column].astype(float)
             except ValueError:
-                warnings.warn("Could not convert %s to float." % column)
+                warnings.warn(
+                    f"Could not convert {column} to float.",
+                    stacklevel=2,
+                )
 
     metadata["name"] = str(name)
-    setattr(df, "_metadata", metadata)
+    df._metadata = metadata
     return df
 
 
@@ -468,9 +474,9 @@ def from_fsi(fname, skiprows=9):
     >>> from pathlib import Path
     >>> import ctd
     >>> data_path = Path(__file__).parents[1].joinpath("tests", "data")
-    >>> cast = ctd.from_fsi(data_path.joinpath('FSI.txt.gz'))
+    >>> cast = ctd.from_fsi(data_path.joinpath("FSI.txt.gz"))
     >>> downcast, upcast = cast.split()
-    >>> ax = downcast['TEMP'].plot_cast()
+    >>> ax = downcast["TEMP"].plot_cast()
 
     """
     f = _read_file(fname)
@@ -487,7 +493,7 @@ def from_fsi(fname, skiprows=9):
     df.set_index("PRES", drop=True, inplace=True)
     df.index.name = "Pressure [dbar]"
     metadata = {"name": str(fname)}
-    setattr(df, "_metadata", metadata)
+    df._metadata = metadata
     return df
 
 
@@ -505,7 +511,7 @@ def rosette_summary(fname):
     >>> from pathlib import Path
     >>> import ctd
     >>> data_path = Path(__file__).parents[1].joinpath("tests", "data")
-    >>> fname = data_path.joinpath('CTD/g01l01s01.ros')
+    >>> fname = data_path.joinpath("CTD/g01l01s01.ros")
     >>> ros = ctd.rosette_summary(fname)
     >>> ros = ros.groupby(ros.index).mean()
     >>> ros.pressure.values.astype(int)
@@ -526,7 +532,7 @@ def from_castaway_csv(fname):
     Example
     --------
     >>> import ctd
-    >>> cast = ctd.from_castaway_csv('tests/data/castaway_data.csv')
+    >>> cast = ctd.from_castaway_csv("tests/data/castaway_data.csv")
     >>> cast.columns
     Index(['depth', 'temperature', 'conductivity', 'specific_conductance',
            'salinity', 'sound_velocity', 'density'],
@@ -561,6 +567,6 @@ def from_castaway_csv(fname):
     for line in meta:
         metadata[line[0]] = line[1]
     metadata["units"] = units
-    setattr(df, "_metadata", metadata)
+    df._metadata = metadata
 
     return df

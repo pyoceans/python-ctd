@@ -29,7 +29,7 @@ def plot_cast(df, secondary_y=False, label=None, ax=None, *args, **kwargs):
 
     y_inverted = False
     if not getattr(ax, "y_inverted", False):
-        setattr(ax, "y_inverted", True)
+        ax.y_inverted = True
         y_inverted = True
 
     if secondary_y:
@@ -40,11 +40,11 @@ def plot_cast(df, secondary_y=False, label=None, ax=None, *args, **kwargs):
 
     if isinstance(df, pd.DataFrame):
         labels = label if label else df.columns
-        for k, (col, series) in enumerate(df.items()):
+        for k, (_col, series) in enumerate(df.items()):
             ax.plot(series, series.index, label=labels[k])
     elif isinstance(df, pd.Series):
         label = label if label else str(df.name)
-        ax.plot(df.values, df.index, label=label, *args, **kwargs)
+        ax.plot(df.values, df.index, *args, label=label, **kwargs)
 
     ax.set_ylabel(ylabel)
     ax.set_xlabel(xlabel)

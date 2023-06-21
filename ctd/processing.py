@@ -62,16 +62,16 @@ def lp_filter(df, sample_rate=24.0, time_constant=0.15):
     >>> import matplotlib.pyplot as plt
     >>> import ctd
     >>> data_path = Path(__file__).parents[1].joinpath("tests", "data")
-    >>> raw = ctd.from_cnv(data_path.joinpath('CTD-spiked-unfiltered.cnv.bz2'))
-    >>> prc = ctd.from_cnv(data_path.joinpath('CTD-spiked-filtered.cnv.bz2'))
+    >>> raw = ctd.from_cnv(data_path.joinpath("CTD-spiked-unfiltered.cnv.bz2"))
+    >>> prc = ctd.from_cnv(data_path.joinpath("CTD-spiked-filtered.cnv.bz2"))
     >>> kw = {"sample_rate": 24.0, "time_constant": 0.15}
     >>> original = prc.index.values
     >>> unfiltered = raw.index.values
     >>> filtered = raw.lp_filter(**kw).index.values
     >>> fig, ax = plt.subplots()
-    >>> l1, = ax.plot(original, 'k', label='original')
-    >>> l2, = ax.plot(unfiltered, 'r', label='unfiltered')
-    >>> l3, = ax.plot(filtered, 'g', label='filtered')
+    >>> (l1,) = ax.plot(original, "k", label="original")
+    >>> (l2,) = ax.plot(unfiltered, "r", label="unfiltered")
+    >>> (l3,) = ax.plot(filtered, "g", label="filtered")
     >>> leg = ax.legend()
 
     Notes

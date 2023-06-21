@@ -1,6 +1,79 @@
 [build-system]
-requires = ["setuptools>=41.2", "setuptools_scm", "wheel"]
 build-backend = "setuptools.build_meta"
+requires = [
+  "setuptools>=41.2",
+  "setuptools_scm",
+  "wheel",
+]
+
+[project]
+name = "ctd"
+description = "Tools to load hydrographic data into pandas DataFrame"
+license = {text = "BSD-3-Clause"}
+authors = [
+    {name = "Filipe Fernandes", email = "ocefpaf+ctd@gmail.com"},
+]
+requires-python = ">=3.9"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+]
+dynamic = [
+  "dependencies",
+  "readme",
+  "version",
+]
+[project.urls]
+documentation = "https://pyoceans.github.io/python-ctd"
+homepage = "https://github.com/pyoceans/python-ctd"
+repository = "https://github.com/pyoceans/python-ctd"
+
+[tool.setuptools]
+packages = ["ctd"]
+include-package-data = true
+license-files = ["LICENSE.txt"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+readme = {file = "README.md", content-type = "text/markdown"}
+
+[tool.setuptools_scm]
+write_to = "ctd/_version.py"
+write_to_template = "__version__ = '{version}'"
+tag_regex = "^(?P<prefix>v)?(?P<version>[^\\+]+)(?P<suffix>.*)?$"
+
+[tool.ruff]
+select = [
+    "A", # flake8-builtins
+    "B", # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "F", # flakes
+    "I", # import sorting
+    "T20", # flake8-print
+    "UP", # upgrade
+]
+target-version = "py39"
+line-length = 80
+
+[tool.ruff.per-file-ignores]
+"docs/source/conf.py" = [
+  "E402",
+  "A001",
+]
+
+[tool.check-manifest]
+ignore = [
+    "*.yml",
+    ".coveragerc",
+    "docs",
+    "docs/*",
+    "notebooks",
+    "notebooks/*",
+    "tests",
+    "tests/*",
+]
 
 [tool.interrogate]
 ignore-init-method = true
@@ -10,7 +83,7 @@ ignore-semiprivate = false
 ignore-private = false
 ignore-module = false
 fail-under = 95
-exclude = ["setup.py", "docs", "tests"]
+exclude = ["docs", "tests"]
 verbose = 1
 quiet = false
 color = true

@@ -40,12 +40,12 @@ repos:
         - --ignore-words-list=pres,nd,te,afe,ue,wil,tey,te,ot,fo
 
 - repo: https://github.com/asottile/add-trailing-comma
-  rev: v2.5.1
+  rev: v3.0.0
   hooks:
     - id: add-trailing-comma
 
-- repo: https://github.com/charliermarsh/ruff-pre-commit
-  rev: v0.0.274
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.0.276
   hooks:
     - id: ruff
 

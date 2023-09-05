@@ -18,8 +18,8 @@ def _assert_is_valid_plot_return_object(objs):
             assert isinstance(el, plt.Axes), (
                 "one of 'objs' is not a "
                 "matplotlib Axes instance, "
-                "type encountered {!r}"
-                "".format(el.__class__.__name__)
+                f"type encountered {el.__class__.__name__!r}"
+                ""
             )
     else:
         assert isinstance(objs, (plt.Artist, tuple, dict)), (

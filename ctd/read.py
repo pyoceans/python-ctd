@@ -166,7 +166,7 @@ def _parse_seabird(lines, ftype):
                 break
         else:  # btl.
             # There is no *END* like in a .cnv file, skip two after header info.
-            if not (line.startswith("*") | line.startswith("#")):
+            if line != "" and not (line.startswith("*") | line.startswith("#")):
                 # Fix commonly occurring problem when Sbeox.* exists in the file
                 # the name is concatenated to previous parameter
                 # example:

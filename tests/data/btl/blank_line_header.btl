@@ -1,0 +1,198 @@
+* Sea-Bird SBE25 Data File:
+* FileName = C:\Users\Science\Documents\CAR2022102\ctd data\22102007.hex
+* Software Version 1.59
+* Temperature SN = Sbe03_1817
+* Conductivity SN = Sbe04-0735
+* System UpLoad Time = Mar 31 2022 08:30:05
+** Latitude: 41 12.513 N
+** Longitude: 067 09.722 W
+** Ship: CFA3098 CCGS Capt Jacques Cartier
+** Cruise: CAR2022102
+** Station_Label:755
+** Set_number:007
+** Stratum_number:5Z41
+** Station: 007
+** Sounding: 61
+** ID_Start:474815
+** Event_Comments: 2022 Georges Bank SurveyKP
+* ds
+* SBE 25 CTD  V 4.0a SN  184   03/31/22  11:27:10.920
+* external pressure sensor, range = 1500 psia,  tcval = 16
+* xtal = 9437427   clk = 32767.537   vmain = 12.5   iop = 4   vlith = 3.9
+* ncasts = 1   samples = 5815   free = 49165   lwait = 0 msec
+*
+* CTD configuration:
+* number of scans averaged = 1,  data stored at 8 scans per second
+* real time data transmitted at 8 scans per second
+* minimum conductivity frequency for pump turn on = 1500
+* battery type = ALKALINE
+*
+* 7 external voltages sampled
+* stored voltage # 0 = external voltage 0
+* stored voltage # 1 = external voltage 1
+* stored voltage # 2 = external voltage 2
+* stored voltage # 3 = external voltage 3
+* stored voltage # 4 = external voltage 4
+* stored voltage # 5 = external voltage 5
+* stored voltage # 6 = external voltage 6
+*
+
+
+* S>
+* dh
+* cast 0  03/31 10:46:00  smpls 0 to 5814  nv = 7  avg = 1  stp = switch of
+
+* S>
+# interval = seconds: 0.125
+# start_time = Mar 31 2022 10:46:00 [Instrument's time stamp, header]
+# <Sensors count="10" >
+#   <sensor Channel="1" >
+#     <!-- Frequency 0, Temperature -->
+#     <TemperatureSensor SensorID="55" >
+#       <SerialNumber>Sbe03_1817</SerialNumber>
+#       <CalibrationDate>24-Nov-2004</CalibrationDate>
+#       <!-- t0pcor = -2.0600e-007 specified on DatCnv command line -->
+#       <UseG_J>1</UseG_J>
+#       <A>3.68120516e-003</A>
+#       <B>6.00510844e-004</B>
+#       <C>1.36911401e-005</C>
+#       <D>1.80939934e-006</D>
+#       <F0_Old>5918.752</F0_Old>
+#       <G>4.85872870e-003</G>
+#       <H>6.78186362e-004</H>
+#       <I>2.69032925e-005</I>
+#       <J>2.15066050e-006</J>
+#       <F0>1000.000</F0>
+#       <Slope>1.00000000</Slope>
+#       <Offset>0.0000</Offset>
+#     </TemperatureSensor>
+#   </sensor>
+#   <sensor Channel="2" >
+#     <!-- Frequency 1, Conductivity -->
+#     <ConductivitySensor SensorID="3" >
+#       <SerialNumber>Sbe04-0735</SerialNumber>
+#       <CalibrationDate>07-Jan-2009</CalibrationDate>
+#       <UseG_J>1</UseG_J>
+#       <!-- Cell const and series R are applicable only for wide range sensors. -->
+#       <SeriesR>0.0000</SeriesR>
+#       <CellConst>2000.0000</CellConst>
+#       <ConductivityType>0</ConductivityType>
+#       <Coefficients equation="0" >
+#         <A>0.00000000e+000</A>
+#         <B>0.00000000e+000</B>
+#         <C>-9.57000000e-008</C>
+#         <D>0.00000000e+000</D>
+#         <M>0.0</M>
+#         <CPcor>0.00000000e+000</CPcor>
+#       </Coefficients>
+#       <Coefficients equation="1" >
+#         <G>-3.99405308e+000</G>
+#         <H>4.26940024e-001</H>
+#         <I>2.75670483e-004</I>
+#         <J>7.86847868e-006</J>
+#         <CPcor>-9.57000000e-008</CPcor>
+#         <CTcor>3.2500e-006</CTcor>
+#         <!-- WBOTC not applicable unless ConductivityType = 1. -->
+#         <WBOTC>0.00000000e+000</WBOTC>
+#       </Coefficients>
+#       <Slope>1.00000000</Slope>
+#       <Offset>0.00000</Offset>
+#     </ConductivitySensor>
+#   </sensor>
+#   <sensor Channel="3" >
+#     <!-- Pressure voltage, Pressure, Strain Gauge -->
+#     <PressureSensor SensorID="49" >
+#       <SerialNumber>Sbe29-0274</SerialNumber>
+#       <CalibrationDate>12-Jan-2009</CalibrationDate>
+#       <A0>7.888379e+002</A0>
+#       <A1>-2.082626e-001</A1>
+#       <A2>3.829048e-007</A2>
+#       <Offset>0.00000</Offset>
+#     </PressureSensor>
+#   </sensor>
+#   <sensor Channel="4" >
+#     <!-- A/D voltage 0, Oxygen, SBE 43 -->
+#     <OxygenSensor SensorID="38" >
+#       <SerialNumber>Sbe43-1157</SerialNumber>
+#       <CalibrationDate>23-May-2017</CalibrationDate>
+#       <Use2007Equation>1</Use2007Equation>
+#       <CalibrationCoefficients equation="0" >
+#         <!-- Coefficients for Owens-Millard equation. -->
+#         <Boc>0.0000</Boc>
+#         <Soc>0.0000e+000</Soc>
+#         <offset>0.0000</offset>
+#         <Pcor>0.00e+000</Pcor>
+#         <Tcor>0.0000</Tcor>
+#         <Tau>0.0</Tau>
+#       </CalibrationCoefficients>
+#       <CalibrationCoefficients equation="1" >
+#         <!-- Coefficients for Sea-Bird equation - SBE calibration in 2007 and later. -->
+#         <Soc>4.8000e-001</Soc>
+#         <offset>-0.5166</offset>
+#         <A>-3.8247e-003</A>
+#         <B> 1.8386e-004</B>
+#         <C>-2.9783e-006</C>
+#         <D0> 2.5826e+000</D0>
+#         <D1> 1.92634e-004</D1>
+#         <D2>-4.64803e-002</D2>
+#         <E> 3.6000e-002</E>
+#         <Tau20> 1.6900</Tau20>
+#         <H1>-3.3000e-002</H1>
+#         <H2> 5.0000e+003</H2>
+#         <H3> 1.4500e+003</H3>
+#       </CalibrationCoefficients>
+#     </OxygenSensor>
+#   </sensor>
+#   <sensor Channel="5" >
+#     <!-- A/D voltage 1, Free -->
+#   </sensor>
+#   <sensor Channel="6" >
+#     <!-- A/D voltage 2, Free -->
+#   </sensor>
+#   <sensor Channel="7" >
+#     <!-- A/D voltage 3, Free -->
+#   </sensor>
+#   <sensor Channel="8" >
+#     <!-- A/D voltage 4, Fluorometer, Chelsea Minitracka -->
+#     <FluoroChelseaMinitrackaSensor SensorID="6" >
+#       <SerialNumber>Mini-175028</SerialNumber>
+#       <CalibrationDate>28 Jan 1998</CalibrationDate>
+#       <Vacetone>0.067</Vacetone>
+#       <Vacetone100>5.419</Vacetone100>
+#       <Offset>0.000</Offset>
+#     </FluoroChelseaMinitrackaSensor>
+#   </sensor>
+#   <sensor Channel="9" >
+#     <!-- A/D voltage 5, Free -->
+#   </sensor>
+#   <sensor Channel="10" >
+#     <!-- A/D voltage 6, PAR/Irradiance, Biospherical/Licor -->
+#     <PAR_BiosphericalLicorChelseaSensor SensorID="42" >
+#       <SerialNumber>SPQA-4859</SerialNumber>
+#       <CalibrationDate>04-Sept-2014</CalibrationDate>
+#       <M>-0.77060200</M>
+#       <B>-3.52671700</B>
+#       <CalibrationConstant>4.28000000</CalibrationConstant>
+#       <Multiplier>1.00000000</Multiplier>
+#       <Offset>0.00000000</Offset>
+#     </PAR_BiosphericalLicorChelseaSensor>
+#   </sensor>
+# </Sensors>
+# datcnv_date = Apr 19 2022 11:52:32, 7.26.6.28
+# datcnv_in = C:\Users\PROUDFOOTMA\Documents\.MISSIONS\2022\CAR2022102_WinterGF\Data\CTD\Reprocessed_Pinky\CTDDATA\22102007.hex C:\Users\PROUDFOOTMA\Documents\.MISSIONS\2022\CAR2022102_WinterGF\Data\CTD\Reprocessed_Pinky\Pinky1_Sbe25-0184standalone_Apr2022.xmlcon
+# datcnv_ox_hysteresis_correction = yes
+# datcnv_bottle_scan_range_source = BL file
+# datcnv_scans_per_bottle = 37
+# bottlesum_date = Apr 19 2022 11:52:36, 7.26.6.28
+# bottlesum_in = C:\Users\PROUDFOOTMA\Documents\.MISSIONS\2022\CAR2022102_WinterGF\Data\CTD\Reprocessed_Pinky\CTDDATA\22102007.ros C:\Users\PROUDFOOTMA\Documents\.MISSIONS\2022\CAR2022102_WinterGF\Data\CTD\Reprocessed_Pinky\Pinky1_Sbe25-0184standalone_Apr2022.xmlcon C:\Users\PROUDFOOTMA\Documents\.MISSIONS\2022\CAR2022102_WinterGF\Data\CTD\Reprocessed_Pinky\CTDDATA\22102007.BL
+# bottlesum_ox_tau_correction = yes
+    Bottle     Bottle        Date Sbeox0ML/L      Sal00 Potemp090C  Sigma-é00       Scan      TimeS       PrSM      T090C      C0S/m    Sbeox0V       FlCM        Par
+  Position       S/N         Time                                                                                                                                    
+      4        474818 Mar 31 2022     6.0542    33.2232     6.7908    26.0473        792     98.875      5.556     6.7912   3.348640     2.3385     5.3210 2.2323e+00 (avg)
+                         10:47:36                                                     11      1.353      0.329     0.0067   0.000340     0.0249     0.3117 1.9796e-01 (sdev)
+      3        474817 Mar 31 2022     6.7306    33.2207     6.7863    26.0459       3250    406.125     26.130     6.7886   3.349098     2.5941     5.8026 4.8180e-02 (avg)
+                         10:52:43                                                     11      1.353      0.503     0.0009   0.000096     0.0016     0.2241 6.2121e-03 (sdev)
+      2        474816 Mar 31 2022     6.7188    33.2219     6.7951    26.0457       3691    461.250     51.103     6.7996   3.351271     2.5846     6.2792 3.1472e-03 (avg)
+                         10:53:38                                                     11      1.353      0.476     0.0026   0.000221     0.0019     0.3323 1.0053e-04 (sdev)
+      1        474815 Mar 31 2022     6.7283    33.2220     6.7985    26.0453       3969    496.000     59.278     6.8037   3.352000     2.5782     6.0967 2.0116e-03 (avg)
+                         10:54:13                                                     11      1.353      0.365     0.0004   0.000037     0.0022     0.2897 0.0000e+00 (sdev)

@@ -115,7 +115,9 @@ def test_header_parse():
 def test_header_parse_blank_line():
     # check that a BTL file can still be loaded if the header section contains blank lines
     try:
-        btl = ctd.from_btl(data_path.joinpath("btl", "blank_line_header.btl"))
+        btl = ctd.from_btl(data_path.joinpath("btl", "blank_line_header.btl",))
+        # if a value error wasn't thrown, ensure the names array for the _metadata was set
+        assert btl._metadata["names"].index("Date")
     except ValueError as ex:
         # if the blank line in the header causes the reader to exit before reading the file
         # the line looking for the Date in the ctd.from_btl() will throw a ValueError.
@@ -125,9 +127,6 @@ def test_header_parse_blank_line():
         if ex.args[0] == "'Date' is not in list":
             raise AssertionError(
                 "Blank line in BTL file causes _parse_seabird function to exit before setting names") from ex
-
-    # if a value error wasn't thrown, ensure the names array for the _metadata was set
-    assert btl._metadata["names"].index("Date")
 
 
 def test_pressure_field_labels():

@@ -114,13 +114,17 @@ def test_header_parse():
 
 def test_header_parse_blank_line():
     # check that a BTL file can still be loaded if the header section contains blank lines
-    btl = ctd.from_btl(data_path.joinpath("btl", "blank_line_header.btl"))
+    try:
+        btl = ctd.from_btl(data_path.joinpath("btl", "blank_line_header.btl"))
+    except ValueError as ex:
+        # if the blank line in the header causes the reader to exit before reading the file
+        # the line looking for the Date in the ctd.from_btl() will throw a ValueError.
+        #
+        # > date_idx = metadata["names"].index("Date")
+        # E ValueError: 'Date' is not in list
+        assert False
 
-    # if the blank line in the header causes the reader to exit before reading the file
-    # the line looking for the Date in the ctd.from_btl will throw an error.
-    # > date_idx = metadata["names"].index("Date")
-    # E ValueError: 'Date' is not in list
-
+    # if a value error wasn't thrown, ensure the names array for the _metadata was set
     assert btl._metadata["names"].index("Date")
 
 

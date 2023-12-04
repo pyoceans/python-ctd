@@ -123,7 +123,8 @@ def test_header_parse_blank_line():
         # > date_idx = metadata["names"].index("Date")
         # E ValueError: 'Date' is not in list
         if ex.args[0] == "'Date' is not in list":
-            raise AssertionError("Blank line in BTL file causes _parse_seabird function to exit before setting names")
+            raise AssertionError(
+                "Blank line in BTL file causes _parse_seabird function to exit before setting names") from ex
 
     # if a value error wasn't thrown, ensure the names array for the _metadata was set
     assert btl._metadata["names"].index("Date")

@@ -169,6 +169,8 @@ def _parse_seabird(lines, ftype):
             # Skip empty lines.
             if not line:
                 continue
+
+            if not (line.startswith("*") | line.startswith("#")):
                 # Fix commonly occurring problem when Sbeox.* exists in the file
                 # the name is concatenated to previous parameter
                 # example:

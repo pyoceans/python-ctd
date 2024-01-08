@@ -112,6 +112,22 @@ def test_header_parse():
     np.testing.assert_almost_equal(xbt._metadata["lat"], -19.7174805)
 
 
+def test_header_parse_blank_line():
+    # check that a BTL file can still be loaded if the header section contains blank lines
+
+    # if the blank line in the header causes the reader to exit before reading the file
+    # the line looking for the Date in the ctd.from_btl() will throw a ValueError.
+    btl = ctd.from_btl(
+        data_path.joinpath(
+            "btl",
+            "blank_line_header.btl",
+        ),
+    )
+
+    # if a value error wasn't thrown, ensure the names array for the _metadata was set
+    assert btl._metadata["names"].index("Date")
+
+
 def test_pressure_field_labels():
     """
     Support different pressure field labels encountered in Sea-Bird cnv files.

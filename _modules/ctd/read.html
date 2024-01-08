@@ -1,23 +1,24 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ctd.read &#8212; ctd 1.4.5.dev18+gc95d9ac documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/sphinx_highlight.js"></script>
+    <title>ctd.read &#8212; ctd 1.4.5 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=a66d8bb5" />
+    <script src="../../_static/documentation_options.js?v=c97b86a3"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
   
+
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  
 
   </head><body>
   <div class="document">
@@ -26,7 +27,9 @@
         <div class="sphinxsidebarwrapper">
 <p class="logo">
   <a href="../../index.html">
-    <img class="logo" src="../../_static/logo.png" alt="Logo"/>
+    <img class="logo" src="../../_static/logo.png" alt="Logo" />
+    
+    <h1 class="logo logo-name">ctd</h1>
     
   </a>
 </p>
@@ -257,6 +260,10 @@
                 <span class="k">break</span>
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># btl.</span>
             <span class="c1"># There is no *END* like in a .cnv file, skip two after header info.</span>
+            <span class="c1"># Skip empty lines.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
+                <span class="k">continue</span>
+
             <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)):</span>
                 <span class="c1"># Fix commonly occurring problem when Sbeox.* exists in the file</span>
                 <span class="c1"># the name is concatenated to previous parameter</span>
@@ -285,7 +292,9 @@
     <span class="k">return</span> <span class="n">metadata</span>
 
 
-<div class="viewcode-block" id="from_bl"><a class="viewcode-back" href="../../ctd.html#ctd.read.from_bl">[docs]</a><span class="k">def</span> <span class="nf">from_bl</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+<div class="viewcode-block" id="from_bl">
+<a class="viewcode-back" href="../../ctd.html#ctd.read.from_bl">[docs]</a>
+<span class="k">def</span> <span class="nf">from_bl</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Read Seabird bottle-trip (bl) file</span>
 
 <span class="sd">    Example</span>
@@ -293,7 +302,7 @@
 <span class="sd">    &gt;&gt;&gt; from pathlib import Path</span>
 <span class="sd">    &gt;&gt;&gt; import ctd</span>
 <span class="sd">    &gt;&gt;&gt; data_path = Path(__file__).parents[1].joinpath(&quot;tests&quot;, &quot;data&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; df = ctd.from_bl(str(data_path.joinpath(&#39;bl&#39;, &#39;bottletest.bl&#39;)))</span>
+<span class="sd">    &gt;&gt;&gt; df = ctd.from_bl(str(data_path.joinpath(&quot;bl&quot;, &quot;bottletest.bl&quot;)))</span>
 <span class="sd">    &gt;&gt;&gt; df._metadata[&quot;time_of_reset&quot;]</span>
 <span class="sd">    datetime.datetime(2018, 6, 25, 20, 8, 55)</span>
 
@@ -313,7 +322,10 @@
     <span class="k">return</span> <span class="n">df</span></div>
 
 
-<div class="viewcode-block" id="from_btl"><a class="viewcode-back" href="../../ctd.html#ctd.read.from_btl">[docs]</a><span class="k">def</span> <span class="nf">from_btl</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+
+<div class="viewcode-block" id="from_btl">
+<a class="viewcode-back" href="../../ctd.html#ctd.read.from_btl">[docs]</a>
+<span class="k">def</span> <span class="nf">from_btl</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    DataFrame constructor to open Seabird CTD BTL-ASCII format.</span>
 
@@ -322,7 +334,7 @@
 <span class="sd">    &gt;&gt;&gt; from pathlib import Path</span>
 <span class="sd">    &gt;&gt;&gt; import ctd</span>
 <span class="sd">    &gt;&gt;&gt; data_path = Path(__file__).parents[1].joinpath(&quot;tests&quot;, &quot;data&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; bottles = ctd.from_btl(data_path.joinpath(&#39;btl&#39;, &#39;bottletest.btl&#39;))</span>
+<span class="sd">    &gt;&gt;&gt; bottles = ctd.from_btl(data_path.joinpath(&quot;btl&quot;, &quot;bottletest.btl&quot;))</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">f</span> <span class="o">=</span> <span class="n">_read_file</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
@@ -382,14 +394,20 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Could not convert </span><span class="si">%s</span><span class="s2"> to float.&quot;</span> <span class="o">%</span> <span class="n">column</span><span class="p">)</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Could not convert </span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2"> to float.&quot;</span><span class="p">,</span>
+                    <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="p">)</span>
 
     <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Date&quot;</span><span class="p">])</span>
-    <span class="nb">setattr</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;_metadata&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">_metadata</span> <span class="o">=</span> <span class="n">metadata</span>
     <span class="k">return</span> <span class="n">df</span></div>
 
 
-<div class="viewcode-block" id="from_edf"><a class="viewcode-back" href="../../ctd.html#ctd.read.from_edf">[docs]</a><span class="k">def</span> <span class="nf">from_edf</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+
+<div class="viewcode-block" id="from_edf">
+<a class="viewcode-back" href="../../ctd.html#ctd.read.from_edf">[docs]</a>
+<span class="k">def</span> <span class="nf">from_edf</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    DataFrame constructor to open XBT EDF ASCII format.</span>
 
@@ -398,8 +416,8 @@
 <span class="sd">    &gt;&gt;&gt; from pathlib import Path</span>
 <span class="sd">    &gt;&gt;&gt; import ctd</span>
 <span class="sd">    &gt;&gt;&gt; data_path = Path(__file__).parents[1].joinpath(&quot;tests&quot;, &quot;data&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; cast = ctd.from_edf(data_path.joinpath(&#39;XBT.EDF.gz&#39;))</span>
-<span class="sd">    &gt;&gt;&gt; ax = cast[&#39;temperature&#39;].plot_cast()</span>
+<span class="sd">    &gt;&gt;&gt; cast = ctd.from_edf(data_path.joinpath(&quot;XBT.EDF.gz&quot;))</span>
+<span class="sd">    &gt;&gt;&gt; ax = cast[&quot;temperature&quot;].plot_cast()</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">f</span> <span class="o">=</span> <span class="n">_read_file</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
@@ -461,11 +479,14 @@
         <span class="s2">&quot;header&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">header</span><span class="p">),</span>
         <span class="s2">&quot;serial&quot;</span><span class="p">:</span> <span class="n">serial</span><span class="p">,</span>
     <span class="p">}</span>
-    <span class="nb">setattr</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;_metadata&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">_metadata</span> <span class="o">=</span> <span class="n">metadata</span>
     <span class="k">return</span> <span class="n">df</span></div>
 
 
-<div class="viewcode-block" id="from_cnv"><a class="viewcode-back" href="../../ctd.html#ctd.read.from_cnv">[docs]</a><span class="k">def</span> <span class="nf">from_cnv</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+
+<div class="viewcode-block" id="from_cnv">
+<a class="viewcode-back" href="../../ctd.html#ctd.read.from_cnv">[docs]</a>
+<span class="k">def</span> <span class="nf">from_cnv</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    DataFrame constructor to open Seabird CTD CNV-ASCII format.</span>
 
@@ -474,9 +495,9 @@
 <span class="sd">    &gt;&gt;&gt; from pathlib import Path</span>
 <span class="sd">    &gt;&gt;&gt; import ctd</span>
 <span class="sd">    &gt;&gt;&gt; data_path = Path(__file__).parents[1].joinpath(&quot;tests&quot;, &quot;data&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; cast = ctd.from_cnv(data_path.joinpath(&#39;CTD_big.cnv.bz2&#39;))</span>
+<span class="sd">    &gt;&gt;&gt; cast = ctd.from_cnv(data_path.joinpath(&quot;CTD_big.cnv.bz2&quot;))</span>
 <span class="sd">    &gt;&gt;&gt; downcast, upcast = cast.split()</span>
-<span class="sd">    &gt;&gt;&gt; ax = downcast[&#39;t090C&#39;].plot_cast()</span>
+<span class="sd">    &gt;&gt;&gt; ax = downcast[&quot;t090C&quot;].plot_cast()</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">f</span> <span class="o">=</span> <span class="n">_read_file</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
@@ -542,14 +563,20 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Could not convert </span><span class="si">%s</span><span class="s2"> to float.&quot;</span> <span class="o">%</span> <span class="n">column</span><span class="p">)</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Could not convert </span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2"> to float.&quot;</span><span class="p">,</span>
+                    <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="p">)</span>
 
     <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-    <span class="nb">setattr</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;_metadata&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">_metadata</span> <span class="o">=</span> <span class="n">metadata</span>
     <span class="k">return</span> <span class="n">df</span></div>
 
 
-<div class="viewcode-block" id="from_fsi"><a class="viewcode-back" href="../../ctd.html#ctd.read.from_fsi">[docs]</a><span class="k">def</span> <span class="nf">from_fsi</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="mi">9</span><span class="p">):</span>
+
+<div class="viewcode-block" id="from_fsi">
+<a class="viewcode-back" href="../../ctd.html#ctd.read.from_fsi">[docs]</a>
+<span class="k">def</span> <span class="nf">from_fsi</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="mi">9</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    DataFrame constructor to open Falmouth Scientific, Inc. (FSI) CTD</span>
 <span class="sd">    ASCII format.</span>
@@ -559,9 +586,9 @@
 <span class="sd">    &gt;&gt;&gt; from pathlib import Path</span>
 <span class="sd">    &gt;&gt;&gt; import ctd</span>
 <span class="sd">    &gt;&gt;&gt; data_path = Path(__file__).parents[1].joinpath(&quot;tests&quot;, &quot;data&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; cast = ctd.from_fsi(data_path.joinpath(&#39;FSI.txt.gz&#39;))</span>
+<span class="sd">    &gt;&gt;&gt; cast = ctd.from_fsi(data_path.joinpath(&quot;FSI.txt.gz&quot;))</span>
 <span class="sd">    &gt;&gt;&gt; downcast, upcast = cast.split()</span>
-<span class="sd">    &gt;&gt;&gt; ax = downcast[&#39;TEMP&#39;].plot_cast()</span>
+<span class="sd">    &gt;&gt;&gt; ax = downcast[&quot;TEMP&quot;].plot_cast()</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">f</span> <span class="o">=</span> <span class="n">_read_file</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
@@ -578,11 +605,14 @@
     <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;PRES&quot;</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Pressure [dbar]&quot;</span>
     <span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">fname</span><span class="p">)}</span>
-    <span class="nb">setattr</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;_metadata&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">_metadata</span> <span class="o">=</span> <span class="n">metadata</span>
     <span class="k">return</span> <span class="n">df</span></div>
 
 
-<div class="viewcode-block" id="rosette_summary"><a class="viewcode-back" href="../../ctd.html#ctd.read.rosette_summary">[docs]</a><span class="k">def</span> <span class="nf">rosette_summary</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+
+<div class="viewcode-block" id="rosette_summary">
+<a class="viewcode-back" href="../../ctd.html#ctd.read.rosette_summary">[docs]</a>
+<span class="k">def</span> <span class="nf">rosette_summary</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Make a BTL (bottle) file from a ROS (bottle log) file.</span>
 
@@ -596,7 +626,7 @@
 <span class="sd">    &gt;&gt;&gt; from pathlib import Path</span>
 <span class="sd">    &gt;&gt;&gt; import ctd</span>
 <span class="sd">    &gt;&gt;&gt; data_path = Path(__file__).parents[1].joinpath(&quot;tests&quot;, &quot;data&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; fname = data_path.joinpath(&#39;CTD/g01l01s01.ros&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; fname = data_path.joinpath(&quot;CTD/g01l01s01.ros&quot;)</span>
 <span class="sd">    &gt;&gt;&gt; ros = ctd.rosette_summary(fname)</span>
 <span class="sd">    &gt;&gt;&gt; ros = ros.groupby(ros.index).mean()</span>
 <span class="sd">    &gt;&gt;&gt; ros.pressure.values.astype(int)</span>
@@ -610,14 +640,17 @@
     <span class="k">return</span> <span class="n">ros</span></div>
 
 
-<div class="viewcode-block" id="from_castaway_csv"><a class="viewcode-back" href="../../ctd.html#ctd.read.from_castaway_csv">[docs]</a><span class="k">def</span> <span class="nf">from_castaway_csv</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+
+<div class="viewcode-block" id="from_castaway_csv">
+<a class="viewcode-back" href="../../ctd.html#ctd.read.from_castaway_csv">[docs]</a>
+<span class="k">def</span> <span class="nf">from_castaway_csv</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    DataFrame constructor to open CastAway CSV format.</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; import ctd</span>
-<span class="sd">    &gt;&gt;&gt; cast = ctd.from_castaway_csv(&#39;tests/data/castaway_data.csv&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; cast = ctd.from_castaway_csv(&quot;tests/data/castaway_data.csv&quot;)</span>
 <span class="sd">    &gt;&gt;&gt; cast.columns</span>
 <span class="sd">    Index([&#39;depth&#39;, &#39;temperature&#39;, &#39;conductivity&#39;, &#39;specific_conductance&#39;,</span>
 <span class="sd">           &#39;salinity&#39;, &#39;sound_velocity&#39;, &#39;density&#39;],</span>
@@ -652,9 +685,10 @@
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
         <span class="n">metadata</span><span class="p">[</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;units&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span>
-    <span class="nb">setattr</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;_metadata&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">_metadata</span> <span class="o">=</span> <span class="n">metadata</span>
 
     <span class="k">return</span> <span class="n">df</span></div>
+
 </pre></div>
 
           </div>
@@ -664,17 +698,17 @@
     <div class="clearer"></div>
   </div>
     <div class="footer">
-      &copy;2017, Filipe Fernandes.
+      &#169;2017, Filipe Fernandes.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.0.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.15</a>
       
     </div>
 
     
     <a href="https://github.com/pyoceans/python-ctd" class="github">
-        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
     </a>
     
 

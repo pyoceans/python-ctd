@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Quick introduction &#8212; ctd 1.4.5.dev18+gc95d9ac documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <title>Quick introduction &#8212; ctd 1.4.5 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=a66d8bb5" />
     <link rel="stylesheet" type="text/css" href="_static/nbsphinx-code-cells.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/documentation_options.js?v=c97b86a3"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -22,8 +22,9 @@
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
+
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  
 
   </head><body>
   <div class="document">
@@ -32,7 +33,9 @@
         <div class="sphinxsidebarwrapper">
 <p class="logo">
   <a href="index.html">
-    <img class="logo" src="_static/logo.png" alt="Logo"/>
+    <img class="logo" src="_static/logo.png" alt="Logo" />
+    
+    <h1 class="logo logo-name">ctd</h1>
     
   </a>
 </p>
@@ -100,9 +103,9 @@
           <div class="body" role="main">
             
   <section id="Quick-introduction">
-<h1>Quick introduction<a class="headerlink" href="#Quick-introduction" title="Permalink to this heading">¶</a></h1>
+<h1>Quick introduction<a class="headerlink" href="#Quick-introduction" title="Link to this heading">¶</a></h1>
 <section id="Reading-and-plotting">
-<h2>Reading and plotting<a class="headerlink" href="#Reading-and-plotting" title="Permalink to this heading">¶</a></h2>
+<h2>Reading and plotting<a class="headerlink" href="#Reading-and-plotting" title="Link to this heading">¶</a></h2>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -464,7 +467,7 @@ dict_keys([&#39;name&#39;, &#39;header&#39;, &#39;config&#39;, &#39;names&#39;, 
 </div>
 </section>
 <section id="Pre-processing-steps">
-<h2>Pre-processing steps<a class="headerlink" href="#Pre-processing-steps" title="Permalink to this heading">¶</a></h2>
+<h2>Pre-processing steps<a class="headerlink" href="#Pre-processing-steps" title="Link to this heading">¶</a></h2>
 <p>Usually the first pre-processing step is to filter the high frequency jitter in the pressure sensor with a low pass filter, here is a zoom in the pressure data (the <code class="docutils literal notranslate"><span class="pre">pandas</span></code> index) demonstrating it:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
@@ -569,7 +572,7 @@ dict_keys([&#39;name&#39;, &#39;header&#39;, &#39;config&#39;, &#39;names&#39;, 
 </div>
 </section>
 <section id="CTD-derive">
-<h2>CTD derive<a class="headerlink" href="#CTD-derive" title="Permalink to this heading">¶</a></h2>
+<h2>CTD derive<a class="headerlink" href="#CTD-derive" title="Link to this heading">¶</a></h2>
 <p>Now we can compute all the derived variables.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
@@ -722,11 +725,11 @@ dict_keys([&#39;name&#39;, &#39;header&#39;, &#39;config&#39;, &#39;names&#39;, 
     <div class="clearer"></div>
   </div>
     <div class="footer">
-      &copy;2017, Filipe Fernandes.
+      &#169;2017, Filipe Fernandes.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.0.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.15</a>
       
       |
       <a href="_sources/quick_intro-output.ipynb.txt"
@@ -735,7 +738,7 @@ dict_keys([&#39;name&#39;, &#39;header&#39;, &#39;config&#39;, &#39;names&#39;, 
 
     
     <a href="https://github.com/pyoceans/python-ctd" class="github">
-        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
     </a>
     
 

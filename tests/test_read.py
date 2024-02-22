@@ -6,7 +6,6 @@ import pandas as pd
 import pytest
 
 import ctd
-import read
 from ctd.read import _read_file
 
 data_path = Path(__file__).parent.joinpath("data")
@@ -104,7 +103,7 @@ def test_ros_is_dataframe(ros):
 def test_ros_no_file_name(ros):
     file = open(mode="rb", file=data_path.joinpath("CTD", "fixstation_hl_02.ros"))
     stream = StringIO(file.read().decode("cp1252"))
-    data = read.rosette_summary(stream)
+    data = ctd.rosette_summary(stream)
     assert data._metadata['name'] == 'unknown'
 
 

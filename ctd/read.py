@@ -448,7 +448,9 @@ def from_cnv(fname):
             )
             df.index.name = prkey
 
-    name = _basename(fname)[1]
+    if 'name' not in metadata:
+        name = _basename(fname)[1]
+        metadata["name"] = str(name)
 
     dtypes = {"bpos": int, "pumps": bool, "flag": bool}
     for column in df.columns:
@@ -463,7 +465,6 @@ def from_cnv(fname):
                     stacklevel=2,
                 )
 
-    metadata["name"] = str(name)
     df._metadata = metadata
     return df
 

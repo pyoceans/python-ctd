@@ -6,6 +6,7 @@ import pandas as pd
 import pytest
 
 import ctd
+import read
 from ctd.read import _read_file
 
 data_path = Path(__file__).parent.joinpath("data")
@@ -97,6 +98,14 @@ def test_btl_as_stringio(btl_as_stream):
 def test_ros_is_dataframe(ros):
     assert isinstance(ros, pd.DataFrame)
     assert not ros.empty
+
+
+# if missing the 'File Name' in the header the dataframe._metadata['name'] should be set to 'unknown'
+def test_ros_no_file_name(ros):
+    file = open(mode="rb", file=data_path.joinpath("CTD", "fixstation_hl_02.ros"))
+    stream = StringIO(file.read().decode("cp1252"))
+    data = read.rosette_summary(stream)
+    assert data._metadata['name'] == 'unknown'
 
 
 # HeaderTest.

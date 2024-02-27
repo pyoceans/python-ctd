@@ -448,7 +448,7 @@ def from_cnv(fname):
             )
             df.index.name = prkey
 
-    if 'name' not in metadata:
+    if "name" not in metadata:
         name = _basename(fname)[1]
         metadata["name"] = str(name)
 

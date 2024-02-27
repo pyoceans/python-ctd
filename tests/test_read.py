@@ -99,6 +99,14 @@ def test_ros_is_dataframe(ros):
     assert not ros.empty
 
 
+# if missing the 'File Name' in the header the dataframe._metadata['name'] should be set to 'unknown'
+def test_ros_no_file_name(ros):
+    file = open(mode="rb", file=data_path.joinpath("CTD", "fixstation_hl_02.ros"))
+    stream = StringIO(file.read().decode("cp1252"))
+    data = ctd.rosette_summary(stream)
+    assert data._metadata["name"] == "unknown"
+
+
 # HeaderTest.
 def test_header_parse():
     # file with missing positions

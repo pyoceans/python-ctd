@@ -46,7 +46,7 @@ write_to_template = "__version__ = '{version}'"
 tag_regex = "^(?P<prefix>v)?(?P<version>[^\\+]+)(?P<suffix>.*)?$"
 
 [tool.ruff]
-select = [
+lint.select = [
     "A", # flake8-builtins
     "B", # flake8-bugbear
     "C4", # flake8-comprehensions
@@ -58,10 +58,11 @@ select = [
 target-version = "py39"
 line-length = 80
 
+# [lint.per-file-ignores]
 [tool.ruff.per-file-ignores]
 "docs/source/conf.py" = [
-  "E402",
-  "A001",
+  "E402",  # Module level import not at top of file
+  "A001",  # builtin-variable-shadowing
 ]
 
 [tool.check-manifest]

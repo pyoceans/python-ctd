@@ -1,6 +1,5 @@
-"""
-Tools to load hydrographic data as pandas DataFrame with some handy methods for
-data pre-processing and analysis.
+"""Tools to load hydrographic data as pandas DataFrame with some handy methods
+for data pre-processing and analysis.
 """
 
 from .plotting import plot_cast

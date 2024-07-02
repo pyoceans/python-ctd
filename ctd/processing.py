@@ -116,7 +116,7 @@ def _bindata(series: pd.Series, delta: int, method: str) -> pd.Series:
     new_index = np.arange(start, stop, delta)
     binned = pd.cut(series.index, bins=new_index)
     if method == "average":
-        new_series = series.groupby(binned).mean()
+        new_series = series.groupby(binned, observed=False).mean()
         new_series.index = new_index[:-1] + delta / 2
     elif method == "interpolate":
         data = np.interp(new_index, series.index, series)

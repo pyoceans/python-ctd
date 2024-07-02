@@ -1,15 +1,15 @@
-"""
-Read module
-"""
+"""Read module."""
+
+from __future__ import annotations
 
 import bz2
 import collections
+import datetime
 import gzip
 import linecache
 import re
 import warnings
 import zipfile
-from datetime import datetime
 from io import StringIO
 from pathlib import Path
 
@@ -19,7 +19,7 @@ import numpy as np
 import pandas as pd
 
 
-def _basename(fname):
+def _basename(fname: str | Path) -> (str, str, str):
     """Return file name without path."""
     if not isinstance(fname, Path):
         fname = Path(fname)
@@ -27,14 +27,13 @@ def _basename(fname):
     return path, name, ext
 
 
-def _normalize_names(name):
+def _normalize_names(name: str) -> str:
     """Normalize column names."""
     name = name.strip()
-    name = name.strip("*")
-    return name
+    return name.strip("*")
 
 
-def _open_compressed(fname):
+def _open_compressed(fname: Path) -> str:
     """Open compressed gzip, gz, zip or bz2 files."""
     extension = fname.suffix.casefold()
     if extension in [".gzip", ".gz"]:
@@ -50,15 +49,19 @@ def _open_compressed(fname):
         name = zfile.namelist()[0]
         cfile = zfile.open(name)
     else:
+        msg = (
+            "Unrecognized file extension. "
+            f"Expected .gzip, .bz2, or .zip, got {extension}"
+        )
         raise ValueError(
-            f"Unrecognized file extension. Expected .gzip, .bz2, or .zip, got {extension}",
+            msg,
         )
     contents = cfile.read()
     cfile.close()
     return contents
 
 
-def _read_file(fname):
+def _read_file(fname: str | Path | StringIO) -> StringIO:
     """Read file contents, or read from StringIO object."""
     if isinstance(fname, StringIO):
         fname.seek(0)
@@ -71,11 +74,15 @@ def _read_file(fname):
     extension = fname.suffix.casefold()
     if extension in [".gzip", ".gz", ".bz2", ".zip"]:
         contents = _open_compressed(fname)
-    elif extension in [".cnv", ".edf", ".txt", ".ros", ".btl"]:
+    elif extension in [".cnv", ".edf", ".txt", ".ros", ".btl", ".bl", ".csv"]:
         contents = fname.read_bytes()
     else:
+        msg = (
+            "Unrecognized file extension. "
+            f"Expected .cnv, .edf, .txt, .ros, or .btl got {extension}"
+        )
         raise ValueError(
-            f"Unrecognized file extension. Expected .cnv, .edf, .txt, .ros, or .btl got {extension}",
+            msg,
         )
     # Read as bytes but we need to return strings for the parsers.
     encoding = chardet.detect(contents)["encoding"]
@@ -83,27 +90,34 @@ def _read_file(fname):
     return StringIO(text)
 
 
-def _remane_duplicate_columns(names):
+def _remane_duplicate_columns(names: str) -> str:
     """Rename a column when it is duplicated."""
     items = collections.Counter(names).items()
     dup = []
     for item, count in items:
-        if count > 2:
+        if count > 2:  # noqa: PLR2004
+            msg = (
+                "Cannot handle more than two duplicated columns. "
+                f"Found {count} for {item}."
+            )
             raise ValueError(
-                f"Cannot handle more than two duplicated columns. Found {count} for {item}.",
+                msg,
             )
         if count > 1:
             dup.append(item)
 
-    # since we can assume there are only two instances of a word in the list, how about we find the last
-    # index of an instance, which will be the second occurrence of the item
-    second_occurrences = [len(names) - names[::-1].index(item) - 1 for item in dup]
+    # We can assume there are only two instances of a word in the list,
+    # we find the last index of an instance,
+    # which will be the second occurrence of the item.
+    second_occurrences = [
+        len(names) - names[::-1].index(item) - 1 for item in dup
+    ]
     for idx in second_occurrences:
         names[idx] = f"{names[idx]}_"
     return names
 
 
-def _parse_seabird(lines, ftype):
+def _parse_seabird(lines: list, ftype: str) -> dict:  # noqa: C901, PLR0912, PLR0915
     """Parse searbird formats."""
     # Initialize variables.
     lon = lat = time = None, None, None
@@ -112,15 +126,15 @@ def _parse_seabird(lines, ftype):
 
     metadata = {}
     header, config, names = [], [], []
-    for k, line in enumerate(lines):
-        line = line.strip()
+    for k, raw_line in enumerate(lines):
+        line = raw_line.strip()
 
-        # Only cnv has columns names, for bottle files we will use the variable row.
-        if ftype == "cnv":
-            if "# name" in line:
-                name, unit = line.split("=")[1].split(":")
-                name, unit = list(map(_normalize_names, (name, unit)))
-                names.append(name)
+        # Only cnv has columns names,
+        # for bottle files we will use the variable row.
+        if ftype == "cnv" and "# name" in line:
+            name, unit = line.split("=")[1].split(":")
+            name, unit = list(map(_normalize_names, (name, unit)))
+            names.append(name)
 
         # Seabird headers starts with *.
         if line.startswith("*"):
@@ -137,27 +151,32 @@ def _parse_seabird(lines, ftype):
         if "NMEA Latitude" in line:
             hemisphere = line[-1]
             lat = line.strip(hemisphere).split("=")[1].strip()
-            lat = np.float_(lat.split())
+            lat = np.float64(lat.split())
             if hemisphere == "S":
                 lat = -(lat[0] + lat[1] / 60.0)
             elif hemisphere == "N":
                 lat = lat[0] + lat[1] / 60.0
             else:
-                raise ValueError("Latitude not recognized.")
+                msg = "Latitude not recognized."
+                raise ValueError(msg)
         if "NMEA Longitude" in line:
             hemisphere = line[-1]
             lon = line.strip(hemisphere).split("=")[1].strip()
-            lon = np.float_(lon.split())
+            lon = np.float64(lon.split())
             if hemisphere == "W":
                 lon = -(lon[0] + lon[1] / 60.0)
             elif hemisphere == "E":
                 lon = lon[0] + lon[1] / 60.0
             else:
-                raise ValueError("Latitude not recognized.")
+                msg = "Latitude not recognized."
+                raise ValueError(msg)
         if "NMEA UTC (Time)" in line:
             time = line.split("=")[-1].strip()
             # Should use some fuzzy datetime parser to make this more robust.
-            time = datetime.strptime(time, "%b %d %Y %H:%M:%S")
+            time = datetime.datetime.strptime(
+                time,
+                "%b %d %Y %H:%M:%S",
+            ).astimezone(datetime.UTC)
 
         # cnv file header ends with *END* while
         if ftype == "cnv":
@@ -174,7 +193,7 @@ def _parse_seabird(lines, ftype):
                 # Fix commonly occurring problem when Sbeox.* exists in the file
                 # the name is concatenated to previous parameter
                 # example:
-                #   CStarAt0Sbeox0Mm/Kg to CStarAt0 Sbeox0Mm/Kg (really two different params)
+                #   CStarAt0Sbeox0Mm/Kg to CStarAt0 Sbeox0Mm/Kg
                 line = re.sub(r"(\S)Sbeox", "\\1 Sbeox", line)
 
                 names = line.split()
@@ -198,10 +217,10 @@ def _parse_seabird(lines, ftype):
     return metadata
 
 
-def from_bl(fname):
-    """Read Seabird bottle-trip (bl) file
+def from_bl(fname: str | Path) -> pd.DataFrame:
+    """Read Seabird bottle-trip (bl) file.
 
-    Example
+    Example:
     -------
     >>> from pathlib import Path
     >>> import ctd
@@ -211,24 +230,24 @@ def from_bl(fname):
     datetime.datetime(2018, 6, 25, 20, 8, 55)
 
     """
-    df = pd.read_csv(
-        fname,
+    f = _read_file(fname)
+    cast = pd.read_csv(
+        f,
         skiprows=2,
         parse_dates=[1],
         index_col=0,
         names=["bottle_number", "time", "startscan", "endscan"],
     )
-    df._metadata = {
+    cast._metadata = {  # noqa: SLF001
         "time_of_reset": pd.to_datetime(
             linecache.getline(str(fname), 2)[6:-1],
         ).to_pydatetime(),
     }
-    return df
+    return cast
 
 
-def from_btl(fname):
-    """
-    DataFrame constructor to open Seabird CTD BTL-ASCII format.
+def from_btl(fname: str | Path) -> pd.DataFrame:
+    """DataFrame constructor to open Seabird CTD BTL-ASCII format.
 
     Examples
     --------
@@ -243,7 +262,7 @@ def from_btl(fname):
 
     f.seek(0)
 
-    df = pd.read_fwf(
+    cast = pd.read_fwf(
         f,
         header=None,
         index_col=False,
@@ -258,22 +277,24 @@ def from_btl(fname):
     # Also needs date,time,and bottle number to be converted to one per line.
 
     # Get row types, see what you have: avg, std, min, max or just avg, std.
-    rowtypes = df[df.columns[-1]].unique()
+    rowtypes = cast[cast.columns[-1]].unique()
     # Get times and dates which occur on second line of each bottle.
     date_idx = metadata["names"].index("Date")
-    dates = df.iloc[:: len(rowtypes), date_idx].reset_index(drop=True)
-    times = df.iloc[1 :: len(rowtypes), date_idx].reset_index(drop=True)
+    dates = cast.iloc[:: len(rowtypes), date_idx].reset_index(drop=True)
+    times = cast.iloc[1 :: len(rowtypes), date_idx].reset_index(drop=True)
     datetimes = dates + " " + times
 
     # Fill the Date column with datetimes.
-    df.loc[:: len(rowtypes), "Date"] = datetimes.values
-    df.loc[1 :: len(rowtypes), "Date"] = datetimes.values
+    cast.loc[:: len(rowtypes), "Date"] = datetimes.to_numpy()
+    cast.loc[1 :: len(rowtypes), "Date"] = datetimes.to_numpy()
 
     # Fill missing rows.
-    df["Bottle"] = df["Bottle"].fillna(method="ffill")
-    df["Date"] = df["Date"].fillna(method="ffill")
+    cast["Bottle"] = cast["Bottle"].ffill()
+    cast["Date"] = cast["Date"].ffill()
 
-    df["Statistic"] = df["Statistic"].str.lstrip("(").str.rstrip(")")  # (avg) to avg
+    cast["Statistic"] = (
+        cast["Statistic"].str.lstrip("(").str.rstrip(")")
+    )  # (avg) to avg
 
     if "name" not in metadata:
         name = _basename(fname)[1]
@@ -288,26 +309,25 @@ def from_btl(fname):
         "Statistic": str,
         "Date": str,
     }
-    for column in df.columns:
+    for column in cast.columns:
         if column in dtypes:
-            df[column] = df[column].astype(dtypes[column])
+            cast[column] = cast[column].astype(dtypes[column])
         else:
             try:
-                df[column] = df[column].astype(float)
+                cast[column] = cast[column].astype(float)
             except ValueError:
                 warnings.warn(
                     f"Could not convert {column} to float.",
                     stacklevel=2,
                 )
 
-    df["Date"] = pd.to_datetime(df["Date"])
-    df._metadata = metadata
-    return df
+    cast["Date"] = pd.to_datetime(cast["Date"])
+    cast._metadata = metadata  # noqa: SLF001
+    return cast
 
 
-def from_edf(fname):
-    """
-    DataFrame constructor to open XBT EDF ASCII format.
+def from_edf(fname: str | Path) -> pd.DataFrame:  # noqa: C901, PLR0912
+    """DataFrame constructor to open XBT EDF ASCII format.
 
     Examples
     --------
@@ -320,15 +340,15 @@ def from_edf(fname):
     """
     f = _read_file(fname)
     header, names = [], []
-    for k, line in enumerate(f.readlines()):
-        line = line.strip()
+    for k, raw_line in enumerate(f.readlines()):
+        line = raw_line.strip()
         if line.startswith("Serial Number"):
             serial = line.strip().split(":")[1].strip()
         elif line.startswith("Latitude"):
             try:
                 hemisphere = line[-1]
                 lat = line.strip(hemisphere).split(":")[1].strip()
-                lat = np.float_(lat.split())
+                lat = np.float64(lat.split())
                 if hemisphere == "S":
                     lat = -(lat[0] + lat[1] / 60.0)
                 elif hemisphere == "N":
@@ -339,7 +359,7 @@ def from_edf(fname):
             try:
                 hemisphere = line[-1]
                 lon = line.strip(hemisphere).split(":")[1].strip()
-                lon = np.float_(lon.split())
+                lon = np.float64(lon.split())
                 if hemisphere == "W":
                     lon = -(lon[0] + lon[1] / 60.0)
                 elif hemisphere == "E":
@@ -356,18 +376,18 @@ def from_edf(fname):
             break
 
     f.seek(0)
-    df = pd.read_csv(
+    cast = pd.read_csv(
         f,
         header=None,
         index_col=None,
         names=names,
         skiprows=skiprows,
-        delim_whitespace=True,
+        sep=r"\s+",
     )
     f.close()
 
-    df.set_index("depth", drop=True, inplace=True)
-    df.index.name = "Depth [m]"
+    cast = cast.set_index("depth", drop=True)
+    cast.index.name = "Depth [m]"
     name = _basename(fname)[1]
 
     metadata = {
@@ -377,13 +397,12 @@ def from_edf(fname):
         "header": "\n".join(header),
         "serial": serial,
     }
-    df._metadata = metadata
-    return df
+    cast._metadata = metadata  # noqa: SLF001
+    return cast
 
 
-def from_cnv(fname):
-    """
-    DataFrame constructor to open Seabird CTD CNV-ASCII format.
+def from_cnv(fname: str | Path) -> pd.DataFrame:
+    """DataFrame constructor to open Seabird CTD CNV-ASCII format.
 
     Examples
     --------
@@ -399,13 +418,13 @@ def from_cnv(fname):
     metadata = _parse_seabird(f.readlines(), ftype="cnv")
 
     f.seek(0)
-    df = pd.read_fwf(
+    cast = pd.read_fwf(
         f,
         header=None,
         index_col=None,
         names=metadata["names"],
         skiprows=metadata["skiprows"],
-        delim_whitespace=True,
+        sep=r"\s+",
         widths=[11] * len(metadata["names"]),
     )
     f.close()
@@ -422,56 +441,60 @@ def from_cnv(fname):
         "depSM",
         "prDE",
     ]
-    df.columns = df.columns.str.strip()
-    prkey = [key for key in prkeys if key in df.columns]
+    cast.columns = cast.columns.str.strip()
+    prkey = [key for key in prkeys if key in cast.columns]
     if len(prkey) == 0:
-        raise ValueError("Expected one pressure/depth column, didn't receive any")
-    elif len(prkey) > 1:
-        # if multiple keys present then keep the first one
+        msg = "Expected one pressure/depth column, didn't receive any"
+        raise ValueError(
+            msg,
+        )
+    if len(prkey) > 1:
+        # If multiple keys present then keep the first one.
         prkey = prkey[0]
 
-    df.set_index(prkey, drop=True, inplace=True)
-    df.index.name = "Pressure [dbar]"
+    cast = cast.set_index(prkey, drop=True)
+    cast.index.name = "Pressure [dbar]"
     if prkey == "depSM":
         lat = metadata.get("lat", None)
         if lat is not None:
-            df.index = gsw.p_from_z(
-                df.index,
+            cast.index = gsw.p_from_z(
+                cast.index,
                 lat,
                 geo_strf_dyn_height=0,
                 sea_surface_geopotential=0,
             )
         else:
-            warnings.war(
-                f"Missing latitude information. Cannot compute pressure! Your index is {prkey}, "
-                "please compute pressure manually with `gsw.p_from_z` and overwrite your index.",
+            msg = (
+                "Missing latitude information. Cannot compute pressure! "
+                f"Your index is {prkey}, please compute pressure manually "
+                "with `gsw.p_from_z` and overwrite your index."
             )
-            df.index.name = prkey
+            warnings.war(msg)
+            cast.index.name = prkey
 
     if "name" not in metadata:
         name = _basename(fname)[1]
         metadata["name"] = str(name)
 
     dtypes = {"bpos": int, "pumps": bool, "flag": bool}
-    for column in df.columns:
+    for column in cast.columns:
         if column in dtypes:
-            df[column] = df[column].astype(dtypes[column])
+            cast[column] = cast[column].astype(dtypes[column])
         else:
             try:
-                df[column] = df[column].astype(float)
+                cast[column] = cast[column].astype(float)
             except ValueError:
                 warnings.warn(
                     f"Could not convert {column} to float.",
                     stacklevel=2,
                 )
 
-    df._metadata = metadata
-    return df
+    cast._metadata = metadata  # noqa: SLF001
+    return cast
 
 
-def from_fsi(fname, skiprows=9):
-    """
-    DataFrame constructor to open Falmouth Scientific, Inc. (FSI) CTD
+def from_fsi(fname: str | Path, skiprows: int = 9) -> pd.DataFrame:
+    """DataFrame constructor to open Falmouth Scientific, Inc. (FSI) CTD
     ASCII format.
 
     Examples
@@ -485,26 +508,25 @@ def from_fsi(fname, skiprows=9):
 
     """
     f = _read_file(fname)
-    df = pd.read_csv(
+    fsi = pd.read_csv(
         f,
         header="infer",
         index_col=None,
         skiprows=skiprows,
         dtype=float,
-        delim_whitespace=True,
+        sep=r"\s+",
     )
     f.close()
 
-    df.set_index("PRES", drop=True, inplace=True)
-    df.index.name = "Pressure [dbar]"
+    fsi = fsi.set_index("PRES", drop=True)
+    fsi.index.name = "Pressure [dbar]"
     metadata = {"name": str(fname)}
-    df._metadata = metadata
-    return df
+    fsi._metadata = metadata  # noqa: SLF001
+    return fsi
 
 
-def rosette_summary(fname):
-    """
-    Make a BTL (bottle) file from a ROS (bottle log) file.
+def rosette_summary(fname: str | Path) -> pd.DataFrame:
+    """Make a BTL (bottle) file from a ROS (bottle log) file.
 
     More control for the averaging process and at which step we want to
     perform this averaging eliminating the need to read the data into SBE
@@ -519,23 +541,24 @@ def rosette_summary(fname):
     >>> fname = data_path.joinpath("CTD/g01l01s01.ros")
     >>> ros = ctd.rosette_summary(fname)
     >>> ros = ros.groupby(ros.index).mean()
-    >>> ros.pressure.values.astype(int)
+    >>> ros.pressure.to_numpy().astype(int)
     array([835, 806, 705, 604, 503, 404, 303, 201, 151, 100,  51,   1])
 
     """
     ros = from_cnv(fname)
-    ros["pressure"] = ros.index.values.astype(float)
+    ros["pressure"] = ros.index.to_numpy().astype(float)
     ros["nbf"] = ros["nbf"].astype(int)
-    ros.set_index("nbf", drop=True, inplace=True, verify_integrity=False)
+    metadata = ros._metadata  # noqa: SLF001
+    ros = ros.set_index("nbf", drop=True, verify_integrity=False)
+    ros._metadata = metadata  # noqa: SLF001
     return ros
 
 
-def from_castaway_csv(fname):
-    """
-    DataFrame constructor to open CastAway CSV format.
+def from_castaway_csv(fname: str | Path) -> pd.DataFrame:
+    """DataFrame constructor to open CastAway CSV format.
 
-    Example
-    --------
+    Example:
+    -------
     >>> import ctd
     >>> cast = ctd.from_castaway_csv("tests/data/castaway_data.csv")
     >>> cast.columns
@@ -544,27 +567,28 @@ def from_castaway_csv(fname):
           dtype='object')
 
     """
-    with open(fname) as file:
-        f = file.readlines()
+    f = _read_file(fname)
+    lines = f.readlines()
 
     # Strip newline characters
-    f = [s.strip() for s in f]
+    lines = [s.strip() for s in lines]
 
     # Separate meta data and CTD profile
-    meta = [s for s in f if s[0] == "%"][0:-1]
-    data = [s.split(",") for s in f if s[0] != "%"]
-    df = pd.DataFrame(data[1:-1], columns=data[0])
+    meta = [s for s in lines if s[0] == "%"][0:-1]
+    data = [s.split(",") for s in lines if s[0] != "%"]
+    cast = pd.DataFrame(data[1:-1], columns=data[0])
 
     # Convert to numeric
-    for col in df.columns:
-        df[col] = pd.to_numeric(df[col])
+    for col in cast.columns:
+        cast[col] = pd.to_numeric(cast[col])
 
     # Normalise column names and extract units
-    units = [s[s.find("(") + 1 : s.find(")")] for s in df.columns]
-    df.columns = [
-        _normalize_names(s.split("(")[0]).lower().replace(" ", "_") for s in df.columns
+    units = [s[s.find("(") + 1 : s.find(")")] for s in cast.columns]
+    cast.columns = [
+        _normalize_names(s.split("(")[0]).lower().replace(" ", "_")
+        for s in cast.columns
     ]
-    df.set_index("pressure", drop=True, inplace=True, verify_integrity=False)
+    cast = cast.set_index("pressure", drop=True, verify_integrity=False)
 
     # Add metadata
     meta = [s.replace("%", "").strip().split(",") for s in meta]
@@ -572,6 +596,6 @@ def from_castaway_csv(fname):
     for line in meta:
         metadata[line[0]] = line[1]
     metadata["units"] = units
-    df._metadata = metadata
+    cast._metadata = metadata  # noqa: SLF001
 
-    return df
+    return cast

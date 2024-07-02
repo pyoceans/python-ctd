@@ -13,11 +13,9 @@ license = { text = "BSD-3-Clause" }
 authors = [
   { name = "Filipe Fernandes", email = "ocefpaf+ctd@gmail.com" },
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 classifiers = [
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
 ]

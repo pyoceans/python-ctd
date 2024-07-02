@@ -1,20 +1,25 @@
-"""
-Plotting module
-"""
+"""Plotting module."""
+
+from __future__ import annotations
 
 import matplotlib.pyplot as plt
 import pandas as pd
 from pandas_flavor import register_dataframe_method, register_series_method
 
+cast = pd.DataFrame | pd.Series
+
 
 @register_series_method
 @register_dataframe_method
-def plot_cast(df, secondary_y=False, label=None, ax=None, *args, **kwargs):
-    """
-    Plot a CTD variable with the index in the y-axis instead of x-axis.
-
-    """
-
+def plot_cast(
+    df: cast,
+    *,
+    secondary_y: bool = False,
+    label: str | None = None,
+    ax: plt.Axes | None = None,
+    **kwargs: dict,
+) -> cast:
+    """Plot a CTD variable with the index in the y-axis instead of x-axis."""
     fignums = plt.get_fignums()
     if ax is None and not fignums:
         ax = plt.axes()
@@ -44,7 +49,7 @@ def plot_cast(df, secondary_y=False, label=None, ax=None, *args, **kwargs):
             ax.plot(series, series.index, label=labels[k])
     elif isinstance(df, pd.Series):
         label = label if label else str(df.name)
-        ax.plot(df.values, df.index, *args, label=label, **kwargs)
+        ax.plot(df.values, df.index, label=label, **kwargs)
 
     ax.set_ylabel(ylabel)
     ax.set_xlabel(xlabel)

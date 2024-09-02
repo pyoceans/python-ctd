@@ -40,21 +40,21 @@ def _check_plot_works(f, *args, **kwargs):
 
 
 # Basic Plotting.
-@pytest.fixture()
+@pytest.fixture
 def xbt():
     """Load XBT."""
     yield ctd.from_edf(data_path.joinpath("XBT.EDF.zip"))
     plt.close("all")
 
 
-@pytest.fixture()
+@pytest.fixture
 def fsi():
     """Load FSI."""
     yield ctd.from_fsi(data_path.joinpath("FSI.txt.gz"), skiprows=9)
     plt.close("all")
 
 
-@pytest.fixture()
+@pytest.fixture
 def cnv():
     """Load CNV."""
     yield ctd.from_cnv(data_path.joinpath("small.cnv.bz2"))

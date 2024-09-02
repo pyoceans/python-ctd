@@ -10,13 +10,13 @@ import ctd
 data_path = Path(__file__).parent.joinpath("data")
 
 
-@pytest.fixture()
+@pytest.fixture
 def spiked_ctd():
     """Load spiked CTD."""
     return ctd.from_cnv(data_path.joinpath("CTD-spiked-unfiltered.cnv.bz2"))
 
 
-@pytest.fixture()
+@pytest.fixture
 def filtered_ctd():
     """Load spiked-filtered CTD."""
     return ctd.from_cnv(data_path.joinpath("CTD-spiked-filtered.cnv.bz2"))

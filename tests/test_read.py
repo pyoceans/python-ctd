@@ -39,31 +39,31 @@ def test_uncompresed():
 
 
 # Test ctd DataFrame.
-@pytest.fixture()
+@pytest.fixture
 def xbt():
     """Load zip EDF file."""
     return ctd.from_edf(data_path.joinpath("XBT.EDF.zip"))
 
 
-@pytest.fixture()
+@pytest.fixture
 def fsi():
     """Load gzip FSI file."""
     return ctd.from_fsi(data_path.joinpath("FSI.txt.gz"), skiprows=9)
 
 
-@pytest.fixture()
+@pytest.fixture
 def cnv():
     """Load bzip2 CNV file."""
     return ctd.from_cnv(data_path.joinpath("small.cnv.bz2"))
 
 
-@pytest.fixture()
+@pytest.fixture
 def btl():
     """Load uncompressed BTL file."""
     return ctd.from_btl(data_path.joinpath("btl", "bottletest.btl"))
 
 
-@pytest.fixture()
+@pytest.fixture
 def btl_as_stream():
     """Load stream BTL data."""
     with Path.open(
@@ -74,7 +74,7 @@ def btl_as_stream():
     return ctd.from_btl(stream)
 
 
-@pytest.fixture()
+@pytest.fixture
 def ros():
     """Load uncompressed ROS file."""
     return ctd.rosette_summary(data_path.joinpath("CTD", "g01l03s01m-m2.ros"))

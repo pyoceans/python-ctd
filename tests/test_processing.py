@@ -5,14 +5,14 @@ import pandas as pd
 import pytest
 
 
-@pytest.fixture()
+@pytest.fixture
 def series():
     """Load data series."""
     index = np.r_[np.linspace(-5, 10, 20), np.linspace(10, -5, 20)]
     return pd.Series(data=np.arange(len(index)), index=index)
 
 
-@pytest.fixture()
+@pytest.fixture
 def df():
     """Load data frame."""
     index = np.r_[np.linspace(-5, 10, 20), np.linspace(10, -5, 20)]

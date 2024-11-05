@@ -36,29 +36,32 @@ def _normalize_names(name: str) -> str:
 def _open_compressed(fname: Path) -> str:
     """Open compressed gzip, gz, zip or bz2 files."""
     extension = fname.suffix.casefold()
-    if extension in [".gzip", ".gz"]:
-        cfile = gzip.open(str(fname))
-    elif extension == ".bz2":
-        cfile = bz2.BZ2File(str(fname))
-    elif extension == ".zip":
+    loaders = {
+        ".gzip": gzip.open,
+        ".gz": gzip.open,
+        ".bz2": bz2.BZ2File,
+        ".zip": zipfile.ZipFile,
+    }
+    loader = loaders.get(extension)
+    if loader is None:
+        valid = ", ".join(loaders.keys())
+        msg = (
+            "Unrecognized file extension. "
+            f"Expected {valid}, got {extension}."
+        )
+        raise ValueError(msg)
+
+    if extension == ".zip":
         # NOTE: Zip format may contain more than one file in the archive
         # (similar to tar), here we assume that there is just one file per
         # zipfile!  Also, we ask for the name because it can be different from
         # the zipfile file!!
-        zfile = zipfile.ZipFile(str(fname))
-        name = zfile.namelist()[0]
-        cfile = zfile.open(name)
-    else:
-        msg = (
-            "Unrecognized file extension. "
-            f"Expected .gzip, .bz2, or .zip, got {extension}"
-        )
-        raise ValueError(
-            msg,
-        )
-    contents = cfile.read()
-    cfile.close()
-    return contents
+        with loader(str(fname)) as zfile:
+            name = zfile.namelist()[0]
+            with zfile.open(name) as cfile:
+                return cfile.read()
+    with loader(str(fname)) as cfile:
+        return cfile.read()
 
 
 def _read_file(fname: str | Path | StringIO) -> StringIO:

@@ -45,10 +45,7 @@ def _open_compressed(fname: Path) -> str:
     loader = loaders.get(extension)
     if loader is None:
         valid = ", ".join(loaders.keys())
-        msg = (
-            "Unrecognized file extension. "
-            f"Expected {valid}, got {extension}."
-        )
+        msg = f"Unrecognized file extension. Expected {valid}, got {extension}."
         raise ValueError(msg)
 
     if extension == ".zip":

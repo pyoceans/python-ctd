@@ -33,11 +33,11 @@ and then,
 from pathlib import Path
 import ctd
 
-path = Path('tests', 'data', 'CTD')
-fname = path.joinpath('g01l06s01.cnv.gz')
+path = Path("tests", "data", "CTD")
+fname = path.joinpath("g01l06s01.cnv.gz")
 
 down, up = ctd.from_cnv(fname).split()
-ax = down['t090C'].plot_cast()
+ax = down["t090C"].plot_cast()
 ```
 
 ![Bad Processing](https://raw.githubusercontent.com/pyoceans/python-ctd/main/docs/readme_01.png)
@@ -45,22 +45,19 @@ ax = down['t090C'].plot_cast()
 We can do [better](https://www.go-ship.org/Manual/McTaggart_et_al_CTD.pdf):
 
 ```python
-temperature = down['t090C']
+temperature = down["t090C"]
 
 fig, ax = plt.subplots(figsize=(5.5, 6))
 temperature.plot_cast(ax=ax)
-temperature.remove_above_water()\
-           .despike()\
-           .lp_filter()\
-           .press_check()\
-           .interpolate(method='index',
-                        limit_direction='both',
-                        limit_area='inside')\
-           .bindata(delta=1, method='interpolate')\
-           .smooth(window_len=21, window='hanning') \
-           .plot_cast(ax=ax)
-ax.set_ylabel('Pressure (dbar)')
-ax.set_xlabel('Temperature (°C)')
+temperature.remove_above_water().despike().lp_filter().press_check().interpolate(
+    method="index", limit_direction="both", limit_area="inside"
+).bindata(delta=1, method="interpolate").smooth(
+    window_len=21, window="hanning"
+).plot_cast(
+    ax=ax
+)
+ax.set_ylabel("Pressure (dbar)")
+ax.set_xlabel("Temperature (°C)")
 ```
 
 ![Good Processing](https://raw.githubusercontent.com/pyoceans/python-ctd/main/docs/readme_02.png)

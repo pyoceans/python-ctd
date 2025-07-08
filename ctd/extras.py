@@ -68,7 +68,7 @@ def extrap_sec(
                  Extrapolated variable
 
     """
-    from scipy.interpolate import interp1d
+    from scipy.interpolate import interp1d  # noqa: PLC0415
 
     new_data1 = []
     for row in data:
@@ -138,8 +138,8 @@ def gen_topomask(
     André Palóczy Filho (paloczy@gmail.com) --  October/2012
 
     """
-    import gsw
-    from scipy.interpolate import interp1d
+    import gsw  # noqa: PLC0415
+    from scipy.interpolate import interp1d  # noqa: PLC0415
 
     h, lon, lat = list(map(np.asanyarray, (h, lon, lat)))
     # Distance in km.
@@ -160,7 +160,7 @@ def plot_section(  # noqa: PLR0915
     **kw: dict,
 ) -> tuple:
     """Plot a sequence of CTD casts as a section."""
-    import gsw
+    import gsw  # noqa: PLC0415
 
     lon, lat, data = list(
         map(np.asanyarray, (self.lon, self.lat, self.to_numpy())),
@@ -298,7 +298,7 @@ def barrier_layer_thickness(sa: pd.Series, ct: pd.Series) -> pd.Series:
     using density.
 
     """
-    import gsw
+    import gsw  # noqa: PLC0415
 
     sigma_theta = gsw.sigma0(sa, ct)
     mask = mixed_layer_depth(ct)

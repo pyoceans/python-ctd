@@ -13,7 +13,7 @@ def _rolling_window(data: np.ndarray, block: int) -> np.ndarray:
     Using strides for an efficient moving average filter.
 
     """
-    shape = data.shape[:-1] + (data.shape[-1] - block + 1, block)
+    shape = *data.shape[:-1], *(data.shape[-1] - block + 1, block)
     strides = (*data.strides, data.strides[-1])
     return np.lib.stride_tricks.as_strided(data, shape=shape, strides=strides)
 
@@ -80,7 +80,7 @@ def lp_filter(
     https://scipy-cookbook.readthedocs.io/items/FIRFilter.html
 
     """
-    from scipy import signal
+    from scipy import signal  # noqa: PLC0415
 
     # Butter is closer to what SBE is doing with their cosine filter.
     wn = (1.0 / time_constant) / (sample_rate * 2.0)

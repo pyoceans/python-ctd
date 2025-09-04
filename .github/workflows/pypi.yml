@@ -14,13 +14,24 @@ defaults:
     shell: bash
 
 jobs:
-  packages:
+  pypi-publish:
+    name: Upload release to PyPI
     runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/python-ctd/
+    permissions:
+      id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
+
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5.0.0
+      with:
+        # Should be enough for setuptools-scm
+        fetch-depth: 100
+        persist-credentials: false
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
       with:
         python-version: "3.x"
 
@@ -29,23 +40,23 @@ jobs:
 
     - name: Install build tools
       run: |
-        python -m pip install --upgrade pip build twine
+        python -m pip install --upgrade build
 
-    - name: Build binary wheel
+    - name: Build sdist and binary wheel
       run: python -m build --sdist --wheel . --outdir dist
 
     - name: CheckFiles
       run: |
         ls dist
+        python -m pip install --upgrade check-manifest
+        check-manifest --verbose
 
     - name: Test wheels
       run: |
         cd dist && python -m pip install *.whl
+        python -m pip install --upgrade twine
         python -m twine check *
 
     - name: Publish a Python distribution to PyPI
       if: success() && github.event_name == 'release'
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_PASSWORD }}
+      uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e  # v1.13.0

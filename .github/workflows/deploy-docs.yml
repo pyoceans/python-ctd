@@ -1,5 +1,8 @@
 name: Documentation
 
+# no permissions by default
+permissions: {}
+
 on:
   pull_request:
   push:
@@ -12,15 +15,18 @@ on:
 jobs:
   build-docs:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
     - name: checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5.0.0
       with:
         fetch-depth: 0
+        persist-credentials: false
 
     - name: Setup Micromamba Python
-      uses: mamba-org/setup-micromamba@v2
+      uses: mamba-org/setup-micromamba@7f29b8b80078b1b601dfa018b0f7425c587c63bb  # v2.0.6
       with:
         environment-name: TEST
         init-shell: bash
@@ -44,7 +50,7 @@ jobs:
 
     - name: Deploy
       if: success() && github.event_name == 'release'
-      uses: peaceiris/actions-gh-pages@v4
+      uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e  # v4.0.0
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: docs/build/html

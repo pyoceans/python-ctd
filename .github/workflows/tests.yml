@@ -6,15 +6,15 @@ permissions: {}
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   run:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [ "3.11", "3.12" ]
-        os: [windows-latest, ubuntu-latest, macos-latest]
+        python-version: [ "3.11", "3.12", "3.13" ]
+        os: [ windows-latest, ubuntu-latest, macos-latest ]
       fail-fast: false
 
     steps:

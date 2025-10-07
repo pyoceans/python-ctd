@@ -54,7 +54,7 @@ def test_press_check_real_data(spiked_ctd):
 
 def test_processing_chain_spiked_ctd(spiked_ctd):
     """Test all processing steps chained."""
-    down, up = spiked_ctd.remove_above_water().split()
+    down, _ = spiked_ctd.remove_above_water().split()
     temp = down["t090C"]  # despike is a series only method
     temp = (
         temp.despike()

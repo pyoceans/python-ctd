@@ -170,7 +170,7 @@ def _parse_seabird(lines: list, ftype: str) -> dict:  # noqa: C901, PLR0912, PLR
             else:
                 msg = "Latitude not recognized."
                 raise ValueError(msg)
-        if "NMEA UTC (Time)" in line:
+        if "System UTC" in line: # ONLY change marisa made, CTD had no saved lat, lon, or time, so retrieving it from when file started writing.
             time = line.split("=")[-1].strip()
             # Should use some fuzzy datetime parser to make this more robust.
             time = datetime.datetime.strptime(

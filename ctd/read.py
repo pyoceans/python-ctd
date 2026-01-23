@@ -549,7 +549,7 @@ def rosette_summary(fname: str | Path) -> pd.DataFrame:
     ros["pressure"] = ros.index.to_numpy().astype(float)
     ros["nbf"] = ros["nbf"].astype(int)
     metadata = ros._metadata  # noqa: SLF001
-    ros = ros.set_index("nbf", drop=True, verify_integrity=False)
+    ros = ros.set_index("nbf", drop=True)
     ros._metadata = metadata  # noqa: SLF001
     return ros
 
@@ -564,7 +564,7 @@ def from_castaway_csv(fname: str | Path) -> pd.DataFrame:
     >>> cast.columns
     Index(['depth', 'temperature', 'conductivity', 'specific_conductance',
            'salinity', 'sound_velocity', 'density'],
-          dtype='object')
+          dtype='str')
 
     """
     f = _read_file(fname)
@@ -588,7 +588,7 @@ def from_castaway_csv(fname: str | Path) -> pd.DataFrame:
         _normalize_names(s.split("(")[0]).lower().replace(" ", "_")
         for s in cast.columns
     ]
-    cast = cast.set_index("pressure", drop=True, verify_integrity=False)
+    cast = cast.set_index("pressure", drop=True)
 
     # Add metadata
     meta = [s.replace("%", "").strip().split(",") for s in meta]

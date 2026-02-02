@@ -62,7 +62,7 @@ repos:
     - id: nb-strip-paths
 
 - repo: https://github.com/tox-dev/pyproject-fmt
-  rev: v2.11.1
+  rev: v2.12.1
   hooks:
     - id: pyproject-fmt
 

@@ -44,11 +44,11 @@ def plot_cast(
     ylabel = getattr(df.index, "name", None)
 
     if isinstance(df, pd.DataFrame):
-        labels = label if label else df.columns
+        labels = label or df.columns
         for k, (_col, series) in enumerate(df.items()):
             ax.plot(series, series.index, label=labels[k])
     elif isinstance(df, pd.Series):
-        label = label if label else str(df.name)
+        label = label or str(df.name)
         ax.plot(df.values, df.index, label=label, **kwargs)
 
     ax.set_ylabel(ylabel)

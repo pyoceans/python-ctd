@@ -38,12 +38,10 @@ include-package-data = true
 license-files = [
   "LICENSE.txt",
 ]
-
-[tool.setuptools.dynamic]
-dependencies = { file = [
+dynamic.dependencies = { file = [
   "requirements.txt",
 ] }
-readme = { file = "README.md", content-type = "text/markdown" }
+dynamic.readme = { file = "README.md", content-type = "text/markdown" }
 
 [tool.setuptools_scm]
 write_to = "ctd/_version.py"
@@ -53,7 +51,6 @@ tag_regex = "^(?P<prefix>v)?(?P<version>[^\\+]+)(?P<suffix>.*)?$"
 [tool.ruff]
 target-version = "py39"
 line-length = 80
-
 lint.select = [
   "A",   # flake8-builtins
   "B",   # flake8-bugbear

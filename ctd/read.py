@@ -204,7 +204,7 @@ def _parse_seabird(lines: list, ftype: str) -> dict:  # noqa: C901, PLR0912, PLR
         names.append("Statistic")
     metadata.update(
         {
-            "name": fname if fname else "unknown",
+            "name": fname or "unknown",
             "header": "\n".join(header),
             "config": "\n".join(config),
             "names": _remane_duplicate_columns(names),

@@ -1,4 +1,4 @@
-chardet
+chardet<7
 gsw>=3.3.0
 matplotlib
 numpy>=2

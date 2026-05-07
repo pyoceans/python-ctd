@@ -86,6 +86,8 @@ def _read_file(fname: str | Path | StringIO) -> StringIO:
         )
     # Read as bytes but we need to return strings for the parsers.
     encoding = chardet.detect(contents)["encoding"]
+    if encoding is None:
+        encoding = "utf-8"
     text = contents.decode(encoding=encoding, errors="replace")
     return StringIO(text)
 
@@ -418,16 +420,27 @@ def from_cnv(fname: str | Path) -> pd.DataFrame:
     metadata = _parse_seabird(f.readlines(), ftype="cnv")
 
     f.seek(0)
-    cast = pd.read_fwf(
-        f,
-        header=None,
-        index_col=None,
-        names=metadata["names"],
-        skiprows=metadata["skiprows"],
-        sep=r"\s+",
-        widths=[11] * len(metadata["names"]),
-    )
+    lines = f.readlines()[metadata["skiprows"] :]
     f.close()
+
+    data = [line.strip().split() for line in lines]
+    cast = pd.DataFrame(
+        data,
+        columns=metadata["names"],
+    )
+
+    dtypes = {"bpos": int, "pumps": bool, "flag": bool}
+    for column in cast.columns:
+        if column in dtypes:
+            cast[column] = cast[column].astype(dtypes[column])
+        else:
+            try:
+                cast[column] = pd.to_numeric(cast[column], errors="coerce")
+            except ValueError:
+                warnings.warn(
+                    f"Could not convert {column} to float.",
+                    stacklevel=2,
+                )
 
     prkeys = [
         "prM",
@@ -475,19 +488,6 @@ def from_cnv(fname: str | Path) -> pd.DataFrame:
     if "name" not in metadata:
         name = _basename(fname)[1]
         metadata["name"] = str(name)
-
-    dtypes = {"bpos": int, "pumps": bool, "flag": bool}
-    for column in cast.columns:
-        if column in dtypes:
-            cast[column] = cast[column].astype(dtypes[column])
-        else:
-            try:
-                cast[column] = cast[column].astype(float)
-            except ValueError:
-                warnings.warn(
-                    f"Could not convert {column} to float.",
-                    stacklevel=2,
-                )
 
     cast._metadata = metadata  # noqa: SLF001
     return cast

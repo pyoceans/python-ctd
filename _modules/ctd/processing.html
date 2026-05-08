@@ -4,12 +4,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ctd.processing &#8212; ctd 1.4.6 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=a66d8bb5" />
-    <script src="../../_static/documentation_options.js?v=fe830cc9"></script>
-    <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <title>ctd.processing &#8212; ctd 1.5.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=f6a572b4" />
+    <script src="../../_static/documentation_options.js?v=e0a75244"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -23,7 +24,7 @@
   </head><body>
   <div class="document">
     
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <p class="logo">
   <a href="../../index.html">
@@ -65,7 +66,7 @@
   </ul></li>
 </ul>
 </div>
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
@@ -73,7 +74,7 @@
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
+</search>
 <script>document.getElementById('searchbox').style.display = "block"</script>
 
 
@@ -92,24 +93,23 @@
           <div class="body" role="main">
             
   <h1>Source code for ctd.processing</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Processing module</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Processing module.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">numpy.ma</span> <span class="k">as</span> <span class="nn">ma</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">pandas_flavor</span> <span class="kn">import</span> <span class="n">register_dataframe_method</span><span class="p">,</span> <span class="n">register_series_method</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">ma</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pandas_flavor</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_dataframe_method</span><span class="p">,</span> <span class="n">register_series_method</span>
+
+<span class="n">cast</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span>
 
 
-<span class="k">def</span> <span class="nf">_rolling_window</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">block</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    http://stackoverflow.com/questions/4936620/</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_rolling_window</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;http://stackoverflow.com/questions/4936620/</span>
 <span class="sd">    Using strides for an efficient moving average filter.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">shape</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">block</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span>
-    <span class="n">strides</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">strides</span> <span class="o">+</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">strides</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],)</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="o">*</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="o">*</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">block</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span>
+    <span class="n">strides</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">data</span><span class="o">.</span><span class="n">strides</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">strides</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">stride_tricks</span><span class="o">.</span><span class="n">as_strided</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="n">strides</span><span class="o">=</span><span class="n">strides</span><span class="p">)</span>
 
 
@@ -117,7 +117,7 @@
 <a class="viewcode-back" href="../../ctd.html#ctd.processing.remove_above_water">[docs]</a>
 <span class="nd">@register_series_method</span>
 <span class="nd">@register_dataframe_method</span>
-<span class="k">def</span> <span class="nf">remove_above_water</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">remove_above_water</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">cast</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cast</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove all data above the water line.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">remove_up_to</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
 
@@ -127,10 +127,9 @@
 <a class="viewcode-back" href="../../ctd.html#ctd.processing.remove_up_to">[docs]</a>
 <span class="nd">@register_series_method</span>
 <span class="nd">@register_dataframe_method</span>
-<span class="k">def</span> <span class="nf">remove_up_to</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Remove all the data above a certain index value where index can be pressure or depth.</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">remove_up_to</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">cast</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cast</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove all the data above a certain index value where index can be</span>
+<span class="sd">    pressure or depth.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">new_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">new_df</span><span class="p">[</span><span class="n">new_df</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;=</span> <span class="n">idx</span><span class="p">]</span></div>
@@ -141,8 +140,8 @@
 <a class="viewcode-back" href="../../ctd.html#ctd.processing.split">[docs]</a>
 <span class="nd">@register_series_method</span>
 <span class="nd">@register_dataframe_method</span>
-<span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a tuple with down/up-cast.&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">split</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">cast</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cast</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a tuple with down/up-cast.&quot;&quot;&quot;</span>
     <span class="n">idx</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
     <span class="n">down</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="n">idx</span><span class="p">]</span>
     <span class="c1"># Reverse index to orient it as a CTD cast.</span>
@@ -155,9 +154,12 @@
 <a class="viewcode-back" href="../../ctd.html#ctd.processing.lp_filter">[docs]</a>
 <span class="nd">@register_series_method</span>
 <span class="nd">@register_dataframe_method</span>
-<span class="k">def</span> <span class="nf">lp_filter</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">sample_rate</span><span class="o">=</span><span class="mf">24.0</span><span class="p">,</span> <span class="n">time_constant</span><span class="o">=</span><span class="mf">0.15</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Filter a series with `time_constant` (use 0.15 s for pressure), and for</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">lp_filter</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">cast</span><span class="p">,</span>
+    <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">24.0</span><span class="p">,</span>
+    <span class="n">time_constant</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.15</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cast</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter a series with `time_constant` (use 0.15 s for pressure), and for</span>
 <span class="sd">    a signal of `sample_rate` in Hertz (24 Hz for 911+).</span>
 <span class="sd">    NOTE: 911+ systems do not require filter for temperature nor salinity.</span>
 
@@ -170,9 +172,9 @@
 <span class="sd">    &gt;&gt;&gt; raw = ctd.from_cnv(data_path.joinpath(&quot;CTD-spiked-unfiltered.cnv.bz2&quot;))</span>
 <span class="sd">    &gt;&gt;&gt; prc = ctd.from_cnv(data_path.joinpath(&quot;CTD-spiked-filtered.cnv.bz2&quot;))</span>
 <span class="sd">    &gt;&gt;&gt; kw = {&quot;sample_rate&quot;: 24.0, &quot;time_constant&quot;: 0.15}</span>
-<span class="sd">    &gt;&gt;&gt; original = prc.index.values</span>
-<span class="sd">    &gt;&gt;&gt; unfiltered = raw.index.values</span>
-<span class="sd">    &gt;&gt;&gt; filtered = raw.lp_filter(**kw).index.values</span>
+<span class="sd">    &gt;&gt;&gt; original = prc.index.to_numpy()</span>
+<span class="sd">    &gt;&gt;&gt; unfiltered = raw.index.to_numpy()</span>
+<span class="sd">    &gt;&gt;&gt; filtered = raw.lp_filter(**kw).index.to_numpy()</span>
 <span class="sd">    &gt;&gt;&gt; fig, ax = plt.subplots()</span>
 <span class="sd">    &gt;&gt;&gt; (l1,) = ax.plot(original, &quot;k&quot;, label=&quot;original&quot;)</span>
 <span class="sd">    &gt;&gt;&gt; (l2,) = ax.plot(unfiltered, &quot;r&quot;, label=&quot;unfiltered&quot;)</span>
@@ -184,14 +186,13 @@
 <span class="sd">    https://scipy-cookbook.readthedocs.io/items/FIRFilter.html</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">signal</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">signal</span>  <span class="c1"># noqa: PLC0415</span>
 
     <span class="c1"># Butter is closer to what SBE is doing with their cosine filter.</span>
-    <span class="n">Wn</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">time_constant</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">sample_rate</span> <span class="o">*</span> <span class="mf">2.0</span><span class="p">)</span>
-    <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">Wn</span><span class="p">,</span> <span class="s2">&quot;low&quot;</span><span class="p">)</span>
+    <span class="n">wn</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">time_constant</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">sample_rate</span> <span class="o">*</span> <span class="mf">2.0</span><span class="p">)</span>
+    <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">wn</span><span class="p">,</span> <span class="s2">&quot;low&quot;</span><span class="p">)</span>
     <span class="n">new_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">new_df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">filtfilt</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">new_df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">filtfilt</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">new_df</span></div>
 
 
@@ -200,13 +201,10 @@
 <a class="viewcode-back" href="../../ctd.html#ctd.processing.press_check">[docs]</a>
 <span class="nd">@register_series_method</span>
 <span class="nd">@register_dataframe_method</span>
-<span class="k">def</span> <span class="nf">press_check</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Remove pressure reversals from the index.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">press_check</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">cast</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cast</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove pressure reversals from the index.&quot;&quot;&quot;</span>
     <span class="n">new_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">press</span> <span class="o">=</span> <span class="n">new_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">press</span> <span class="o">=</span> <span class="n">new_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
 
     <span class="n">ref</span> <span class="o">=</span> <span class="n">press</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">inversions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">press</span><span class="p">,</span> <span class="n">press</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span> <span class="o">&lt;</span> <span class="mi">0</span>
@@ -216,26 +214,27 @@
             <span class="n">ref</span> <span class="o">=</span> <span class="n">press</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
             <span class="n">cut</span> <span class="o">=</span> <span class="n">press</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span> <span class="o">&lt;</span> <span class="n">ref</span>
             <span class="n">mask</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:][</span><span class="n">cut</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">new_df</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+    <span class="n">new_df</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
     <span class="k">return</span> <span class="n">new_df</span></div>
 
 
 
-<span class="k">def</span> <span class="nf">_bindata</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_bindata</span><span class="p">(</span><span class="n">series</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">delta</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Average the data into bins of the size `delta`.&quot;&quot;&quot;</span>
     <span class="n">start</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">stop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">new_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">delta</span><span class="p">)</span>
     <span class="n">binned</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">new_index</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;average&quot;</span><span class="p">:</span>
-        <span class="n">new_series</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">binned</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="n">new_series</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">binned</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
         <span class="n">new_series</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">new_index</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">delta</span> <span class="o">/</span> <span class="mi">2</span>
     <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;interpolate&quot;</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">new_index</span><span class="p">,</span> <span class="n">series</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">series</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">new_index</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Expected method `average` or `interpolate`, but got </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">.&quot;</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Expected method `average` or `interpolate`, but got </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+            <span class="n">msg</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="n">new_series</span>
 
@@ -244,9 +243,8 @@
 <a class="viewcode-back" href="../../ctd.html#ctd.processing.bindata">[docs]</a>
 <span class="nd">@register_series_method</span>
 <span class="nd">@register_dataframe_method</span>
-<span class="k">def</span> <span class="nf">bindata</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;average&quot;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Bin average the index (usually pressure) to a given interval (default</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">bindata</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">cast</span><span class="p">,</span> <span class="n">delta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;average&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cast</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Bin average the index (usually pressure) to a given interval (default</span>
 <span class="sd">    delta = 1).</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -258,14 +256,12 @@
 
 
 
-<span class="k">def</span> <span class="nf">_despike</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">keep</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Wild Edit Seabird-like function.  Passes with Standard deviation</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_despike</span><span class="p">(</span><span class="n">series</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">n1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wild Edit Seabird-like function.  Passes with Standard deviation</span>
 <span class="sd">    `n1` and `n2` with window size `block`.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">data</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">roll</span> <span class="o">=</span> <span class="n">_rolling_window</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span>
     <span class="n">roll</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">masked_invalid</span><span class="p">(</span><span class="n">roll</span><span class="p">)</span>
     <span class="n">std</span> <span class="o">=</span> <span class="n">n1</span> <span class="o">*</span> <span class="n">roll</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -273,8 +269,10 @@
     <span class="c1"># Use the last value to fill-up.</span>
     <span class="n">std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">std</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">std</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">block</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
     <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">mean</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">mean</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">block</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
-    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">data</span> <span class="o">-</span> <span class="n">mean</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">std</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">)</span>
-    <span class="n">data</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">data</span> <span class="o">-</span> <span class="n">mean</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">std</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span>
+        <span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">data</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
     <span class="c1"># Pass two recompute the mean and std without the flagged values from pass</span>
     <span class="c1"># one and removed the flagged data.</span>
@@ -285,13 +283,13 @@
     <span class="c1"># Use the last value to fill-up.</span>
     <span class="n">std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">std</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">std</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">block</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
     <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">mean</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">mean</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">block</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
-    <span class="n">values</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
-    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">values</span> <span class="o">-</span> <span class="n">mean</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">std</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span>
-        <span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">values</span> <span class="o">-</span> <span class="n">mean</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">std</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span>
+        <span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">clean</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">clean</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+    <span class="n">clean</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
     <span class="k">return</span> <span class="n">clean</span>
 
 
@@ -299,23 +297,21 @@
 <a class="viewcode-back" href="../../ctd.html#ctd.processing.despike">[docs]</a>
 <span class="nd">@register_series_method</span>
 <span class="nd">@register_dataframe_method</span>
-<span class="k">def</span> <span class="nf">despike</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">n1</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n2</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">keep</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Wild Edit Seabird-like function.  Passes with Standard deviation</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">despike</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">cast</span><span class="p">,</span> <span class="n">n1</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">n2</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cast</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wild Edit Seabird-like function.  Passes with Standard deviation</span>
 <span class="sd">    `n1` and `n2` with window size `block`.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
-        <span class="n">new_df</span> <span class="o">=</span> <span class="n">_despike</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">n1</span><span class="o">=</span><span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="o">=</span><span class="n">n2</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">,</span> <span class="n">keep</span><span class="o">=</span><span class="n">keep</span><span class="p">)</span>
+        <span class="n">new_df</span> <span class="o">=</span> <span class="n">_despike</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">n1</span><span class="o">=</span><span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="o">=</span><span class="n">n2</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">new_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">_despike</span><span class="p">,</span> <span class="n">n1</span><span class="o">=</span><span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="o">=</span><span class="n">n2</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">,</span> <span class="n">keep</span><span class="o">=</span><span class="n">keep</span><span class="p">)</span>
+        <span class="n">new_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">_despike</span><span class="p">,</span> <span class="n">n1</span><span class="o">=</span><span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="o">=</span><span class="n">n2</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">new_df</span></div>
 
 
 
-<span class="k">def</span> <span class="nf">_smooth</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">window_len</span><span class="p">,</span> <span class="n">window</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_smooth</span><span class="p">(</span><span class="n">series</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">window_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">window</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Smooth the data using a window with requested size.&quot;&quot;&quot;</span>
-
     <span class="n">windows</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;flat&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">,</span>
         <span class="s2">&quot;hanning&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">hanning</span><span class="p">,</span>
@@ -323,15 +319,17 @@
         <span class="s2">&quot;bartlett&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">bartlett</span><span class="p">,</span>
         <span class="s2">&quot;blackman&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">blackman</span><span class="p">,</span>
     <span class="p">}</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="n">window_len</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+    <span class="n">min_window_length</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">if</span> <span class="n">window_len</span> <span class="o">&lt;</span> <span class="n">min_window_length</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">series</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">series</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">window</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">windows</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;window must be one of &#39;flat&#39;, &#39;hanning&#39;,</span>
+<span class="s2">                         &#39;hamming&#39;, &#39;bartlett&#39;, &#39;blackman&#39;&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;window must be one of &#39;flat&#39;, &#39;hanning&#39;,</span>
-<span class="sd">                         &#39;hamming&#39;, &#39;bartlett&#39;, &#39;blackman&#39;&quot;&quot;&quot;</span><span class="p">,</span>
+            <span class="n">msg</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span>
@@ -351,7 +349,7 @@
 <a class="viewcode-back" href="../../ctd.html#ctd.processing.smooth">[docs]</a>
 <span class="nd">@register_series_method</span>
 <span class="nd">@register_dataframe_method</span>
-<span class="k">def</span> <span class="nf">smooth</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">window_len</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s2">&quot;hanning&quot;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">smooth</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">cast</span><span class="p">,</span> <span class="n">window_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">11</span><span class="p">,</span> <span class="n">window</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;hanning&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cast</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Smooth the data using a window with requested size.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
         <span class="n">new_df</span> <span class="o">=</span> <span class="n">_smooth</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">window_len</span><span class="o">=</span><span class="n">window_len</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">)</span>
@@ -361,8 +359,8 @@
 
 
 
-<span class="k">def</span> <span class="nf">_movingaverage</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="mi">48</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Moving average function on a pandas series.&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_movingaverage</span><span class="p">(</span><span class="n">series</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">48</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform Moving Average function on a pandas series.&quot;&quot;&quot;</span>
     <span class="n">window</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window_size</span><span class="p">))</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">window_size</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="s2">&quot;same&quot;</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">series</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
 
@@ -371,15 +369,13 @@
 <a class="viewcode-back" href="../../ctd.html#ctd.processing.movingaverage">[docs]</a>
 <span class="nd">@register_series_method</span>
 <span class="nd">@register_dataframe_method</span>
-<span class="k">def</span> <span class="nf">movingaverage</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="mi">48</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Moving average on a data frame or series.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">movingaverage</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">cast</span><span class="p">,</span> <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">48</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cast</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform Moving Average on a DataFrame or Series.</span>
 
 <span class="sd">    Inputs:</span>
 <span class="sd">      windows_size : integer</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
         <span class="n">new_df</span> <span class="o">=</span> <span class="n">_movingaverage</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="n">window_size</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -398,14 +394,14 @@
       &#169;2017, Filipe Fernandes.
       
       |
-      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.2.6</a>
-      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
       
     </div>
 
     
     <a href="https://github.com/pyoceans/python-ctd" class="github">
-        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+        <img src="../../_static/github-banner.svg" alt="Fork me on GitHub" class="github"/>
     </a>
     
 

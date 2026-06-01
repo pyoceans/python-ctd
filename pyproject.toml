@@ -35,18 +35,18 @@ packages = [
   "ctd",
 ]
 include-package-data = true
-license-files = [
-  "LICENSE.txt",
-]
 dynamic.dependencies = { file = [
   "requirements.txt",
 ] }
 dynamic.readme = { file = "README.md", content-type = "text/markdown" }
+license-files = [
+  "LICENSE.txt",
+]
 
 [tool.setuptools_scm]
+tag_regex = "^(?P<prefix>v)?(?P<version>[^\\+]+)(?P<suffix>.*)?$"
 write_to = "ctd/_version.py"
 write_to_template = "__version__ = '{version}'"
-tag_regex = "^(?P<prefix>v)?(?P<version>[^\\+]+)(?P<suffix>.*)?$"
 
 [tool.ruff]
 target-version = "py39"
@@ -66,6 +66,22 @@ per-file-ignores."docs/source/conf.py" = [
   "A001", # builtin-variable-shadowing
 ]
 
+[tool.interrogate]
+fail-under = 95
+ignore-init-method = true
+ignore-init-module = false
+ignore-magic = false
+ignore-semiprivate = false
+ignore-private = false
+ignore-module = false
+exclude = [
+  "docs",
+  "tests",
+]
+color = true
+verbose = 1
+quiet = false
+
 [tool.check-manifest]
 ignore = [
   "*.yml",
@@ -77,19 +93,3 @@ ignore = [
   "tests",
   "tests/*",
 ]
-
-[tool.interrogate]
-ignore-init-method = true
-ignore-init-module = false
-ignore-magic = false
-ignore-semiprivate = false
-ignore-private = false
-ignore-module = false
-fail-under = 95
-exclude = [
-  "docs",
-  "tests",
-]
-verbose = 1
-quiet = false
-color = true

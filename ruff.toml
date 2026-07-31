@@ -3,6 +3,7 @@ line-length = 80
 lint.select = ["ALL"]
 
 lint.ignore = [
+  "CPY001",  # Missing copyright notice at top of file
   "D203",  # 1 blank line required before class docstring
   "D205",  # 1 blank line required between summary line and description
   "D213",  # incompatible. Ignoring `multi-line-summary-second-line`
@@ -20,13 +21,13 @@ lint.ignore = [
 ]
 "test_*.py" = [
   "ANN001",  # Missing type annotation for function argument
+  "ANN002",  # Missing type annotation for `*args`
+  "ANN003",  # Missing type annotation for `**kwargs`
   "ANN201",  # Missing return type annotation for public function
   "ANN202",  # Missing return type annotation for private function
   "INP001",  # File is part of an implicit namespace package
   "PD901",  # Avoid using the generic variable name `df` for DataFrames
   "S101",  # Use of assert detected
-  "ANN002",  # Missing type annotation for `*args`
-  "ANN003",  # Missing type annotation for `**kwargs`
 ]
 "ctd/extras.py" = [
   "ANN001",  # Missing type annotation for function argument
@@ -36,18 +37,18 @@ lint.ignore = [
 # nbqa-ruff acts on converted .py so we cannot glob .ipynb :-/
 # https://github.com/nbQA-dev/nbQA/issues/823
 "notebooks/*" = [
-    "ANN001",  # Missing type annotation for function argument
-    "ANN201",  # Missing return type annotation for public function
-    "B018",  # Found useless expression. Either assign it to a variable or remove it
-    "D100",  # Missing docstring in public module
-    "D103",  # Missing docstring in public function
-    "E402",  # Module level import not at top of file
-    "FBT003",  # Boolean positional value in function call
-    "INP001",  # File is part of an implicit namespace package
-    "N816",  # Variable in global scope should not be mixedCase
-    "PD901",  # Avoid using the generic variable name `df` for DataFrames
-    "SLF001",  # Private member accessed
-    "T201",  # `print` found"
+  "ANN001",  # Missing type annotation for function argument
+  "ANN201",  # Missing return type annotation for public function
+  "B018",  # Found useless expression. Either assign it to a variable or remove it
+  "D100",  # Missing docstring in public module
+  "D103",  # Missing docstring in public function
+  "E402",  # Module level import not at top of file
+  "FBT003",  # Boolean positional value in function call
+  "INP001",  # File is part of an implicit namespace package
+  "N816",  # Variable in global scope should not be mixedCase
+  "PD901",  # Avoid using the generic variable name `df` for DataFrames
+  "SLF001",  # Private member accessed
+  "T201",  # `print` found"
 ]
 [lint.pycodestyle]
 max-doc-length = 180

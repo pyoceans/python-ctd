@@ -53,9 +53,7 @@ temperature.remove_above_water().despike().lp_filter().press_check().interpolate
     method="index", limit_direction="both", limit_area="inside"
 ).bindata(delta=1, method="interpolate").smooth(
     window_len=21, window="hanning"
-).plot_cast(
-    ax=ax
-)
+).plot_cast(ax=ax)
 ax.set_ylabel("Pressure (dbar)")
 ax.set_xlabel("Temperature (°C)")
 ```

@@ -229,7 +229,7 @@ def from_bl(fname: str | Path) -> pd.DataFrame:
     >>> data_path = Path(__file__).parents[1].joinpath("tests", "data")
     >>> df = ctd.from_bl(str(data_path.joinpath("bl", "bottletest.bl")))
     >>> df._metadata["time_of_reset"]
-    dt.datetime(2018, 6, 25, 20, 8, 55)
+    datetime.datetime(2018, 6, 25, 20, 8, 55)
 
     """
     f = _read_file(fname)

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import bz2
 import collections
-import datetime
+import datetime as dt
 import gzip
 import linecache
 import re
@@ -175,10 +175,10 @@ def _parse_seabird(lines: list, ftype: str) -> dict:  # noqa: C901, PLR0912, PLR
         if "NMEA UTC (Time)" in line:
             time = line.split("=")[-1].strip()
             # Should use some fuzzy datetime parser to make this more robust.
-            time = datetime.datetime.strptime(
+            time = dt.datetime.strptime(
                 time,
                 "%b %d %Y %H:%M:%S",
-            ).astimezone(datetime.UTC)
+            ).astimezone(dt.UTC)
 
         # cnv file header ends with *END* while
         if ftype == "cnv":
@@ -229,7 +229,7 @@ def from_bl(fname: str | Path) -> pd.DataFrame:
     >>> data_path = Path(__file__).parents[1].joinpath("tests", "data")
     >>> df = ctd.from_bl(str(data_path.joinpath("bl", "bottletest.bl")))
     >>> df._metadata["time_of_reset"]
-    datetime.datetime(2018, 6, 25, 20, 8, 55)
+    dt.datetime(2018, 6, 25, 20, 8, 55)
 
     """
     f = _read_file(fname)
